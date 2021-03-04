@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Wed Jan 20 19:03:06 CET 2021
+https\://repo.spring.io/libs-release/.error=Could not transfer artifact com.google.guava\:guava\:jar\:22.0 from/to spring-releases (https\://repo.spring.io/libs-release)\: Authentication failed for https\://repo.spring.io/libs-release/com/google/guava/guava/22.0/guava-22.0.jar 401 Unauthorized
+@default-spring-releases-https\://repo.spring.io/libs-release/.lastUpdated=1611165786009
