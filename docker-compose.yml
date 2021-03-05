@@ -5,7 +5,7 @@ services:
         environment:
           - SOLR_HOME=/mnt/solr-config
         ports:
-          - ${MONGODB_IP}:8983:8983
+          - 8983:8983
         volumes:
           - ols-solr-data:/var/solr
           - ./ols-solr/src/main/solr-5-config:/mnt/solr-config
@@ -13,7 +13,7 @@ services:
     mongo:
       image: mongo:3.2.9
       ports:
-          - ${MONGODB_IP}:27017:27017
+          - 27017:27017
       volumes:
           - ols-mongo-data:/data/db
       command:
@@ -29,8 +29,8 @@ services:
         - solr
         - mongo
       environment:
-        - spring.data.solr.host=http://${MONGODB_IP}:8983/solr
-        - spring.data.mongodb.host=${MONGODB_IP}
+        - spring.data.solr.host=http://solr:8983/solr
+        - spring.data.mongodb.host=mongo
         - OLS_HOME=/mnt/
       volumes:
         - ols-neo4j-data:/mnt/neo4j 
