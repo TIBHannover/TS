@@ -13,7 +13,7 @@ public class CustomisationProperties {
     @Value("${ols.customisation.debrand:false}")
     private boolean debrand;
     
-    @Value("${ols.customisation.logo:/img/OLS_logo_2017.png}")
+    @Value("${ols.customisation.logo:/img/TIB_Logo_en.png}")
     private String logo;
 
     @Value("${ols.customisation.title:Ontology Lookup Service}")

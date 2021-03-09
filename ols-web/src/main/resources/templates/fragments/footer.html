@@ -15,25 +15,31 @@
     </footer>
     -->
     <!-- End optional local footer -->
-    <div class="row">
-        <div th:if="${debrand} == false" id="elixir-banner" data-color="none" data-name="The Ontology Lookup Service" data-description="OLS is an Elixir interoperability service" data-more-information-link="//www.elixir-europe.org/platforms/interoperability" data-use-basic-styles="true"></div>
-        <script src="//ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/js/elixirBanner.js"></script>
-    </div>
+    
+<!--     Giray Note: Elixir banner slightly above footer was removed -->
+<!--     The Ontology Lookup Service is part of the ELIXIR infrastructure OLS is an Elixir interoperability service Learn more › -->
+<!--     <div class="row"> -->
+<!--         <div th:if="${debrand} == false" id="elixir-banner" data-color="none" data-name="The Ontology Lookup Service" data-description="OLS is an Elixir interoperability service" data-more-information-link="//www.elixir-europe.org/platforms/interoperability" data-use-basic-styles="true"></div> -->
+<!--         <script src="//ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/js/elixirBanner.js"></script> -->
+<!--     </div> -->
 
     <footer>
         <!-- https://www.ebi.ac.uk/style-lab/websites/patterns/banner-elixir.html
         <div id="elixir-banner" data-color="none" data-name="This service" data-description="I am a super cool service" data-more-information-link="https://www.elixir-europe.org/about-us/who-we-are/nodes/embl-ebi" data-use-basic-styles="true"></div>
         -->
-        <div th:if="${debrand} == false" id="global-footer" class="global-footer">
-            <nav id="global-nav-expanded" class="global-nav-expanded row">
-                <!-- Footer will be automatically inserted by footer.js -->
-            </nav>
-            <section id="ebi-footer-meta" class="ebi-footer-meta row">
-                <!-- Footer meta will be automatically inserted by footer.js -->
-            </section>
-        </div>
-        <div th:if="${debrand} == true" style="text-align: center;">
-            Powered by <a href="https://www.ebi.ac.uk/ols">OLS</a> from <a href="http://www.ebi.ac.uk">EMBL-EBI</a>
+<!--         <div th:if="${debrand} == false" id="global-footer" class="global-footer"> -->
+        
+<!--                 Giray Note: The part commented below is intranet services plus Services, Research, Training, Industry and About listings of EBI-->
+<!--             <nav id="global-nav-expanded" class="global-nav-expanded row"> -->
+<!--                 Footer will be automatically inserted by footer.js -->
+<!--             </nav> -->
+<!--             Giray Note: The part commented below gives address information of EMBL-EBI at the bottom of the page!!! -->
+<!--             <section id="ebi-footer-meta" class="ebi-footer-meta row"> -->
+<!--                 Footer meta will be automatically inserted by footer.js -->
+<!--             </section> -->
+<!--         </div> -->
+        <div style="text-align: center;">
+            Powered by <a href="https://www.tib.eu/">TIB</a> as a fork of <a href="https://www.ebi.ac.uk/ols">OLS</a> 
         </div>
     </footer>
 
@@ -76,3 +82,4 @@
 </div>
 </body>
 </html>
+
