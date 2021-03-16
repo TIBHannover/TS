@@ -1,0 +1,26 @@
+version: '2'
+services:
+    ols-web:
+      build:
+          context: .
+          dockerfile: ols-web/Dockerfile
+      environment:
+        - spring.data.solr.host=http://${MONGODB_IP}:8983/solr
+        - spring.data.mongodb.host=${MONGODB_IP}
+        - ols.customisation.logo=${LOGO}
+        - ols.customisation.title=${TITLE}
+        - ols.customisation.short-title=${SHORT_TITLE}
+        - ols.customisation.web=${WEB}
+        - ols.customisation.twitter=${TWITTER}
+        - ols.customisation.org=${ORG}
+        - ols.customisation.backgroundImage=${BACKGROUND_IMAGE}
+        - ols.customisation.backgroundColor=${BACKGROUND_COLOR}
+        - OLS_HOME=/mnt/
+      volumes:
+        - ols-neo4j-data:/mnt/neo4j 
+      ports:
+      - 8080:8080
+volumes:
+    ols-neo4j-data:
+        external: true
+
