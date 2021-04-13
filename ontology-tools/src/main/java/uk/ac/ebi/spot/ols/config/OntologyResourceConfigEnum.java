@@ -19,7 +19,8 @@ public enum OntologyResourceConfigEnum {
     MAILING_LIST("mailing_list"),
     CREATOR("creator"),
     PREFERRED_ROOT_TERM("preferred_root_term"),
-    ALLOW_DOWNLOAD("allow_download");
+    ALLOW_DOWNLOAD("allow_download"),
+	SUBJECT("subject");
 
     private final String propertyName;
 

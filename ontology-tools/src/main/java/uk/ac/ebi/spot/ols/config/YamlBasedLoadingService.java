@@ -266,4 +266,14 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             builder.setAllowDownload(true);
         }
     }
+    
+    private void populateSubjects(OntologyResourceConfig.OntologyResourceConfigBuilder builder) {
+        if (ontology.containsKey(SUBJECT.getPropertyName()))  {
+            Set<String> subjects = new HashSet<>();
+            for (String subject :  (ArrayList<String>) ontology.get(SUBJECT.getPropertyName())) {
+                subjects.add(subject);
+            }
+            builder.setSubjects(subjects);
+        }
+    }  
 }

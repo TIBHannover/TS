@@ -92,6 +92,8 @@ public class DocumentUpdater {
         }
 
         originalDocument.getConfig().setAllowDownload(newDocument.getAllowDownload());
+        
+        originalDocument.getConfig().setSubjects(newDocument.getSubjects());
 
 
         // Henriette To do: Remove because this is not used.
