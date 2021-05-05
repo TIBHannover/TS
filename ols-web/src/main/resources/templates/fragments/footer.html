@@ -36,9 +36,16 @@
                 Footer meta will be automatically inserted by footer.js
             </section>
         </div>
+		      
+        <br />
+         <div th:if="${ebiInfo} == false" style="text-align: center;">
+           <a th:href="@{/imprint}">Imprint</a> &nbsp; <a th:href="@{/dataprotection}">Data Protection</a>
+        </div>
+		
         <div th:if="${ebiInfo} == false" style="text-align: center;">
             Powered by <a th:href="@{${web}}" th:text="@{${org}}"></a> based on <a href="https://www.ebi.ac.uk/ols">OLS</a> 
         </div>
+		<br />
     </footer>
 
 

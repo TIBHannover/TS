@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"/> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"/> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"/> <![endif]-->
+<!-- Consider adding an manifest.appcache: h5bp.com/d/Offline -->
+<!--[if gt IE 8]><!--> <html  xmlns:th="https://www.thymeleaf.org" class="no-js" lang="en"> <!--<![endif]-->
+
+
+<head>
+    <div th:replace="fragments/head :: head(olscss=true, datatables=true)"></div>
+    <title id="pageTitle" th:inline="text">Coming Soon &lt; [[${title}]] &lt; [[${org}]]</title>
+    <!-- A few keywords that relate to the content of THIS PAGE (not the whole project)
+    <meta name="keywords" content="biosamples, europe, EBI" />
+    <!- - Describe what this page is about - ->
+    <meta name="description" content="EMBL-EBI" />
+    <meta name="ebi:last-review" content="2016-12-20" />
+    <!- - The last time the content was reviewed - ->
+    <meta name="ebi:expiry" content="2017-12-20" />
+    <!- - When this content is no longer relevant -->
+</head>
+
+
+<body>
+<th:block th:include="fragments/header :: header"></th:block>
+
+<section id="main-content-area" role="main">
+    <div class="row">
+        <h2 class="imprint">Imprint</h2>
+        <p>
+            Imprint for this website &#8208; also serves as provider identification according to &sect; 5 Telemediengesetz (TMG)
+        </p>       
+        <h3>Provider:</h3>
+		<p>
+		
+		Technische Informationsbibliothek (TIB)
+		 <br />
+		Welfengarten 1 B, 30167 Hannover
+		 <br />
+		Postfach 6080, 30060 Hannover
+		 <br />
+		</p>
+		
+		<h3>Authorised Representative:</h3>
+		
+		<p>
+		
+		Prof. Dr. S&ouml;ren Auer (Director of TIB)
+		 <br />
+		Technische Informationsbibliothek (TIB) is a foundation of public law of the state of Lower Saxony.
+		 <br />
+		</p>
+		
+		<h3>Responsible Supervisory Authority:</h3>
+		
+		<p>
+		
+		Ministry for Science and Culture of Lower Saxony
+		
+		</p>
+		
+		<h3>Contact:</h3>
+		
+		<p>
+		
+		Customer service phone: +49 511 762-8989
+		 <br />
+		Central information desk phone: +49 511 762-2268
+		 <br />
+		Fax: +49 511 762-4076
+		 <br />
+		Email: <a href="mailto:information@tib.eu">information@tib.eu</a>
+		 <br />
+		
+		</p>
+		
+		<h3>VAT (sales tax) registration number:</h3>
+		
+		<p>
+		
+		DE 214931803
+		
+		</p>
+		
+		<h3>Editorial Office:</h3>
+		
+		<p>
+		
+		Axel Klinger
+		 <br />
+		Email: <a href="mailto:axel.klinger@tib.eu">axel.klinger@tib.eu</a>
+		 <br />
+		
+		</p>
+		
+	    <h3>Copyright Notice:</h3>
+		
+		<p>
+		
+		The layout of the homepage, the graphics used and the other content are protected by copyright.
+		 <br />
+		</p>
+		
+    </div>
+</section>
+
+<th:block th:include="fragments/footer :: footer"></th:block>
+
+
+</body>
+</html>

@@ -229,6 +229,18 @@ public class HomeController {
     public String showSparql() {
         return "comingsoon";
     }
+	
+	@RequestMapping({"dataprotection"})
+    public String showDataProtection(Model model) {
+    	customisationProperties.setCustomisationModelAttributes(model);
+        return "dataprotection";
+    }
+    
+    @RequestMapping({"imprint"})
+    public String showImprint(Model model) {
+    	customisationProperties.setCustomisationModelAttributes(model);
+        return "imprint";
+    }
 
     @RequestMapping({"about"})
     public String showAbout() {
