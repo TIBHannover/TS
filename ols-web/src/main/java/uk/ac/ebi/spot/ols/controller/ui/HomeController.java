@@ -243,8 +243,9 @@ public class HomeController {
     }
 
     @RequestMapping({"about"})
-    public String showAbout() {
-        return "redirect:docs/about";
+    public String showAbout(Model model) {
+    	customisationProperties.setCustomisationModelAttributes(model);
+        return "about";
     }
 
     @RequestMapping({"docs"})

@@ -48,8 +48,8 @@
                         <input style="margin-bottom: 0.1em;" class="form-control typeahead" autofocus="autofocus" type="text" name="q" data-olswidget="multisearch" data-olsontology="" th:placeholder="'Search ' + ${shortTitle} + '...'" aria-describedby="basic-addon1"/>
                               <button class="button secondary searchButton glyphicon glyphicon-search" type="submit">Search</button>
                     </div>
-                        <span class="examples">Examples: <a class="nounderline ontology-link" href="search?q=diabetes">diabetes</a>,
-                             <a class="nounderline ontology-link" href="search?q=GO:0098743">GO:0098743</a></span>
+                        <span class="examples">Examples: <a class="nounderline ontology-link" href="search?q=electric+vehicle">electric vehicle</a>,
+                             <a class="nounderline ontology-link" href="search?q=CHEBI:72695">CHEBI:72695</a></span>
                         <span style="float: right;" class="examples"><a class="nounderline ontology-link" href="ontologies">Looking for a particular ontology?</a>
                          </span>
                 </form>
@@ -59,12 +59,10 @@
                 <div class="small-4 columns">
                     <h4>
                         <i style="color: #BF8230;" class="icon icon-functional" data-icon="b"></i>
-                        <a href="docs/about">About OLS</a>
+                        <a th:href="@{/about}">TIB&#146;s Terminology Service</a>
                     </h4>
                     <p class="about">
-                        The Ontology Lookup Service (OLS) is a repository for biomedical ontologies that aims to provide
-                        a single point of access to the latest ontology versions. You can browse the ontologies through
-                        the website as well as programmatically via the OLS API. OLS is developed and maintained by the
+                        With its new Terminology Service, <a href="http://www.tib.eu/">TIB &ndash; Leibniz Information Centre for Science and Technology and University Library</a> provides a single point of access to terminology from domains such as architecture, chemistry, computer science, mathematics and physics. The Terminology Service is a repository for terminological resources based on semantic <a href="https://www.w3.org/">W3C</a> standards like the <a href="https://www.w3.org/TR/owl2-overview/">Web Ontology Language (OWL 2)</a>. You can browse ontologies through the website or use its API to retrieve terminological information and use it in your technical services. TIB&#146;s service is based on open source software developed and maintained by the 
                         <a href="http://www.ebi.ac.uk/about/spot-team">Samples, Phenotypes and Ontologies Team</a>
                         (SPOT) at EMBL-EBI.
                     </p>

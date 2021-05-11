@@ -26,39 +26,35 @@
 
 <section id="main-content-area" role="main">
     <div class="row">
-        <h2>HELLO</h2>
+        <h2>Welcome to the Central Portal of TIB Terminology Services</h2>
 
-        <h3>About the Ontology Lookup Service</h3>
+        <h3>TIB Terminology Service</h3>
 
                 <p>
-                    The Ontology Lookup Service (OLS) is a repository for biomedical ontologies that aims to provide a single point of access to the latest ontology versions. The user can browse the ontologies through the website as well as programmatically via the OLS API. OLS is developed and maintained by the <a href="http://www.ebi.ac.uk/about/spot-team">Samples, Phenotypes and Ontologies team</a> at EMBL-EBI.
+                    The Terminology Service of TIB - Leibniz Information Centre for Science and Technology and University Library is a single-point-of-entry web-service providing access to terms from generic and domain-specific controlled vocabularies and ontologies.
                 </p>
 
-                <h4>Funding</h4>
                 <p>
-                    OLS is supported in part by CORBEL funded by the  EU's Horizon 2020 research and innovation programme (2014–2020) under grant agreement number 654248 and by DIACHRON, EU FP7 Capacities Specific Programme,/grant/agreement/number/284209.
+                    The web-service offers an intuitive search functionality which is based on a SOLR search index on identifiers and terms. Search results can be filtered by entity type or ontology. Two visualisations allow interactive browsing of terms: Term hierarchies are displayed in a tree-view, while further ontological relations between terms are displayed in a graph-based visualisation. RDF serializations of the latest ontology version are offered as downloads.
                 </p>
 
+				<p>
+					The service also offers an API that allows to retrieve information on terms and their relations as json data for use in other webservices, e.g. in services of the research data management infrastructure of the NFDIs. In applications like research data management systems, ontological terms and their unique identifiers can, for example, be used as metadata on research data artifacts - thereby making research (meta)data more findable and interoperable.
+				</p>
 
-                <h4>Thanks</h4>
+                <h4>Functionalities</h4>
 
-                <p>OLS makes use of many public and freely available software resources - we would like to thank them all for their continued support.</p>
+                <p>In further stages, the service will be expanded by the following functionalities:</p>
                 <ul>
-                    <li><a href="https://spring.io">Spring</a>: application framework</li>
-                    <li><a href="http://owlapi.sourceforge.net">OWL API</a>: Java OWL API</li>
-                    <li><a href="http://www.hermit-reasoner.com">HermiT</a>: OWL reasoner</li>
-                    <li><a href="https://www.cs.ox.ac.uk/isg/tools/ELK/">Elk</a>: OWL reasoner</li>
-                    <li><a href="http://neo4j.com">Neo4j</a>: Graph database</li>
-                    <li><a href="http://lucene.apache.org/solr/">Solr</a>: Search server</li>
-                    <li><a href="https://www.mongodb.org">MongoDB</a>: Document store</li>
-                    <li><a href="http://virtuoso.openlinksw.com">OpenLink Virtuoso</a>: RDF triple store provider for SPARQL endpoint</li>
-                    <li><a href="http://tomcat.apache.org">Apache Tomcat</a>: Web server</li>
-                    <li><a href="https://maven.apache.org">Apache Maven</a>: Software library dependency management</li>
-                    <li><a href="https://github.com">GitHub</a>: - source code hosting</li>
-                    <li><a href="https://www.atlassian.com/software/bamboo/">Bamboo</a>: Continuous integration, continuous deployment and release management.</li>
-                    <li><a href="https://www.atlassian.com/software/fisheye/">Fisheye</a>: Browse, search and track your source code repositories.</li>
-                    <li><a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a> is the full-featured commercial IDE — with a complete set of tools and integrations with the most important modern technologies and frameworks, such as Spring and Hibernate — a must-have for effective Web and Java EE development.</li>
+                    <li>reliable storage for newly created domain-specific vocabularies,</li>
+                    <li>a fine-grained classification of vocabularies</li>
+                    <li>collaborative creation of ontologies including a governance structure, a versioning system, a management platform and the possibility to identify missing terms and make term suggestions</li>
+                    <li>a help-desk to assist the user community in the curation of terminologies.</li>
                 </ul>
+                
+                <p>
+                The technical components of the service are based on open source solutions. The web-service for ontology browsing is based on the Ontology Look-up Service (OLS) developed by the <a href="http://www.ebi.ac.uk/about/spot-team">Samples, Phenotypes and Ontologies Team (SPOT)</a> at the <a href="https://www.ebi.ac.uk/">European Bioinformatics Institute (EMBL-EBI)</a>. Further modules of the service could be realized by GitLab, Web-Prot&eacute;g&eacute;, or Redmine.
+                </p>
 
     </div>
 </section>
