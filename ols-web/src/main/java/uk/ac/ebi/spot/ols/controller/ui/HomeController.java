@@ -247,6 +247,18 @@ public class HomeController {
     	customisationProperties.setCustomisationModelAttributes(model);
         return "about";
     }
+    
+    @RequestMapping({"apidoc"})
+    public String showAPI(Model model) {
+    	customisationProperties.setCustomisationModelAttributes(model);
+        return "apidoc";
+    }
+    
+    @RequestMapping({"documentation"})
+    public String showDocumentation(Model model) {
+    	customisationProperties.setCustomisationModelAttributes(model);
+        return "documentation";
+    }
 
     @RequestMapping({"docs"})
     public String showDocsIndex(Model model) {

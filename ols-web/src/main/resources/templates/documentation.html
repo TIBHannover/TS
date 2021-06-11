@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"/> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"/> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"/> <![endif]-->
+<!-- Consider adding an manifest.appcache: h5bp.com/d/Offline -->
+<!--[if gt IE 8]><!--> <html  xmlns:th="https://www.thymeleaf.org" class="no-js" lang="en"> <!--<![endif]-->
+
+
+<head>
+    <div th:replace="fragments/head :: head(olscss=true)"></div>
+    <title id="pageTitle" th:inline="text">About [[${title}]] &lt; [[${org}]]</title>
+    <!-- A few keywords that relate to the content of THIS PAGE (not the whole project)
+    <meta name="keywords" content="biosamples, europe, EBI" />
+    <!- - Describe what this page is about - ->
+    <meta name="description" content="EMBL-EBI" />
+    <meta name="ebi:last-review" content="2016-12-20" />
+    <!- - The last time the content was reviewed - ->
+    <meta name="ebi:expiry" content="2017-12-20" />
+    <!- - When this content is no longer relevant -->
+</head>
+
+
+<body>
+<th:block th:include="fragments/header :: header"></th:block>
+
+<section id="main-content-area" role="main">
+    <div class="row">        
+<h3>How to use the TIB Central Terminology Service</h3>
+<p>This service offers an intuitive search functionality which is based on a SOLR search index on identifiers and terms. There are two main ways of browsing the Terminology Service. You can either browse the available ontologies via the <a th:href="@{/ontologies}" th:text="${ontologyAliasPlural}">Ontologies</a> tab or you can make search on all available ontologies by using the search box in the main page. 
+If you browse the available ontologies, you should pick an ontology from the list and then you can browse through its tree view to lower levels or you can make a search for a specific term in that particular ontology through its search box. 
+Alternatively, if you make a search from the search box provided in the home page, the results will be displayed based on all ontologies that include the searched term. By using advanced search options, results can be filtered by entity type or ontology. 
+The entity types used for filtering are class, property, individual or ontology respectively. 
+As a result, your search leads you to the graph based view of a term regardless of your browsing methodology.
+RDF serializations of the latest ontology version are offered as downloads through the service.
+</p>
+<h3>How to use the Machine Interface of TIB Central Terminology Service</h3>
+<p>The service also offers an API that allows to retrieve information on terms and their relations as json data for use in other webservices, e.g. in services of the research data management infrastructure of various research communities. In applications like research data management systems, ontological terms and their unique identifiers can, for example, be used as metadata on research data artifacts - thereby making research (meta)data more findable and interoperable. The REST API interface of the <a href="https://service.tib.eu/ts4tib">TIB Central Terminology Service</a> starts with <a href="http://service.tib.eu/ts4tib/api">http://service.tib.eu/ts4tib/api</a>. This API enables to search all the terminologies of various research communities maintained by TIB. The methodology on how to use this interface is explained in the <strong><a th:href="@{/apidoc}">API documentation</a></strong> in detail.</p>
+    </div>
+</section>
+
+
+<th:block th:include="fragments/footer :: footer"></th:block>
+<script type="text/javascript" src="../static/js/user.js" th:src="@{js/user.js}"></script>
+<!-- <script type="text/javascript" src="/js/oxo.js" th:src="@{/js/oxo.js}"></script> -->
+
+
+<!-- All JS that is just used on this page should go here, I suppose-->
+<script>
+    $(document).ready(function() {
+    });
+</script>
+
+</body>
+</html>
+
+
+

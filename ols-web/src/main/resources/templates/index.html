@@ -70,15 +70,12 @@
 
                 <div class="small-4 columns">
                     <h4>
-                        <i style="color: #BF8230;" class="icon icon-functional" data-icon="t"></i>
-                        <a href="https://www.ebi.ac.uk/spot/ontology/">Related Tools</a>
+                        <i style="color: #BF8230;" class="icon icon-functional" data-icon="j"></i>
+                        <a href="https://www.nfdi.de">Community Terminology Services</a>
                     </h4>
                     <p class="about">
-                        In addition to OLS the SPOT team also provides the OxO, Zooma and Webulous services.
-                        <a href="//www.ebi.ac.uk/spot/oxo">OxO</a> provides cross-ontology mappings between terms from
-                        different ontologies. <a href="//www.ebi.ac.uk/spot/zooma">Zooma</a> is a service to assist in
-                        mapping data to ontologies in OLS and <a href="//www.ebi.ac.uk/spot/webulous">Webulous</a> is a
-                        tool for building ontologies from spreadsheets.
+                        TIB maintains additional Terminology Services specific to several research communities as extensions to this service. <a href="https://service.tib.eu/ts4ing">NFDI4Ing</a> and <a href="https://nfdi4chem.de/">NFDI4Chem</a> are particular examples of these extensions.
+						It is planned to host more community specific Terminology Services as extensions of the central service. 
                     </p>
                 </div>
 
@@ -88,12 +85,8 @@
                         <a th:href="@{${issuesPage}}">Report an Issue</a>
                     </h4>
                     <p class="about">
-                        For feedback, enquiries or suggestion about OLS or to request a new ontology please use
-                        our GitHub <a th:href="@{${issuesPage}}">issue tracker</a>.
-                        For announcements relating to
-                        OLS, such as new releases and new features sign up to the
-                        <a href="https://listserver.ebi.ac.uk/mailman/listinfo/ols-announce">OLS announce mailing
-                        list</a>
+                        For feedback, enquiries or suggestions on our service or to request a new ontology please use our GitHub <a th:href="@{${issuesPage}}">issue tracker</a>.
+                        For contacting us about further matters regarding the TIB Terminology Service, send an e-mail to <a th:href="@{'mailto:' + ${supportMail}}" th:text="@{${supportMail}}"></a>
                     </p>
                 </div>
             </div>
