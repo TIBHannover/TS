@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
+
+import io.swagger.annotations.ApiOperation;
 import uk.ac.ebi.spot.ols.exception.ErrorMessage;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
@@ -64,7 +66,7 @@ public class OntologyController implements
         resource.add(ControllerLinkBuilder.linkTo(OntologyController.class).withRel("ontologies"));
         return resource;
     }
-
+    @ApiOperation(value = "List all ontologies")
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<OntologyDocument>> getOntologies(
             @PageableDefault(size = 20, page = 0) Pageable pageable,
@@ -74,7 +76,7 @@ public class OntologyController implements
         return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
 
-
+    @ApiOperation(value = "Retrieve a particular ontology")
     @RequestMapping(path = "/{onto}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<Resource<OntologyDocument>> getOntology(@PathVariable("onto") String ontologyId) throws ResourceNotFoundException {
         ontologyId = ontologyId.toLowerCase();
