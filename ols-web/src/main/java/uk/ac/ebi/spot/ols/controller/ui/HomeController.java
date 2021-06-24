@@ -248,6 +248,12 @@ public class HomeController {
         return "about";
     }
     
+    @RequestMapping({"graphview-help"})
+    public String showGraphViewHelp(Model model) {
+    	customisationProperties.setCustomisationModelAttributes(model);
+        return "graphview-help";
+    }
+    
     @RequestMapping({"apidoc"})
     public String showAPI(Model model) {
     	customisationProperties.setCustomisationModelAttributes(model);
