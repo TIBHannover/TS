@@ -265,6 +265,12 @@ public class HomeController {
     	customisationProperties.setCustomisationModelAttributes(model);
         return "documentation";
     }
+    
+    @RequestMapping({"google056bffc3c1713b87.html"})
+    public String showGoogleVerification(Model model) {
+    	customisationProperties.setCustomisationModelAttributes(model);
+        return "google056bffc3c1713b87";
+    }
 
     @RequestMapping({"docs"})
     public String showDocsIndex(Model model) {
