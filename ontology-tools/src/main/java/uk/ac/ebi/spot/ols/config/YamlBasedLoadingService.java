@@ -80,6 +80,7 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             populateCreator(builder);
             populatePreferredRootTerms(builder);
             populateAllowDownload(builder);
+            populateSubject(builder);
 
             return builder.build();
         }
@@ -280,7 +281,7 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
         }
     }
     
-    private void populateSubjects(OntologyResourceConfig.OntologyResourceConfigBuilder builder) {
+    private void populateSubject(OntologyResourceConfig.OntologyResourceConfigBuilder builder) {
         if (ontology.containsKey(SUBJECT.getPropertyName()))  {
             Set<String> subjects = new HashSet<>();
             for (String subject :  (ArrayList<String>) ontology.get(SUBJECT.getPropertyName())) {
