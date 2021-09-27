@@ -8,6 +8,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PageableDefault;
@@ -35,6 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,6 +77,25 @@ public class OntologyController implements
     ) throws ResourceNotFoundException {
         Page<OntologyDocument> document = ontologyRepositoryService.getAllDocuments(pageable);
         return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
+    }
+    
+    @ApiOperation(value = "Filter list of ontologies by subject")
+    @RequestMapping(path = "/subject/{subj}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<PagedResources<OntologyDocument>> filterOntologiesBySubject(@PathVariable("subj") String subject,
+            @PageableDefault(size = 20, page = 0) Pageable pageable,
+            PagedResourcesAssembler assembler
+    ) throws ResourceNotFoundException {
+    	List<OntologyDocument> temp = new ArrayList<OntologyDocument>();
+    	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+    		if(ontologyDocument.getConfig().getSubjects().contains(subject))
+    			temp.add(ontologyDocument);
+		}
+        
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), temp.size());
+        Page<OntologyDocument> document = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
+       
+       return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Retrieve a particular ontology")
