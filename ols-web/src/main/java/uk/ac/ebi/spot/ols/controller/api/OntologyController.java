@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -89,6 +91,35 @@ public class OntologyController implements
     	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
     		if(ontologyDocument.getConfig().getSubjects().contains(subject))
     			temp.add(ontologyDocument);
+		}
+        
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), temp.size());
+        Page<OntologyDocument> document = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
+       
+       return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
+    }
+    
+    @ApiOperation(value = "Filter list of ontologies by a particular classification schema")
+    @RequestMapping(path = "/classification/{schema}/{classification}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(@PathVariable("schema") String schema, @PathVariable("classification") String classification,
+            @PageableDefault(size = 20, page = 0) Pageable pageable,
+            PagedResourcesAssembler assembler
+    ) throws ResourceNotFoundException {
+    	
+    	String[] cls = classification.split(",");    	
+    	
+    	List<OntologyDocument> temp = new ArrayList<OntologyDocument>();
+    	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+    		for(HashMap<String, ArrayList<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+    			if(classificationSchema.containsKey(schema))
+    				for (int i = 0;i<cls.length;i++)
+    				  if (classificationSchema.get(schema).contains(cls[i])) {
+    					  temp.add(ontologyDocument);
+    					  break;
+    				  }
+    			    
+    			}
 		}
         
         final int start = (int)pageable.getOffset();

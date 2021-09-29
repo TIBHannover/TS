@@ -22,7 +22,8 @@ public enum OntologyResourceConfigEnum {
     CREATOR("creator"),
     PREFERRED_ROOT_TERM("preferred_root_term"),
     ALLOW_DOWNLOAD("allow_download"),
-	SUBJECT("subject");
+	SUBJECT("subject"),
+	CLASSIFICATION("classification");
 
     private final String propertyName;
 
