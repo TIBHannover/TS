@@ -50,7 +50,7 @@ public class OntologyResourceConfig  {
 
     private boolean allowDownload;
     private Collection<String> subjects;
-    private ArrayList<HashMap<String, ArrayList<String>>> classifications;
+    private Collection<Map<String, Collection<String>>> classifications;
 
     // these are any metadata properties for the ontology, such as title or definition that are included in the ontology as OWL ontology annotation
     private Collection<String> internalMetadataProperties;
@@ -62,7 +62,7 @@ public class OntologyResourceConfig  {
                                   Collection<URI> synonymProperties, Collection<URI> hierarchicalProperties,
                                   Collection<String> baseUris, Collection<URI> hiddenProperties, boolean isSkos,
                                   Collection<String> internalMetadataProperties, Collection<URI> preferredRootTerms,
-                                  boolean allowDownload, Collection<String> subjects, ArrayList<HashMap<String, ArrayList<String>>> classifications) {
+                                  boolean allowDownload, Collection<String> subjects, Collection<Map<String, Collection<String>>> classifications) {
         this.id = id;
         this.versionIri = versionIri;
         this.title = title;
@@ -345,11 +345,11 @@ public class OntologyResourceConfig  {
          this.subjects = subjects;
     }
     
-    public ArrayList<HashMap<String, ArrayList<String>>> getClassifications() {
+    public Collection<Map<String, Collection<String>>> getClassifications() {
 		return classifications;
 	}
 
-	public void setClassifications(ArrayList<HashMap<String, ArrayList<String>>> classifications) {
+	public void setClassifications(Collection<Map<String, Collection<String>>> classifications) {
 		this.classifications = classifications;
 	}
 
@@ -381,7 +381,7 @@ public class OntologyResourceConfig  {
         private Collection<URI> preferredRootTerms = Collections.emptySet();
         private boolean allowDownload = true;
         private Collection<String> subjects = Collections.emptySet();
-        private ArrayList<HashMap<String, ArrayList<String>>> classifications = new ArrayList<>();
+        private Collection<Map<String, Collection<String>>> classifications = new ArrayList<>();
 
         public OntologyResourceConfigBuilder(String id, String title, String namespace, URI fileLocation) {
             this.id = id;
@@ -524,7 +524,7 @@ public class OntologyResourceConfig  {
             return this;
         }
         
-        public OntologyResourceConfigBuilder setClassifications(ArrayList<HashMap<String, ArrayList<String>>> classifications) {
+        public OntologyResourceConfigBuilder setClassifications(Collection<Map<String, Collection<String>>> classifications) {
             this.classifications = classifications;
             return this;
         }

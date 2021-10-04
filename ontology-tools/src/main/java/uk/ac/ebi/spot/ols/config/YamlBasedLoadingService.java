@@ -294,9 +294,9 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
     
     private void populateClassification(OntologyResourceConfig.OntologyResourceConfigBuilder builder) {
         if (ontology.containsKey(CLASSIFICATION.getPropertyName()))  {
-        	ArrayList<HashMap<String, ArrayList<String>>> classifications = new ArrayList<HashMap<String, ArrayList<String>>>();
-            for (HashMap<String, ArrayList<String>> classification :  (ArrayList<HashMap<String, ArrayList<String>>>) ontology.get(CLASSIFICATION.getPropertyName())) {
-                classifications.add(classification);
+        	Collection<Map<String, Collection<String>>> classifications = new ArrayList<>();
+            for (Object classification :  (ArrayList) ontology.get(CLASSIFICATION.getPropertyName())) {
+                classifications.add((Map<String, Collection<String>>) classification);
             }            
             
             builder.setClassifications(classifications);

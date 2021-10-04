@@ -38,6 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +112,7 @@ public class OntologyController implements
     	
     	List<OntologyDocument> temp = new ArrayList<OntologyDocument>();
     	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-    		for(HashMap<String, ArrayList<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+    		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
     			if(classificationSchema.containsKey(schema))
     				for (int i = 0;i<cls.length;i++)
     				  if (classificationSchema.get(schema).contains(cls[i])) {
