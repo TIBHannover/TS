@@ -27,8 +27,33 @@ ontologies:
     reasoner: OWL2
     oboSlims: false
     ontology_purl: http://www.ebi.ac.uk/efo/efo.owl
+    classification:
+      - DFG: 
+          - 2.1
+          - 1.4
+      - GBV: 
+          - test3
+          - test5
+      - collection:
+          - NFDI4CHEM
+      - subject:
+          - "Biology"
+          - "Information Science"
 
   ## overide for mondo
 
   - id: mondo
     ontology_purl: http://purl.obolibrary.org/obo/mondo.obo
+    classification:
+      - DFG: 
+          - 3.2.2
+          - 1.4
+      - GBV: 
+          - test4
+          - test5
+          - test2
+      - collection:
+          - NFDI4ING
+          - NFDI4CHEM
+      - subject:
+          - Epidemiology
