@@ -42,7 +42,7 @@ public class SwaggerConfig {
 				.description("TIB Terminology Service API Reference for Developers")
 				.termsOfServiceUrl("https://www.tib.eu/en/service/terms-of-use")
 				.contact("TIB Terminology Service Development Team").license("imprint")
-				.licenseUrl("imprint").version("1.0").build();
+				.licenseUrl("https://git.tib.eu/terminology/OLS.git").version("1.0").build();
 	}
 
 }
