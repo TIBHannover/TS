@@ -83,25 +83,6 @@ public class OntologyController implements
         return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
     
-    @ApiOperation(value = "Filter list of ontologies by subject")
-    @RequestMapping(path = "/subject/{subj}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<PagedResources<OntologyDocument>> filterOntologiesBySubject(@PathVariable("subj") String subject,
-            @PageableDefault(size = 20, page = 0) Pageable pageable,
-            PagedResourcesAssembler assembler
-    ) throws ResourceNotFoundException {
-    	List<OntologyDocument> temp = new ArrayList<OntologyDocument>();
-    	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-    		if(ontologyDocument.getConfig().getSubjects().contains(subject))
-    			temp.add(ontologyDocument);
-		}
-        
-        final int start = (int)pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), temp.size());
-        Page<OntologyDocument> document = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
-       
-       return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
-    }
-    
     @ApiOperation(value = "Filter list of ontologies by a particular classification schema",notes = "Multiple classification values can be provided with comma separated strings")
     @RequestMapping(path = "/classification/{schema}/{classification}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(@ApiParam(value = "Classification schema that the filtering operation is based on", required = true, allowableValues = "DFG, GBV, subject, bk, collection") @PathVariable("schema") String schema, @ApiParam(value = "Classification value(s)", required = true) @PathVariable("classification") String classification,

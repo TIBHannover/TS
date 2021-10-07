@@ -49,7 +49,6 @@ public class OntologyResourceConfig  {
     private boolean isSkos;
 
     private boolean allowDownload;
-    private Collection<String> subjects;
     private Collection<Map<String, Collection<String>>> classifications;
 
     // these are any metadata properties for the ontology, such as title or definition that are included in the ontology as OWL ontology annotation
@@ -62,7 +61,7 @@ public class OntologyResourceConfig  {
                                   Collection<URI> synonymProperties, Collection<URI> hierarchicalProperties,
                                   Collection<String> baseUris, Collection<URI> hiddenProperties, boolean isSkos,
                                   Collection<String> internalMetadataProperties, Collection<URI> preferredRootTerms,
-                                  boolean allowDownload, Collection<String> subjects, Collection<Map<String, Collection<String>>> classifications) {
+                                  boolean allowDownload, Collection<Map<String, Collection<String>>> classifications) {
         this.id = id;
         this.versionIri = versionIri;
         this.title = title;
@@ -88,7 +87,6 @@ public class OntologyResourceConfig  {
         this.internalMetadataProperties = internalMetadataProperties;
         this.preferredRootTerms = preferredRootTerms;
         this.allowDownload = allowDownload;
-        this.subjects = subjects;
         this.classifications = classifications;
     }
 
@@ -122,7 +120,6 @@ public class OntologyResourceConfig  {
         this.internalMetadataProperties = builder.internalMetadatProperties;
         this.preferredRootTerms = builder.preferredRootTerms;
         this.allowDownload = builder.allowDownload;
-        this.subjects = builder.subjects;
         this.classifications = builder.classifications;
     }
 
@@ -337,14 +334,6 @@ public class OntologyResourceConfig  {
         this.allowDownload = allowDownload;
     }
     
-    public Collection<String> getSubjects() {
-        return subjects;
-    }
-    
-    public void setSubjects(Collection<String> subjects) {
-         this.subjects = subjects;
-    }
-    
     public Collection<Map<String, Collection<String>>> getClassifications() {
 		return classifications;
 	}
@@ -380,7 +369,6 @@ public class OntologyResourceConfig  {
         private Collection<String> internalMetadatProperties = Collections.emptySet();
         private Collection<URI> preferredRootTerms = Collections.emptySet();
         private boolean allowDownload = true;
-        private Collection<String> subjects = Collections.emptySet();
         private Collection<Map<String, Collection<String>>> classifications = new ArrayList<>();
 
         public OntologyResourceConfigBuilder(String id, String title, String namespace, URI fileLocation) {
@@ -517,11 +505,6 @@ public class OntologyResourceConfig  {
 
         public void setAllowDownload(boolean allowDownload) {
             this.allowDownload = allowDownload;
-        }
-        
-        public OntologyResourceConfigBuilder setSubjects(Collection<String> subjects) {
-            this.subjects = subjects;
-            return this;
         }
         
         public OntologyResourceConfigBuilder setClassifications(Collection<Map<String, Collection<String>>> classifications) {
