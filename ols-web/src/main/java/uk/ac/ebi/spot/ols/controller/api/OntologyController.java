@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import uk.ac.ebi.spot.ols.exception.ErrorMessage;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
@@ -101,9 +102,9 @@ public class OntologyController implements
        return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
     
-    @ApiOperation(value = "Filter list of ontologies by a particular classification schema")
+    @ApiOperation(value = "Filter list of ontologies by a particular classification schema",notes = "Multiple classification values can be provided with comma separated strings")
     @RequestMapping(path = "/classification/{schema}/{classification}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(@PathVariable("schema") String schema, @PathVariable("classification") String classification,
+    HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(@ApiParam(value = "Classification schema that the filtering operation is based on", required = true, allowableValues = "DFG, GBV, subject, bk, collection") @PathVariable("schema") String schema, @ApiParam(value = "Classification value(s)", required = true) @PathVariable("classification") String classification,
             @PageableDefault(size = 20, page = 0) Pageable pageable,
             PagedResourcesAssembler assembler
     ) throws ResourceNotFoundException {

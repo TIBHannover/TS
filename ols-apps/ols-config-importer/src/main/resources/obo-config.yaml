@@ -41,6 +41,9 @@ ontologies:
           - test5
       - collection:
           - NFDI4ING
+          - CoyPu
+      - subject:
+          - "Information Science"
   - preferredPrefix: aeon
     creator:
       - Christian Hauschke
@@ -50,17 +53,19 @@ ontologies:
     ontology_purl: https://raw.githubusercontent.com/tibonto/aeon/master/aeon.ttl
     description: The Academic Event Ontology (AEON) is used to represent information regarding academic events. The ontology supports the identification, development, management, evaluation, and impact assessment of events, components of events and event series, as well as identification and reuse of works presented or developed at events. The ontology is independent of knowledge, creative domain, or topics related to events. AEON is focused on events and assumes the representation of many entities associated with events such as attendees, locations, academic works, datetimes, and processes are defined in compatible ontologies.
     id: aeon
-    license.url: https://creativecommons.org/licenses/by/4.0/
+    license: {url: 'https://creativecommons.org/licenses/by/4.0/'}
     title: Academic Event Ontology@en
-  classification:
-      - DFG: 
-          - 4.4.1
-          - 3.2.5
-      - GBV: 
-          - test
-          - test2
-      - collection:
-          - NFDI4CULTURE
+    classification:
+        - DFG: 
+            - 4.4.1
+            - 3.2.5
+        - GBV: 
+            - test
+            - test2
+        - collection:
+            - NFDI4CULTURE
+        - subject:
+            - "Management and Organization"
   - activity_status: active
     browsers:
       - {label: Monarch, title: Monarch Initiative Disease Browser, url: 'https://monarchinitiative.org/disease/MONDO:0019609'}
@@ -577,3 +582,4 @@ ontologies:
         title: NCIt Plus Neoplasm Core
     title: NCI Thesaurus OBO Edition
     tracker: https://github.com/NCI-Thesaurus/thesaurus-obo-edition/issues
+

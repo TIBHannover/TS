@@ -36,6 +36,9 @@ ontologies:
           - test5
       - collection:
           - NFDI4CHEM
+      - subject:
+          - "Biology"
+          - "Information Science"
 
   ## overide for mondo
 
@@ -52,4 +55,5 @@ ontologies:
       - collection:
           - NFDI4ING
           - NFDI4CHEM
-
+      - subject:
+          - Epidemiology
