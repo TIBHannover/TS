@@ -42,8 +42,7 @@ ontologies:
       - collection:
           - NFDI4ING
           - CoyPu
-      - subject:
-          - "Information Science"
+      - {subject: ["Information Science","Management Information Systems"],subfield: ["System Analysis","System Design"]}
   - preferredPrefix: aeon
     creator:
       - Christian Hauschke
@@ -64,8 +63,7 @@ ontologies:
             - test2
         - collection:
             - NFDI4CULTURE
-        - subject:
-            - "Management and Organization"
+        - {subject: ["Management and Organization", "Event Management"], subfield: ["Academic Affairs","Congress Organization"]}
   - activity_status: active
     browsers:
       - {label: Monarch, title: Monarch Initiative Disease Browser, url: 'https://monarchinitiative.org/disease/MONDO:0019609'}
