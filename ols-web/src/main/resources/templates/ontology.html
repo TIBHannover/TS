@@ -184,13 +184,12 @@
                         <b>Creator: </b> <span th:text="${creator}">NCBI:9606</span>
                     </div>
                     
-                    <br/>
-                    <div th:each="classifications: ${ontologyDocument.getConfig().getClassifications()}">
-                       <div th:each="schema: ${classifications.keySet().toArray()}">
-                           <b>
-                               <a href="#" th:href="@{../search(q=${schema},exact='true', type=property, ontology=${ontologyDocument.getOntologyId()})}" th:text="${schema}">property name</a>
-                           </b>
-                           <p style="margin-left:9px;" th:each="schemavalue : ${classifications.get(schema)}" th:text="${schemavalue}">NCBI_9606</p>
+                    <b th:unless="${ontologyDocument.getConfig().getClassifications().isEmpty()}">Classifications: </b>
+                    <div th:each="classification: ${ontologyDocument.getConfig().getClassifications()}">
+                       <b th:text="'Class ' + ${classification.keySet().toString()} + ' : '"></b>
+                       <div th:each="schema: ${classification.keySet().toArray()}">
+                           <b th:text="${schema} + ': '"></b>
+                           <p style="margin-left:9px;" th:each="schemavalue : ${classification.get(schema)}" th:text="${schemavalue}">NCBI_9606</p>
                        </div>
                     </div>
 
