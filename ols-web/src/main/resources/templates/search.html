@@ -66,6 +66,28 @@
                         </option>
                     </select>
                 </div>
+                
+                <div style="visibility:hidden;position:absolute;">
+                    <select id="schema-id" name="schema" multiple="multiple" >
+                        <option
+                                th:value="${schema}"
+                                th:each="schema : ${searchOptions.getSchemas()}"
+                                selected="selected"
+                        >
+                        </option>
+                    </select>
+                </div>
+                
+                <div style="visibility:hidden;position:absolute;">
+                    <select id="classification-id" name="classification" multiple="multiple" >
+                        <option
+                                th:value="${classification}"
+                                th:each="classification : ${searchOptions.getClassifications()}"
+                                selected="selected"
+                        >
+                        </option>
+                    </select>
+                </div>
 
                 <div style="visibility:hidden;position:absolute;">
                     <select id="ontology-type-id" name="type" multiple="multiple">
@@ -121,6 +143,55 @@
                         <div id="ontology-summary">
                         </div>
                     </div>
+                    
+                    <h4 class="filterbox-header">Schemas</h4>
+                    <div class="filterBoxes">
+                        <select id="schema-select-id" name="schema" class="schema-select" multiple="multiple" style="width:100%">
+                            <option
+                                    th:value="${schema}"
+                                    th:each="schema : ${availableSchemaKeys}"
+                                    th:text="${schema}"
+                                    th:attr="data-schema-title=${schema}"
+                                    th:with="schemas=${searchOptions.getSchemas()}"
+                                    th:selected="${#sets.contains(schemas , schema)}"
+                            >
+                            </option>
+                        </select>
+                        <div id="schema-summary">
+                        </div>
+                    </div>
+                    
+                    <h4 class="filterbox-header">Classifications</h4>
+                    <div class="filterBoxes">
+                        <select id="classification-select-id" name="classification" class="classification-select" multiple="multiple" style="width:100%">
+                            <option
+                                    th:value="${classification}"
+                                    th:each="classification : ${collectionClassifications}"
+                                    th:text="${classification}"
+                                    th:attr="data-classification-title=${classification}"
+                                    th:with="classifications=${searchOptions.getClassifications()}"
+                                    th:selected="${#sets.contains(classifications , classification)}"
+                            >
+                            </option>
+                        </select>
+                        <div id="classification-summary">
+                        </div>
+                    </div>
+                    
+                    <select th:onchange="'window.location.href =  this.value '" style="width:100%">
+                            <option
+                                    th:value="${urlBuilder.replaceQueryParam('schema', 'collection').replaceQueryParam('classification', '__(${classification})__').toUriString()}"
+                                    th:each="classification : ${collectionClassifications}"
+                                    th:text="${classification}"
+                                    th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+                            >
+                            </option>
+                        </select>
+                    
+<!--                     <span th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}" -->
+<!--                           th:text="${urlBuilder.replaceQueryParam('schema', 'collection').replaceQueryParam('classification', 'NFDI4ING').toUriString()}"> -->
+<!--                      </span> -->
+                    
                     <button id="clearFilters" type="button" class="button secondary filterbox-button" onclick="clearFilter()">Clear all filters</button>
                 </fieldset>
             </form>

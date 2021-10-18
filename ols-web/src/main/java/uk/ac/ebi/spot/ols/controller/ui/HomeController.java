@@ -2,11 +2,16 @@ package uk.ac.ebi.spot.ols.controller.ui;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,6 +78,64 @@ public class HomeController {
             return Collections.emptyList();
         }
     }
+    
+    public Set<String> getAvailableSchemaValuesForKeys(Collection<String> keys){
+    	
+        try {
+        	Set<String> temp = new HashSet<String>();
+        	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (keys.contains(k)) temp.addAll(x.get(k));} ));
+			}
+            return temp;
+        } catch (Exception e) {
+        	return Collections.emptySet();
+        }
+    }
+    
+    public Set<String> getAvailableSchemaValuesForOntologyAndKey(String ontology, String key){
+    	
+        try {
+        	Set<String> temp = new HashSet<String>();
+        	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+        		document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (k.equals(key) && document.getConfig().getId().equals(ontology)) temp.addAll(x.get(k));} ));
+			}
+            return temp;
+        } catch (Exception e) {
+        	return Collections.emptySet();
+        }
+    }
+    
+    public Set<String> getAvailableKeys(){
+        try {
+        	Set<String> temp = new HashSet<String>();
+        	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+				document.getConfig().getClassifications().forEach(x -> temp.addAll(x.keySet()));
+			}
+            return temp;
+        } catch (Exception e) {
+        	return Collections.emptySet();
+        }
+    }
+    
+    public Set<OntologyDocument> filterOntologiesByClassification(Collection<String> schemas, Collection<String> classifications){
+	 	
+    	Set<OntologyDocument> temp = new HashSet<OntologyDocument>();
+    	 for (OntologyDocument ontologyDocument : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+    		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+    			for (Map.Entry<String, Collection<String>> entry : classificationSchema.entrySet()) {
+					if (schemas.contains(entry.getKey()))
+						for (String classification : entry.getValue()) {
+							if (classifications.contains(classification)) {
+								temp.add(ontologyDocument);
+							}		
+						}		
+				}
+            }
+    	 }
+    	 
+    	 return temp;
+    }
+    	 
 
     @RequestMapping({"", "/"})
     public String goHome () {
@@ -155,6 +218,8 @@ public class HomeController {
     public String doSearch(
             @RequestParam(value = "q", defaultValue = "*") String query,
             @RequestParam(value = "ontology", required = false) Collection<String> ontologies,
+            @RequestParam(value = "schema", required = false) Collection<String> schemas,
+            @RequestParam(value = "classification", required = false) Collection<String> classifications,
             @RequestParam(value = "type", required = false) Collection<String> types,
             @RequestParam(value = "slim", required = false) Collection<String> slims,
             @RequestParam(value = "queryFields", required = false) Collection<String> queryFields,
@@ -181,6 +246,14 @@ public class HomeController {
         if (ontologies != null) {
             searchOptions.setOntologies(ontologies);
         }
+        
+        if (schemas != null) {
+            searchOptions.setSchemas(schemas);
+        }
+        
+        if (classifications != null) {
+            searchOptions.setClassifications(classifications);
+        }
 
         if (queryFields != null) {
             searchOptions.setQueryField(queryFields);
@@ -197,9 +270,22 @@ public class HomeController {
         if (groupField != null) {
             searchOptions.setGroupField(groupField);
         }
-
+        if ( schemas != null && classifications != null) {
+        	List<String> temp = new ArrayList<String>();	
+        	for (OntologyDocument document : filterOntologiesByClassification(schemas, classifications)) 
+        	     temp.add(document.getOntologyId());
+        	searchOptions.setOntologies(temp);
+        	
+//        	model.addAttribute("filtered_ontologies",filterOntologiesByClassification(schemas, classifications));
+        }
+            
+//        else {
+//        	model.addAttribute("filtered_ontologies",getOntologies());
+//        }  	
 
         model.addAttribute("searchOptions", searchOptions);
+        model.addAttribute("availableSchemaKeys",getAvailableKeys());
+        model.addAttribute("collectionClassifications",getAvailableSchemaValuesForKeys(searchOptions.getSchemas()));
         customisationProperties.setCustomisationModelAttributes(model);
         return "search";
     }
