@@ -182,7 +182,7 @@
                     
                     <h4 class="filterbox-header">Collection</h4>
                     <select th:onchange="'window.location.href =  this.value '" style="width:100%">
-                            <option disabled selected value="0">-- select a classification --</option>
+                            <option disabled selected value="0">-- select a collection --</option>
                             <option
                                     th:value="${urlBuilder.replaceQueryParam('schema', 'collection').replaceQueryParam('classification', '__(${classification})__').toUriString()}"
                                     th:each="classification : ${collectionValues}"
