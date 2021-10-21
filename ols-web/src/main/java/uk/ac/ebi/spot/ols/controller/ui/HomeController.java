@@ -3,6 +3,7 @@ package uk.ac.ebi.spot.ols.controller.ui;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -135,6 +136,21 @@ public class HomeController {
     	 
     	 return temp;
     }
+    
+    public Set<String> findDuplicates(Collection<String> listContainingDuplicates)
+    { 
+      final Set<String> setToReturn = new HashSet<>(); 
+      final Set<String> set1 = new HashSet<>();
+
+      for (String string : listContainingDuplicates)
+      {
+       if (!set1.add(string))
+       {
+        setToReturn.add(string);
+       }
+      }
+      return setToReturn;
+    }
     	 
 
     @RequestMapping({"", "/"})
@@ -242,8 +258,31 @@ public class HomeController {
                 rows,
                 start
         );
-
-        if (ontologies != null) {
+        
+        if ( schemas != null && classifications != null) {
+        	Set<String> temp = new HashSet<String>();	
+        	for (OntologyDocument document : filterOntologiesByClassification(schemas, classifications)) 
+        		temp.add(document.getOntologyId());
+        	
+        	ontologies = new HashSet<String>();
+    		ontologies.addAll(temp);
+    		schemas = new HashSet<>();
+        	
+//        	if (ontologies != null) {
+//        		if (ontologies.containsAll(temp))
+//        			ontologies.removeAll(temp);
+//        		else
+//        			ontologies.retainAll(temp);
+//        	}
+//        		
+//        	else
+//        	{
+//        		ontologies = new HashSet<String>();
+//        		ontologies.addAll(temp);
+//        	} 	
+        } 
+        
+        if(ontologies != null) {
             searchOptions.setOntologies(ontologies);
         }
         
@@ -251,9 +290,9 @@ public class HomeController {
             searchOptions.setSchemas(schemas);
         }
         
-        if (classifications != null) {
-            searchOptions.setClassifications(classifications);
-        }
+//        if (classifications != null) {
+//            searchOptions.setClassifications(classifications);
+//        }
 
         if (queryFields != null) {
             searchOptions.setQueryField(queryFields);
@@ -270,22 +309,11 @@ public class HomeController {
         if (groupField != null) {
             searchOptions.setGroupField(groupField);
         }
-        if ( schemas != null && classifications != null) {
-        	List<String> temp = new ArrayList<String>();	
-        	for (OntologyDocument document : filterOntologiesByClassification(schemas, classifications)) 
-        	     temp.add(document.getOntologyId());
-        	searchOptions.setOntologies(temp);
-        	
-//        	model.addAttribute("filtered_ontologies",filterOntologiesByClassification(schemas, classifications));
-        }
-            
-//        else {
-//        	model.addAttribute("filtered_ontologies",getOntologies());
-//        }  	
-
+        
         model.addAttribute("searchOptions", searchOptions);
         model.addAttribute("availableSchemaKeys",getAvailableKeys());
-        model.addAttribute("collectionClassifications",getAvailableSchemaValuesForKeys(searchOptions.getSchemas()));
+        model.addAttribute("availableSchemaValues",getAvailableSchemaValuesForKeys(searchOptions.getSchemas()));
+        model.addAttribute("collectionValues",getAvailableSchemaValuesForKeys(new ArrayList<String>(Arrays.asList("collection"))));
         customisationProperties.setCustomisationModelAttributes(model);
         return "search";
     }

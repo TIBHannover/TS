@@ -146,7 +146,7 @@
                     
                     <h4 class="filterbox-header">Schemas</h4>
                     <div class="filterBoxes">
-                        <select id="schema-select-id" name="schema" class="schema-select" multiple="multiple" style="width:100%">
+                        <select id="schema-select-id" name="schema" class="schema-select" style="width:100%">
                             <option
                                     th:value="${schema}"
                                     th:each="schema : ${availableSchemaKeys}"
@@ -163,10 +163,10 @@
                     
                     <h4 class="filterbox-header">Classifications</h4>
                     <div class="filterBoxes">
-                        <select id="classification-select-id" name="classification" class="classification-select" multiple="multiple" style="width:100%">
+                        <select id="classification-select-id" name="classification" class="classification-select" style="width:100%">
                             <option
                                     th:value="${classification}"
-                                    th:each="classification : ${collectionClassifications}"
+                                    th:each="classification : ${availableSchemaValues}"
                                     th:text="${classification}"
                                     th:attr="data-classification-title=${classification}"
                                     th:with="classifications=${searchOptions.getClassifications()}"
@@ -178,19 +178,16 @@
                         </div>
                     </div>
                     
+                    <h4 class="filterbox-header">Collection</h4>
                     <select th:onchange="'window.location.href =  this.value '" style="width:100%">
                             <option
                                     th:value="${urlBuilder.replaceQueryParam('schema', 'collection').replaceQueryParam('classification', '__(${classification})__').toUriString()}"
-                                    th:each="classification : ${collectionClassifications}"
+                                    th:each="classification : ${collectionValues}"
                                     th:text="${classification}"
                                     th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
                             >
                             </option>
-                        </select>
-                    
-<!--                     <span th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}" -->
-<!--                           th:text="${urlBuilder.replaceQueryParam('schema', 'collection').replaceQueryParam('classification', 'NFDI4ING').toUriString()}"> -->
-<!--                      </span> -->
+                     </select>
                     
                     <button id="clearFilters" type="button" class="button secondary filterbox-button" onclick="clearFilter()">Clear all filters</button>
                 </fieldset>

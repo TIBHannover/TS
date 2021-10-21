@@ -39,6 +39,8 @@ $(document).ready(function() {
             $("#filter_form").submit();
         });
 
+	var emptyList = [];
+
     $('.schema-select').select2({placeholder: "Filter by schema "})
         .on('select2:select', function (e) {
             $("#schema-id").append($('<option/>', {
@@ -49,6 +51,8 @@ $(document).ready(function() {
 
             //always restart start when faceting
             $('#start').val(0);
+//            $('#ontology-id').val(emptyList);
+//            $('#ontology-type-id').val(emptyList);
             $("#filter_form").submit();
         })
         .on('select2:unselect', function (e) {
@@ -56,6 +60,8 @@ $(document).ready(function() {
             $("#schema-id").find("[value=\"" + e.params.data.id + "\"]").remove();
             //always restart start when faceting
             $('#start').val(0);
+//            $('#ontology-id').val(emptyList);
+//            $('#ontology-type-id').val(emptyList);
             $("#filter_form").submit();
         });
 
@@ -69,6 +75,8 @@ $(document).ready(function() {
 
             //always restart start when faceting
             $('#start').val(0);
+//            $('#ontology-id').val(emptyList);
+//            $('#ontology-type-id').val(emptyList);
             $("#filter_form").submit();
         })
         .on('select2:unselect', function (e) {
@@ -76,6 +84,8 @@ $(document).ready(function() {
             $("#classification-id").find("[value=\"" + e.params.data.id + "\"]").remove();
             //always restart start when faceting
             $('#start').val(0);
+//            $('#ontology-id').val(emptyList);
+//            $('#ontology-type-id').val(emptyList);
             $("#filter_form").submit();
         });
 
@@ -320,10 +330,25 @@ function processData(data) {
     var schemaSummary  = $('#schema-summary');
     var classificationSummary  = $('#classification-summary');
 
+    ontologyList = new Object();
+    $('#ontology-select-id option').each(function(){
+        ontologyList[this.value]=$(this).attr('data-ontology-title');
+    });
+
+    schemaList = new Object();
+    $('#schema-select-id option').each(function(){
+        schemaList[this.value]=$(this).attr('data-schema-title');
+    });
+
+    classificationList = new Object();
+    $('#classification-select-id option').each(function(){
+        classificationList[this.value]=$(this).attr('data-classification-title');
+    });
+
     renderTypesFacetField(facets.type, typeSummary);
     renderOntologyFacetField(facets.ontology_prefix, ontologySummary);
-    renderSchemaFacetField(schemaList, schemaSummary);
-    renderClassificationFacetField(classificationList, classificationSummary);
+    renderSchemaFacetField(Object.keys(schemaList), schemaSummary);
+    renderClassificationFacetField(Object.keys(classificationList), classificationSummary);
     //renderFacetField(facets.is_defining_ontology, "Defining ontology", searchSummary);
     //renderFacetField(facets.is_obsolete, "Is Obsolete", searchSummary);
     //renderFacetField(facets.subset, "Susbsets", searchSummary);
@@ -432,7 +457,12 @@ function renderOntologyFacetField (facetArray, searchSummary) {
             }));
 
             //always restart start when faceting
+
             $('#start').val(0);
+            var emptyList = [];
+            emptyList[0] = e.target.id.toLowerCase();
+            $('#ontology-id').val(emptyList);
+
             $("#filter_form").submit();
         });
     }
@@ -446,15 +476,10 @@ function renderSchemaFacetField (facetArray, searchSummary) {
 
         var fieldList = $('<div class="list-group"></div>');
 
-        for (var x = 0 ; x < facetArray.length; x = x + 2) {
+        for (var x = 0 ; x < facetArray.length; x = x + 1) {
             var name = facetArray[x];
-            var count = facetArray[x + 1];
-
-            if (count > 0) {
-                fieldList.append('<button type=\'button\' id="'+name+'" class="schema_list list-group-item" title="'+schemaList[name]+'">'+name+ '<span class="badge">' + count + '</span></button>');
-                numberOfFacets++;
-            }
-
+            fieldList.append('<button type=\'button\' id="'+name+'" class="schema_list list-group-item" title="'+schemaList[name]+'">'+name+ '<span class="badge"></span></button>');
+            numberOfFacets++;
         }
 
         if (numberOfFacets > 0) {
@@ -465,8 +490,8 @@ function renderSchemaFacetField (facetArray, searchSummary) {
         $(".schema_list").on('click', function(e){
             //$('#classification-select-id').val('');
             $("#schema-id").append($('<option/>', {
-                value: e.delegateTarget.id.toLowerCase(),
-                text : e.delegateTarget.id.toLowerCase(),
+                value: e.delegateTarget.id,
+                text : e.delegateTarget.id,
                 selected : 'selected'
             }));
 
@@ -485,14 +510,10 @@ function renderClassificationFacetField (facetArray, searchSummary) {
 
         var fieldList = $('<div class="list-group"></div>');
 
-        for (var x = 0 ; x < facetArray.length; x = x + 2) {
+        for (var x = 0 ; x < facetArray.length; x = x + 1) {
             var name = facetArray[x];
-            var count = facetArray[x + 1];
-
-            if (count > 0) {
-                fieldList.append('<button type=\'button\' id="'+name+'" class="classification_list list-group-item" title="'+classificationList[name]+'">'+name+ '<span class="badge">' + count + '</span></button>');
-                numberOfFacets++;
-            }
+            fieldList.append('<button type=\'button\' id="'+name+'" class="classification_list list-group-item" title="'+classificationList[name]+'">'+name+ '<span class="badge"></span></button>');
+            numberOfFacets++;
 
         }
 
@@ -504,13 +525,15 @@ function renderClassificationFacetField (facetArray, searchSummary) {
         $(".classification_list").on('click', function(e){
             //$('#classification-select-id').val('');
             $("#classification-id").append($('<option/>', {
-                value: e.delegateTarget.id.toLowerCase(),
-                text : e.delegateTarget.id.toLowerCase(),
+                value: e.delegateTarget.id,
+                text : e.delegateTarget.id,
                 selected : 'selected'
             }));
 
             //always restart start when faceting
             $('#start').val(0);
+            var emptyList = [];
+            $('#ontology-id').val(emptyList);
             $("#filter_form").submit();
         });
     }
