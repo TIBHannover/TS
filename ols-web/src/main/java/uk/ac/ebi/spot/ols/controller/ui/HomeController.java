@@ -268,18 +268,6 @@ public class HomeController {
     		ontologies.addAll(temp);
     		schemas = new HashSet<>();
         	
-//        	if (ontologies != null) {
-//        		if (ontologies.containsAll(temp))
-//        			ontologies.removeAll(temp);
-//        		else
-//        			ontologies.retainAll(temp);
-//        	}
-//        		
-//        	else
-//        	{
-//        		ontologies = new HashSet<String>();
-//        		ontologies.addAll(temp);
-//        	} 	
         } 
         
         if(ontologies != null) {
@@ -289,10 +277,6 @@ public class HomeController {
         if (schemas != null) {
             searchOptions.setSchemas(schemas);
         }
-        
-//        if (classifications != null) {
-//            searchOptions.setClassifications(classifications);
-//        }
 
         if (queryFields != null) {
             searchOptions.setQueryField(queryFields);

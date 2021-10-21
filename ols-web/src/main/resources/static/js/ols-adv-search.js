@@ -51,8 +51,6 @@ $(document).ready(function() {
 
             //always restart start when faceting
             $('#start').val(0);
-//            $('#ontology-id').val(emptyList);
-//            $('#ontology-type-id').val(emptyList);
             $("#filter_form").submit();
         })
         .on('select2:unselect', function (e) {
@@ -478,7 +476,7 @@ function renderSchemaFacetField (facetArray, searchSummary) {
 
         for (var x = 0 ; x < facetArray.length; x = x + 1) {
             var name = facetArray[x];
-            fieldList.append('<button type=\'button\' id="'+name+'" class="schema_list list-group-item" title="'+schemaList[name]+'">'+name+ '<span class="badge"></span></button>');
+            fieldList.append('<button type=\'button\' id="'+name+'" class="schema_list list-group-item" title="'+schemaList[name]+'">'+name+ '</button>');
             numberOfFacets++;
         }
 
@@ -512,7 +510,7 @@ function renderClassificationFacetField (facetArray, searchSummary) {
 
         for (var x = 0 ; x < facetArray.length; x = x + 1) {
             var name = facetArray[x];
-            fieldList.append('<button type=\'button\' id="'+name+'" class="classification_list list-group-item" title="'+classificationList[name]+'">'+name+ '<span class="badge"></span></button>');
+            fieldList.append('<button type=\'button\' id="'+name+'" class="classification_list list-group-item" title="'+classificationList[name]+'">'+name+ '</button>');
             numberOfFacets++;
 
         }
