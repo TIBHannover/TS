@@ -147,6 +147,7 @@
                     <h4 class="filterbox-header">Schemas</h4>
                     <div class="filterBoxes">
                         <select id="schema-select-id" name="schema" class="schema-select" style="width:100%">
+                            <option disabled selected value="0">-- select a schema --</option>
                             <option
                                     th:value="${schema}"
                                     th:each="schema : ${availableSchemaKeys}"
@@ -161,9 +162,10 @@
                         </div>
                     </div>
                     
-                    <h4 class="filterbox-header">Classifications</h4>
-                    <div class="filterBoxes">
+                    <h4 class="filterbox-header" th:if="${not #lists.isEmpty(availableSchemaValues)}">Classifications</h4>
+                    <div class="filterBoxes" th:if="${not #lists.isEmpty(availableSchemaValues)}">
                         <select id="classification-select-id" name="classification" class="classification-select" style="width:100%">
+                            <option disabled selected value="0">-- select a classification --</option>
                             <option
                                     th:value="${classification}"
                                     th:each="classification : ${availableSchemaValues}"
@@ -180,6 +182,7 @@
                     
                     <h4 class="filterbox-header">Collection</h4>
                     <select th:onchange="'window.location.href =  this.value '" style="width:100%">
+                            <option disabled selected value="0">-- select a classification --</option>
                             <option
                                     th:value="${urlBuilder.replaceQueryParam('schema', 'collection').replaceQueryParam('classification', '__(${classification})__').toUriString()}"
                                     th:each="classification : ${collectionValues}"

@@ -476,8 +476,10 @@ function renderSchemaFacetField (facetArray, searchSummary) {
 
         for (var x = 0 ; x < facetArray.length; x = x + 1) {
             var name = facetArray[x];
-            fieldList.append('<button type=\'button\' id="'+name+'" class="schema_list list-group-item" title="'+schemaList[name]+'">'+name+ '</button>');
-            numberOfFacets++;
+            if (name != '0') {
+                fieldList.append('<button type=\'button\' id="'+name+'" class="schema_list list-group-item" title="'+schemaList[name]+'">'+name+ '</button>');
+                numberOfFacets++;
+            }
         }
 
         if (numberOfFacets > 0) {
@@ -510,9 +512,10 @@ function renderClassificationFacetField (facetArray, searchSummary) {
 
         for (var x = 0 ; x < facetArray.length; x = x + 1) {
             var name = facetArray[x];
-            fieldList.append('<button type=\'button\' id="'+name+'" class="classification_list list-group-item" title="'+classificationList[name]+'">'+name+ '</button>');
-            numberOfFacets++;
-
+            if (name != '0') {
+                fieldList.append('<button type=\'button\' id="'+name+'" class="classification_list list-group-item" title="'+classificationList[name]+'">'+name+ '</button>');
+                numberOfFacets++;
+            }
         }
 
         if (numberOfFacets > 0) {
