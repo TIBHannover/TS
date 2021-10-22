@@ -80,7 +80,7 @@ public class HomeController {
         }
     }
     
-    public Set<String> getAvailableSchemaValuesForKeys(Collection<String> keys){
+    public Set<String> getClassificationsForSchemas(Collection<String> keys){
     	
         try {
         	Set<String> temp = new HashSet<String>();
@@ -93,7 +93,7 @@ public class HomeController {
         }
     }
     
-    public Set<String> getAvailableSchemaValuesForOntologyAndKey(String ontology, String key){
+    public Set<String> getClassificationsForOntologyAndSchema(String ontology, String key){
     	
         try {
         	Set<String> temp = new HashSet<String>();
@@ -119,8 +119,7 @@ public class HomeController {
         }
     }
     
-    public Set<OntologyDocument> filterOntologiesByClassification(Collection<String> schemas, Collection<String> classifications){
-	 	
+    public Set<OntologyDocument> filterOntologiesByClassification(Collection<String> schemas, Collection<String> classifications){ 	
     	Set<OntologyDocument> temp = new HashSet<OntologyDocument>();
     	 for (OntologyDocument ontologyDocument : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
     		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
@@ -138,19 +137,13 @@ public class HomeController {
     	 return temp;
     }
     
-    public Set<String> findDuplicates(Collection<String> listContainingDuplicates)
-    { 
-      final Set<String> setToReturn = new HashSet<>(); 
-      final Set<String> set1 = new HashSet<>();
-
-      for (String string : listContainingDuplicates)
-      {
-       if (!set1.add(string))
-       {
-        setToReturn.add(string);
-       }
-      }
-      return setToReturn;
+    public Set<String> findDuplicates(Collection<String> listContainingDuplicates) {
+        final Set<String> setToReturn = new HashSet<>(); 
+        final Set<String> set1 = new HashSet<>();
+        for (String string : listContainingDuplicates)
+    	    if (!set1.add(string))
+    		    setToReturn.add(string);
+        return setToReturn;
     }
     	 
 
@@ -299,8 +292,8 @@ public class HomeController {
         }
         
         model.addAttribute("searchOptions", searchOptions);
-        model.addAttribute("availableSchemaValues",getAvailableSchemaValuesForKeys(searchOptions.getSchemas()));
-        model.addAttribute("collectionValues",getAvailableSchemaValuesForKeys(new ArrayList<String>(Arrays.asList("collection"))));
+        model.addAttribute("availableSchemaValues",getClassificationsForSchemas(searchOptions.getSchemas()));
+        model.addAttribute("collectionValues",getClassificationsForSchemas(new ArrayList<String>(Arrays.asList("collection"))));
         customisationProperties.setCustomisationModelAttributes(model);
         return "search";
     }
