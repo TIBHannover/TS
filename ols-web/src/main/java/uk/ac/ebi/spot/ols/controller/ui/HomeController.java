@@ -106,6 +106,7 @@ public class HomeController {
         }
     }
     
+    @ModelAttribute("availableSchemaKeys")
     public Set<String> getAvailableKeys(){
         try {
         	Set<String> temp = new HashSet<String>();
@@ -264,6 +265,9 @@ public class HomeController {
         	for (OntologyDocument document : filterOntologiesByClassification(schemas, classifications)) 
         		temp.add(document.getOntologyId());
         	
+        	String filterMessage = "Displaying results for schemas: "+String.join(",", schemas)+" and respective classifications: "+String.join(",",classifications);
+        	model.addAttribute("filterMessage",filterMessage);
+        	
         	ontologies = new HashSet<String>();
     		ontologies.addAll(temp);
     		schemas = new HashSet<>();
@@ -295,7 +299,6 @@ public class HomeController {
         }
         
         model.addAttribute("searchOptions", searchOptions);
-        model.addAttribute("availableSchemaKeys",getAvailableKeys());
         model.addAttribute("availableSchemaValues",getAvailableSchemaValuesForKeys(searchOptions.getSchemas()));
         model.addAttribute("collectionValues",getAvailableSchemaValuesForKeys(new ArrayList<String>(Arrays.asList("collection"))));
         customisationProperties.setCustomisationModelAttributes(model);

@@ -107,6 +107,9 @@
               <form id="ontofilter" disabled="true">
                 <fieldset form="ontofilter" display="block">
                     <!--<legend><span class="glyphicon glyphicon-filter">Filters</span></legend>-->
+                    
+                    <p th:if="${filterMessage != null}" th:text="${filterMessage}" style="color: #00827c;"></p>
+                    
                     <h4 class="filterbox-header">Term type</h4>
                     <div class="filterBoxes">
                         <select id="ontology-select-type-id" name="type" class="type-select" multiple="multiple" style="width:100%"
