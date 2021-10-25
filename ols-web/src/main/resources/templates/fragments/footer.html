@@ -20,7 +20,7 @@
         <script src="//ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/js/elixirBanner.js"></script>
     </div>
 
-    <footer>
+    <footer id="local-footer" class="local-footer" role="local-footer">
         <!-- https://www.ebi.ac.uk/style-lab/websites/patterns/banner-elixir.html
         <div id="elixir-banner" data-color="none" data-name="This service" data-description="I am a super cool service" data-more-information-link="https://www.elixir-europe.org/about-us/who-we-are/nodes/embl-ebi" data-use-basic-styles="true"></div>
         -->
@@ -32,21 +32,46 @@
                 Footer meta will be automatically inserted by footer.js
             </section>
         </div>
-		
-		<br />
-         <div th:if="${ebiInfo} == false" style="text-align: center;">
-           <a th:href="@{/imprint}">Imprint</a> &nbsp; <a th:href="@{/dataprotection}">Data Protection</a>
+        <div th:if="${ebiInfo} == false"  class="row">
+            <div class="medium-4 columns">
+                <div class=""><h4>About the service:</h4></div>
+                <div class="examples"><a th:href="@{/imprint}">Imprint</a></div>
+                <div class="examples"><a th:href="@{/dataprotection}">Data Protection</a></div>
+                <br />
+                <div class=""><h6>Powered by <a href="https://www.ebi.ac.uk/ols">OLS</a> from <a href="http://www.ebi.ac.uk">EMBL-EBI</a></h6></div>
+            </div>
+            
+            <div class="medium-3 columns">
+                <h4 class="icon icon-generic"> Maintainer:</h4>
+                <div class="frame-v">
+                    <a style="text-decoration:none !important; border:0px !important;" th:href="@{${web}}" 
+            			 th:title="'Go to ' + ${org} + ' homepage'">
+            			<img class="orga-logo" th:src="@{${logo}}" style="width:200px;"/>
+        			</a>
+                </div>
+            </div>
+            
+            <div class="medium-3 columns">
+                <h4 class="icon icon-generic"> Partner:</h4>
+                <div class="frame-v">
+                    <a style="text-decoration:none !important;border:0px !important; " th:href="@{https://www.nfdi.de/?lang=en}" 
+            			 th:title="'Go to NFDI homepage'">
+            			<img class="orga-logo" th:src="@{/img/nfdi_rgb_Wortmarke_neg_Zusatz_quer.svg}" style="width:200px;"/>
+        			</a>
+                </div>
+            </div>
+
+            <div class="medium-2 columns">
+                <h4 class="icon icon-generic"> Funding:</h4><!-- data-icon="Fy"-->
+                <div class="frame-v">
+                    <a  style="text-decoration:none !important; border:0px !important;" th:href="@{https://www.dfg.de}" 
+            			 th:title="'Go to DFG homepage'">
+            			<img class="orga-logo" th:src="@{/img/dfg_logo.png}" style="width:200px;"/>
+        			</a>  
+                </div>
+                <p style="color:#777; font-size:11px;">NFDI community projects are supported by DFG. </p>
+            </div>
         </div>
-		
-        <div th:if="${ebiInfo} == false" style="text-align: center;">
-            Powered by <a href="https://www.ebi.ac.uk/ols">OLS</a> from <a href="http://www.ebi.ac.uk">EMBL-EBI</a> 
-        </div>
-		<div class="columns medium-12" id="local-title" style="text-align: center;">
-		<a th:href="@{${web}}" 
-            th:title="'Go to ' + ${org} + ' homepage'">
-            <img th:src="@{${logo}}" style="height:60px;"/>
-        </a>
-		</div>
     </footer>
 
 
