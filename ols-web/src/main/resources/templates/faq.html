@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"/> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"/> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"/> <![endif]-->
+<!-- Consider adding an manifest.appcache: h5bp.com/d/Offline -->
+<!--[if gt IE 8]><!--> <html  xmlns:th="https://www.thymeleaf.org" class="no-js" lang="en"> <!--<![endif]-->
+
+
+<head>
+    <div th:replace="fragments/head :: head(olscss=true)"></div>
+    <title id="pageTitle" th:inline="text">About [[${title}]] &lt; [[${org}]]</title>
+    <!-- A few keywords that relate to the content of THIS PAGE (not the whole project)
+    <meta name="keywords" content="biosamples, europe, EBI" />
+    <!- - Describe what this page is about - ->
+    <meta name="description" content="EMBL-EBI" />
+    <meta name="ebi:last-review" content="2016-12-20" />
+    <!- - The last time the content was reviewed - ->
+    <meta name="ebi:expiry" content="2017-12-20" />
+    <!- - When this content is no longer relevant -->
+</head>
+
+<style>
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  border-style: groove;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.collapsible:after {
+  content: '\002B';
+  color: white;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2212";
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
+</style>
+
+<body>
+<th:block th:include="fragments/header :: header"></th:block>
+
+<section id="main-content-area" role="main">
+    <div class="row">        
+<h2 th:inline="text">Frequently Asked Questions about the [[${org}]] [[${title}]]</h2>
+
+<button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">What is terminology?</button>
+<div class="content">
+<p>Every field of expertise - be it a science, be it a trade, be it a craft – comes with its own body of knowledge, comprised of specialized concepts, relations between these concepts as well as the necessary terms to communicate about these concepts. As such, terminology is the most important tool for any kind of collaboration among experts, e.g. formulating research hypotheses as well as collecting, analysing and interpreting research data.</p>
+</div>
+
+<button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">What has terminology to do with research data management (RDM)?</button>
+<div class="content">
+<p>Concise terminology usually plays an important role in data interpretation and in “writing up the research”. However, it is already used and needed much earlier than that and also plays a role in professional research data management: Research data on their own are useless. Without annotations and accompanying information (e.g. about the data elicitation process, data transformations, or data analysis) data are simply meaningless and not fit for reuse. These “data about data” are called <i>metadata</i>.  Metadata are key to making data discoverable and reusable in future contexts. They are usually given in a well-structured format following a recognized schema, often with expected and authorized sets of values. Naturally, domain-specific metadata need to make use of a domain’s terminology – ideally in a consistent and harmonized manner and with means of persistent reference.</p>
+</div>
+
+<button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">How can I use [[${org}]]’s Terminology Service for research data management?</button>
+<div class="content">
+<p th:inline="text">[[${org}]]’s Terminology Service provides domain-specific concepts, their terms and relations to other concepts, their definition and other types of information, from a range of engineering-related terminology collections. Each concept is represented by a <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">Uniform Resource Identifier (URI)</a>. You can use the URI of a fitting concept (instead of a potentially ambiguous natural language expression!) for your research data documentation and annotation and thus persistently refer to a reliable description of a concept related to your work.
+You can also integrate terminological items into your own applications via the Terminology Service’s <a th:href="@{/api}">API</a>. Learn more about the API here or at its <strong><a href="http://service.tib.eu/ts4tib/swagger-ui.html">Swagger Documentation</a></strong>.
+In the future, the terminology from the Terminology Service will also be integrated into other [[${org}]] services for research data management where it makes terminology available for standardized data description – increasing the Findability, Interoperability and Reusability of research data in the [[${org}]] overall infrastructure.
+</div>
+<button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">I do not find the terms I need – what can I do now?</button>
+<div class="content">
+<p>Please get in touch with us to let us know your demand. Write a mail to felix.engel [AT] tib.eu or leave an issue at our <a th:href="@{${issuesPage}}"> issue tracker</a>. If you know of a source containing relevant terminology, you can also suggest this at the <a th:href="@{${issuesPage}}"> issue tracker</a>. Please notice, that a terminology collection can be ingested fastest, if it comes in a certain format and with a free license. Other terminology sources will need additional processing steps or might not be eligible at all. </p>
+</div>
+
+<button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">What technical formats does the Terminology Service ingest?</button>
+<div class="content">
+<p th:inline="text">[[${org}]]’s Terminology Service is a repository software that was designed to ingest terminologies employing these standards and that are ready for the Semantic Web. Terminology that is documented in other forms, needs to be transformed for an ingest. A terminology should therefore use one of the serializations RDF/XML (.rdf/.owl), Turtle (.ttl) and OBO (.obo). Terminologies in a tabular format (.tsv, .csv, .xlsx) or in mark-up languages like XML (.xml) are not ready for ingest and require further processing. </p>
+</div>
+
+<button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">Are there other services to look up terminology?</button>
+<div class="content">
+<p>Yes, there are. There are a several terminology portals offered by standardization bodies like ISO, DIN or IEC where you can look up standardized terms and definitions. </p>
+     <ul>
+         <li><a href="https://www.iso.org/obp/ui#search">https://www.iso.org/obp/ui#search</a></li>
+         <li><a href="https://www.electropedia.org/">https://www.electropedia.org/</a></li>
+         <li><p><a href="https://www.din.de/de/service-fuer-anwender/din-term">https://www.din.de/de/service-fuer-anwender/din-term</a> (search for terms and definitions from German standards, requires registration)</p></li>
+         <li><p><a href="https://www.din.de/de/service-fuer-anwender/din-termonline">https://www.din.de/de/service-fuer-anwender/din-termonline</a> (search for terms and approved translations, available without registration)</p></li>
+     </ul>
+     
+     <p>A multiple domain search for terms is also possible on services like</p>
+     
+      <ul>
+         <li><a href="https://bartoc-fast.ub.unibas.ch/bartocfast/">https://bartoc-fast.ub.unibas.ch/bartocfast/</a></li>
+         <li><a href="https://service.tib.eu/ts4tib/index">https://service.tib.eu/ts4tib/index</a></li>
+     </ul>
+     
+     <p>The following services allow the search for terminological collections from different domains or for specific sub-fields and concept fiels in the domain:</p>
+     
+     <ul>
+         <li><a href="https://bartoc.org/">https://bartoc.org/</a></li>
+         <li><a href="https://lov.linkeddata.es/dataset/lov/">https://lov.linkeddata.es/dataset/lov/</a></li>
+         <li><a href="https://www.lod-cloud.net/">https://www.lod-cloud.net/</a></li>
+         <li><a href="https://archivo.dbpedia.org/list">https://archivo.dbpedia.org/list</a></li>
+     </ul>
+</div>   
+     <button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">Are there further benefits for ontological terminology management for research data management?</button>
+     <div class="content">
+     <p>Ontologies will realise a machine-processable expression of the semantics of established domain concepts. They will be applied to enable unambiguous and semantically enriched access to distributed datasets. They will function as the corner stone for a semantic web of data, enabling effective access and machine-actionable processing of information, easy and unambiguous exchange of data over system barriers, as well as the automation of related processes and reuse of data. </p>
+     </div>
+     <button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">Where can I learn more on terminologies in RDM?</button>
+     <div class="content">
+     <ul>
+         <li><p>The FAIR Cookbook: a deliverable of the FAIRplus project (grant agreement 802750), funded by the IMI programme, a private-public partnership that receives support from the European Union’s Horizon 2020 research and innovation programme and EFPIA Companies. Introduction to terminologies and ontologies <a href="https://w3id.org/faircookbook/FCB019">https://w3id.org/faircookbook/FCB019</a></p></li>
+         <li><a href="https://www.w3.org/TR/rdf11-primer/">https://www.w3.org/TR/rdf11-primer/</a></li>
+         <li><a href="https://www.w3.org/TR/rdf-schema/">https://www.w3.org/TR/rdf-schema/</a></li>
+         <li><a href="https://www.w3.org/TR/owl2-primer/">https://www.w3.org/TR/owl2-primer/</a></li>
+         <li><a href="https://www.w3.org/TR/skos-reference/">https://www.w3.org/TR/skos-reference/</a></li>
+     </ul>
+     </div>
+</div>
+</section>
+
+
+<th:block th:include="fragments/footer :: footer"></th:block>
+<script type="text/javascript" src="../static/js/user.js" th:src="@{js/user.js}"></script>
+<!-- <script type="text/javascript" src="/js/oxo.js" th:src="@{/js/oxo.js}"></script> -->
+
+
+<!-- All JS that is just used on this page should go here, I suppose-->
+<script>
+    $(document).ready(function() {
+    });
+</script>
+
+</body>
+</html>

@@ -20,23 +20,72 @@
     <!- - When this content is no longer relevant -->
 </head>
 
+<style>
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  border-style: groove;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.collapsible:after {
+  content: '\002B';
+  color: white;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2212";
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
+</style>
 
 <body>
 <th:block th:include="fragments/header :: header"></th:block>
 
 <section id="main-content-area" role="main">
-    <div class="row">        
-<h3>How to use the TIB Central Terminology Service</h3>
-<p>This service offers an intuitive search functionality which is based on a SOLR search index on identifiers and terms. There are two main ways of browsing the Terminology Service. You can either browse the available ontologies via the <a th:href="@{/ontologies}" th:text="${ontologyAliasPlural}">Ontologies</a> tab or you can make search on all available ontologies by using the search box in the main page. 
+    <div class="row">   
+    
+<h2>Documentation</h2>  
+<p th:inline="text">This service offers an intuitive search functionality which is based on a SOLR search index on identifiers and terms. [[${org}]] [[${title}]] can be used both manually and programmatically. Manual access (User Interface) appeals to a larger audience whereas programmatical access (REST Interface) can play a key role in larger contexts. For this reason, they are both essential features of the service. </p>    
+         
+<button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">User Interface Specification of [[${org}]] [[${title}]]</button>
+<div class="content">
+<p th:inline="text">There are two main ways of browsing the [[${title}]] . You can either browse the available ontologies via the <a th:href="@{/ontologies}" th:text="${ontologyAliasPlural}">Ontologies</a> tab or you can make search on all available ontologies by using the search box in the main page. 
 If you browse the available ontologies, you should pick an ontology from the list and then you can browse through its tree view to lower levels or you can make a search for a specific term in that particular ontology through its search box. 
 Alternatively, if you make a search from the search box provided in the home page, the results will be displayed based on all ontologies that include the searched term. By using advanced search options, results can be filtered by entity type or ontology. 
 The entity types used for filtering are class, property, individual or ontology respectively. 
 As a result, your search leads you to the graph based view of a term regardless of your browsing methodology.
 RDF serializations of the latest ontology version are offered as downloads through the service.
 </p>
-<h3>How to use the REST Interface of TIB Central Terminology Service</h3>
+</div>
+<button class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #' + ${backgroundColor.replace('#', '')} + ';'">REST Interface Specification of [[${org}]] [[${title}]]</button>
+<div class="content">
 <p>The service also offers an API that allows to retrieve information on terms and their relations as json data for use in other webservices, e.g. in services of the research data management infrastructure of various research communities. In applications like research data management systems, ontological terms and their unique identifiers can, for example, be used as metadata on research data artifacts - thereby making research (meta)data more findable and interoperable. The REST API interface of the <a href="https://service.tib.eu/ts4tib">TIB Central Terminology Service</a> starts with <a href="http://service.tib.eu/ts4tib/api">http://service.tib.eu/ts4tib/api</a>. This API enables to search all the terminologies of various research communities maintained by TIB. The methodology on how to use this interface is explained in the <strong><a th:href="@{/apidoc}">API Documentation</a></strong> in detail.</p>
 <p>Publicly available API commands can also be analyzed and executed from the <strong><a th:href="@{/swagger-ui.html}">Swagger Documentation</a></strong>. The underlying models can further be viewed through this documentation for a deeper understanding of the API commands. </p>
+</div>
+
+<h3>Report an Issue</h3>
+<p th:inline="text">For feedback, enquiries or suggestion about [[${org}]] [[${shortTitle}]] or to request a new ontology please use our GitLab <a th:href="@{${issuesPage}}">issue tracker</a>. For more information, you can <a href="https://www.tib.eu/en/contact-form">contact TIB</a>.</p>
     </div>
 </section>
 
