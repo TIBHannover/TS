@@ -183,9 +183,9 @@
                 <li class="tabs-title"><a id="oxo-link"
                                           data-tabs-target="oxo-tab"
                                           href="#oxo-tab"><i class="icon icon-functional" data-icon="0"></i> Term mappings</a></li>
-                <li class="tabs-title"><a id="diachron-link"
-                                          data-tabs-target="diachron-tab"
-                                          href="#diachron-tab"><i class="icon icon-generic" data-icon="g"></i> Term history</a></li>
+<!--                 <li class="tabs-title"><a id="diachron-link" -->
+<!--                                           data-tabs-target="diachron-tab" -->
+<!--                                           href="#diachron-tab"><i class="icon icon-generic" data-icon="g"></i> Term history</a></li> -->
 
                 <!--li role="presentation"><a data-toggle="tab"
                                               href="#graph-tab"th:onclick="'window.open(\'@{../../ontologies/__${ontologyTerm.getOntologyName()}__/terms/graph (iri=${ontologyTerm.getIri()})\'})'"
@@ -501,6 +501,7 @@
         var shortForm = $('#shortForm').text();
 
         // shortForm="EFO:0000400";
+        var urlOxo = [[${oxoUrl}]];
         var baseURL = [[${oxoUrl}]] + "api/mappings?fromId=";
         var URL = baseURL + shortForm;
         var buttonLink = [[${oxoUrl}]] + "terms/" + shortForm;
@@ -534,9 +535,10 @@
                 $('#oxo-tab').append(htmlString);
             } else {
                 $('#oxo-tab').append(
-                    '<p>Could not find any direct mappings for this term. Use our \
-                     <a th:href="${oxoUrl}">Ontology Xreference service</a> \
-                     to explore mappings in more detail!</p>'
+                		'<p>Could not find any direct mappings for this term. You can explore \
+                        <a href="'+urlOxo+'">Ontology Xreference service</a> \
+                        for more details about mappings!</p>'
+
                 );
             }
         });
