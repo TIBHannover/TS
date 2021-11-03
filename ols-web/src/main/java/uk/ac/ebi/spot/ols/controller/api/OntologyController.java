@@ -83,21 +83,19 @@ public class OntologyController implements
         return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
     
-    @ApiOperation(value = "Filter list of ontologies by a particular classification schema",notes = "Multiple classification values can be provided with comma separated strings")
-    @RequestMapping(path = "/classification/{schema}/{classification}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(@ApiParam(value = "Classification schema that the filtering operation is based on", required = true, allowableValues = "DFG, GBV, subject, bk, collection") @PathVariable("schema") String schema, @ApiParam(value = "Classification value(s)", required = true) @PathVariable("classification") String classification,
+    @ApiOperation(value = "Filter list of ontologies by a particular classification schema")
+    @RequestMapping(path = "/classification/{schema}/classifications", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(@ApiParam(value = "Classification schema that the filtering operation is based on", required = true, allowableValues = "DFG, GBV, subject, bk, collection") @PathVariable("schema") String schema, @RequestParam(value = "classification", required = false) Collection<String> classifications,
             @PageableDefault(size = 20, page = 0) Pageable pageable,
             PagedResourcesAssembler assembler
-    ) throws ResourceNotFoundException {
-    	
-    	String[] cls = classification.split(",");    	
+    ) throws ResourceNotFoundException { 	
     	
     	List<OntologyDocument> temp = new ArrayList<OntologyDocument>();
     	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
     		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
     			if(classificationSchema.containsKey(schema))
-    				for (int i = 0;i<cls.length;i++)
-    				  if (classificationSchema.get(schema).contains(cls[i])) {
+    				for (String classification: classifications)
+    				  if (classificationSchema.get(schema).contains(classification)) {
     					  temp.add(ontologyDocument);
     					  break;
     				  }
