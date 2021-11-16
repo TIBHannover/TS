@@ -40,9 +40,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Simon Jupp
@@ -83,10 +86,63 @@ public class OntologyController implements
         return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
     
-    @ApiOperation(value = "Filter list of ontologies by a classification schemas and classifications", notes = "It is possible to pick multiple schema values with Ctrl and Shift buttons")
+    @ApiOperation(value = "List available schema keys")
+    @RequestMapping(path = "/schemakeys", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<PagedResources<String>> getAvailableSchemaKeys(
+            @PageableDefault(size = 20, page = 0) Pageable pageable,
+            PagedResourcesAssembler assembler
+    ) throws ResourceNotFoundException { 	
+    	Set<String> temp = new HashSet<String>();
+    	
+        try {
+        	
+        	for (OntologyDocument document : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+				document.getConfig().getClassifications().forEach(x -> temp.addAll(x.keySet()));
+			}
+        } catch (Exception e) {
+        }
+        
+        List<String> tempList = new ArrayList<String>();
+        tempList.addAll(temp);
+        
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), temp.size());
+        Page<String> document = new PageImpl<>(tempList.subList(start, end), pageable, temp.size());
+       
+       return new ResponseEntity<>( assembler.toResource(document), HttpStatus.OK);
+    }
+    
+    @ApiOperation(value = "List available classification values for particular schema keys", notes = "Possible schema keys can be inquired with /api/ontologies/schemakeys method.")
+    @RequestMapping(path = "/schemavalues", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<PagedResources<String>> getClassificationsForSchemas(
+    		@RequestParam(value = "schema", required = true) Collection<String> schemas,
+            @PageableDefault(size = 20, page = 0) Pageable pageable,
+            PagedResourcesAssembler assembler
+    ) throws ResourceNotFoundException { 	
+    	Set<String> temp = new HashSet<String>();
+    	
+        try {
+        	for (OntologyDocument document : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (schemas.contains(k)) temp.addAll(x.get(k));} ));
+			}
+        } catch (Exception e) {
+        }
+        
+        List<String> tempList = new ArrayList<String>();
+        tempList.addAll(temp);
+        
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), temp.size());
+        Page<String> document = new PageImpl<>(tempList.subList(start, end), pageable, temp.size());
+       
+       return new ResponseEntity<>( assembler.toResource(document), HttpStatus.OK);
+    }
+    
+    
+    @ApiOperation(value = "Filter list of ontologies by particular schema keys and classification values", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively.")
     @RequestMapping(path = "/filterby", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(
-    		@RequestParam(value = "schema", required = true) Collection<Schema> schemas,
+    		@RequestParam(value = "schema", required = true) Collection<String> schemas,
     		@RequestParam(value = "classification", required = true) Collection<String> classifications,
             @PageableDefault(size = 20, page = 0) Pageable pageable,
             PagedResourcesAssembler assembler
@@ -96,10 +152,10 @@ public class OntologyController implements
     	
     	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
     		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-    			for (Schema schema: schemas)
-    			    if(classificationSchema.containsKey(schema.getName()))
+    			for (String schema: schemas)
+    			    if(classificationSchema.containsKey(schema))
     				    for (String classification: classifications)
-    				      if (classificationSchema.get(schema.getName()).contains(classification)) {
+    				      if (classificationSchema.get(schema).contains(classification)) {
     					      temp.add(ontologyDocument);
     					      break;
     				  }
