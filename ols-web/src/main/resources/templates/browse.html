@@ -52,9 +52,8 @@
                 <tr>
                     <th data-width="20%" style="width: 20%;" data-sortable="true" th:inline="text">[[${ontologyAlias}]] Name</th>
                     <th data-sortable="true" style="width: 11%;">Short name</th>
-                    <th data-sortable="true">Description</th>
-                    <th data-sortable="true" style="width: 10%;">Classifications</th>
-                    <th data-sortable="true"  style="width: 4%;">Loaded</th>
+                    <th data-sortable="true">Description and Classifications</th>
+                    <th data-sortable="true"  style="width: 8%;">Loaded</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -67,16 +66,16 @@
                         <span th:if="${{onto.getStatus() ==  T(uk.ac.ebi.spot.ols.model.Status).NOTLOADED}}" th:text="${{onto.getConfig().getTitle()}}">Ontology name</span>
                     </td>
                     <td style="width: 11%;"><span class="ontology-source" th:text="${{onto.getConfig().getPreferredPrefix()}}"></span></td>
-                    <td style="font-size: smaller;" th:text="${{onto.getConfig().getDescription()}}">0</td>
-                    <td  style="width: 10%;">            
+                    <td style="font-size: smaller;">
+                    <span th:text="${{onto.getConfig().getDescription()}}"></span>            
                     <div th:each="classification: ${onto.getConfig().getClassifications()}">
-                       <div th:each="schema: ${classification.keySet().toArray()}" style="line-height: 1.15;">
-                           <b style="font-size: smaller;" th:text="${schema} + ': '"></b>
-                           <span style="font-size: smaller;" th:each="schemavalue : ${classification.get(schema)}" th:text="${schemavalue} + ' - '">NCBI_9606</span>
+                       <div th:each="schema: ${classification.keySet().toArray()}">
+                           <b th:text="${schema} + ': '"></b>
+                           <span th:each="schemavalue : ${classification.get(schema)}" th:text="${schemavalue} + ' - '">NCBI_9606</span>
                        </div>
                     </div>          
                     </td>
-                    <td  style="width: 4%;font-size: smaller;" th:text="${{onto.getLoaded()}}">0</td>
+                    <td  style="width: 8%;font-size: smaller;" th:text="${{onto.getLoaded()}}">0</td>
                     <td>
                         <a th:unless="${{onto.getStatus() == T(uk.ac.ebi.spot.ols.model.Status).NOTLOADED}}" th:href="'search?ontology=' + ${onto.getConfig().getNamespace()}" href="search">Search</a><br/>
                         <a th:unless="${{onto.getStatus() == T(uk.ac.ebi.spot.ols.model.Status).NOTLOADED}}" th:href="@{ontologies/__${onto.getConfig().getNamespace()}__/terms}">Terms</a><br/>
