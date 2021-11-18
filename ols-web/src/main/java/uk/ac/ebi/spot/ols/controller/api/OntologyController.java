@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.propertyeditors.CustomCollectionEditor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
@@ -70,6 +72,12 @@ public class OntologyController implements
     @Autowired DocumentAssembler documentAssembler;
 
     @Autowired TermAssembler termAssembler;
+    
+    @InitBinder()
+    public void initBinder(WebDataBinder binder) throws Exception
+    {
+       binder.registerCustomEditor(Collection.class, new CustomCollectionEditor(List.class));
+    }
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
