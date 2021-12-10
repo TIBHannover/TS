@@ -5,13 +5,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
+import io.swagger.annotations.ApiOperation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.ebi.spot.ols.config.OntologyResourceConfig;
+import uk.ac.ebi.spot.ols.entities.UserOntology;
+import uk.ac.ebi.spot.ols.entities.UserOntologyUtilities;
+import uk.ac.ebi.spot.ols.entities.YamlBasedPersistence;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import uk.ac.ebi.spot.ols.util.ReasonerType;
@@ -68,7 +80,33 @@ public class OntologyConfigController {
         return "";
 
     }
+    
+    @ApiOperation(value = "Extract metadata of an ontology from its PURL in YAML format")
+    @RequestMapping(path = "/plain-metadata-extractor", produces = {"text/yaml"}, method = RequestMethod.GET)
+    String extractPlainMetaData(
+            @RequestParam(value = "PURL", required = true, defaultValue = "") String PURL
+    ) {
+    	UserOntology userOntology = new UserOntology();
+    	userOntology.setPURL(PURL);
+        return YamlBasedPersistence.singleYAMLDumpWriter(UserOntologyUtilities.extractMetaData(userOntology), false);
 
+    }
+    
+    @ApiOperation(value = "Extract metadata of an ontology from its PURL as a Resource in JSON format")
+    @RequestMapping(path = "/metadata-extractor", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<Resource<UserOntology>> extractMetaData(
+            @RequestParam(value = "PURL", required = true, defaultValue = "") String PURL
+    ) {
+    	UserOntology userOntology = new UserOntology();
+    	userOntology.setPURL(PURL);
+    	
+    	Resource<UserOntology> resourceUserOntology = new Resource<UserOntology>(UserOntologyUtilities.extractMetaData(userOntology));
+
+        final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(OntologyConfigController.class).extractMetaData(PURL));
+        resourceUserOntology.add(lb.withSelfRel());	
+        return new ResponseEntity<>( resourceUserOntology, HttpStatus.OK);
+    }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
     @ExceptionHandler(ResourceNotFoundException.class)
