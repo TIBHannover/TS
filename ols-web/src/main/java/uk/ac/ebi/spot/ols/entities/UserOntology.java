@@ -21,6 +21,7 @@ public class UserOntology {
     
     @NotNull(message = "Name is mandatory.")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters.")
+    @Column(unique=true)
     private String name;
     
     @ValidURL(message = "Enter a valid URL.")
@@ -52,6 +53,7 @@ public class UserOntology {
     
     @NotNull(message = "Preferred Prefix is mandatory")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters")
+    @Column(unique=true)
     private String preferredPrefix;
     
     private String baseURI;

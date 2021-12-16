@@ -24,7 +24,7 @@ import uk.ac.ebi.spot.ols.util.OLSEnv;
 
 public class YamlBasedPersistence {
 	
-	public static String yamlDumpWriter(List<UserOntology> userOntologies, boolean includeUserData) {
+	public static String yamlSuggestionsDumpWriter(List<UserOntology> userOntologies, boolean includeUserData) {
 
 		   List<Map<String, Object>> ontologyList = new ArrayList<Map<String, Object>> ();
 		   for (UserOntology userOntology : userOntologies) {	   
@@ -51,11 +51,18 @@ public class YamlBasedPersistence {
 		   return yaml.dump(ontologies);
 		}
 	
-	public static String singleYAMLDumpWriter(UserOntology userOntology, boolean includeUserData) {
+	public static String singleSuggestionYAMLDumpWriter(UserOntology userOntology, boolean includeUserData) {
 		   DumperOptions options = new DumperOptions();
 		   options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		   Yaml yaml = new Yaml(options);
 		   return yaml.dump(putUserOntologyToMap(userOntology,includeUserData));
+	}
+	
+	public static String yamlGenericDumpWriter(Map<String, Object> data) {
+		   DumperOptions options = new DumperOptions();
+		   options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+		   Yaml yaml = new Yaml(options);
+		   return yaml.dump(data);
 	}
 	
 	public static Map<String, Object> putUserOntologyToMap (UserOntology userOntology, boolean includeUserData ) {
