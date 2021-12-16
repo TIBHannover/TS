@@ -96,18 +96,18 @@ public class OntologyConfigController {
 
     @ApiOperation(value = "Extract metadata of an ontology from its PURL in YAML format")
     @RequestMapping(path = "/plain-metadata-extractor", produces = {"text/yaml"}, method = RequestMethod.GET)
-    String extractPlainMetaData(
+    String extractSuggestionMetaData(
             @RequestParam(value = "PURL", required = true, defaultValue = "") String PURL
     ) {
     	UserOntology userOntology = new UserOntology();
     	userOntology.setPURL(PURL);
-        return YamlBasedPersistence.singleSuggestionYAMLDumpWriter(UserOntologyUtilities.extractMetaData(userOntology), false);
+        return YamlBasedPersistence.singleSuggestionDumpWriter(UserOntologyUtilities.extractMetaData(userOntology), false);
 
     }
     
     @ApiOperation(value = "Extract metadata of an ontology from its PURL as a Resource in JSON format")
     @RequestMapping(path = "/metadata-extractor", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<Resource<UserOntology>> extractMetaData(
+    HttpEntity<Resource<UserOntology>> extractSuggestionMetaDataJSON(
             @RequestParam(value = "PURL", required = true, defaultValue = "") String PURL
     ) {
     	UserOntology userOntology = new UserOntology();
@@ -116,13 +116,13 @@ public class OntologyConfigController {
     	Resource<UserOntology> resourceUserOntology = new Resource<UserOntology>(UserOntologyUtilities.extractMetaData(userOntology));
 
         final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
-                ControllerLinkBuilder.methodOn(OntologyConfigController.class).extractMetaData(PURL));
+                ControllerLinkBuilder.methodOn(OntologyConfigController.class).extractSuggestionMetaDataJSON(PURL));
         resourceUserOntology.add(lb.withSelfRel());	
         return new ResponseEntity<>( resourceUserOntology, HttpStatus.OK);
     }
     
     @ApiOperation(value = "Add an ontology suggestion and return it in YAML format")
-    @RequestMapping(path = "/add-suggestion", produces = {"text/yaml"}, method = RequestMethod.GET)
+    @RequestMapping(path = "/add-ontology-suggestion", produces = {"text/yaml"}, method = RequestMethod.GET)
     String addSuggestion(
     		@RequestParam(value = "name", required = true) String name,
     		@RequestParam(value = "PURL", required = true) String PURL,
@@ -191,15 +191,34 @@ public class OntologyConfigController {
 			
 		if(error.isEmpty() && validator.validate(userOntology).isEmpty()) {
 		    userOntologyRepository.save(userOntology);
-			return YamlBasedPersistence.singleSuggestionYAMLDumpWriter(userOntology, false);
+			return YamlBasedPersistence.singleSuggestionDumpWriter(userOntology, false);
 		} 	
 		
 		validator.validate(userOntology).forEach(x->error.put(x.getMessage(), x.getInvalidValue()));    	    
-    	return YamlBasedPersistence.yamlGenericDumpWriter(error);		    
+    	return YamlBasedPersistence.genericDumpWriter(error);		    
     }
-    
-    @ApiOperation(value = "List ontologies")
-    @RequestMapping(path = "/list-ontologies", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+     
+    @ApiOperation(value = "Extract metadata of a particular ontology suggestion in YAML format")
+    @RequestMapping(path = "/suggestion-metadata-extractor/{name}", produces = {"text/yaml"}, method = RequestMethod.GET)
+    public String extractSingleSuggestionsMetaData(@PathVariable("name") String name ) {
+           List<UserOntology> results = userOntologyRepository.findByName(name);
+           if(!results.isEmpty())
+        	  return YamlBasedPersistence.singleSuggestionDumpWriter(results.get(0), false); 
+           Map<String,Object> error = new HashMap<String,Object>();
+           error.put("No such record", name);
+           return YamlBasedPersistence.genericDumpWriter(error);
+    }
+       
+    @ApiOperation(value = "Extract metadata of all ontology suggestions in YAML format")
+    @RequestMapping(path = "/all-suggestions-metadata-extractor", produces = {"text/yaml"}, method = RequestMethod.GET)
+    public String extractAllSuggestionsMetaData() {
+           List<UserOntology> ontologyList = new ArrayList<UserOntology>();
+           userOntologyRepository.findAll().forEach(ontologyList::add);
+          return YamlBasedPersistence.allSuggestionsDumpWriter(ontologyList, false);  
+    }
+
+    @ApiOperation(value = "List all ontology suggestions")
+    @RequestMapping(path = "/list-ontology-suggestions", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<UserOntology>> listUserOntologies(@PageableDefault(size = 20, page = 0) Pageable pageable,PagedResourcesAssembler assembler   ) {
     	List<UserOntology> temp = new ArrayList<UserOntology>();
     	
