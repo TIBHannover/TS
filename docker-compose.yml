@@ -42,7 +42,7 @@ services:
         - ols.customisation.issuesPage=${ISSUES_PAGE}
         - ols.customisation.supportMail=${SUPPORT_MAIL}
         - ols.downloads.folder=/mnt/downloads
-        - OLS_HOME=/mnt
+        - OLS_HOME=/mnt/
       volumes:
         - ols-neo4j-data:/mnt/neo4j
         - ols-downloads:/mnt/downloads

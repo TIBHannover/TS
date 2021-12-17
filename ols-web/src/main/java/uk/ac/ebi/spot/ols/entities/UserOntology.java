@@ -58,7 +58,7 @@ public class UserOntology {
     
     private String baseURI;
     
-    private String reasoner;
+    private ReasonerEnum reasoner;
     
     private String labelProperty;
     @ElementCollection
@@ -80,7 +80,7 @@ public class UserOntology {
     @NotNull(message = "isFoundary is mandatory")
     private boolean foundary;
     
-    private String approval;
+    private ApprovalEnum approval;
     
     private String addedBy;
     
@@ -91,10 +91,10 @@ public class UserOntology {
 			@NotNull(message = "PURL is mandatory") String pURL, String uRI, String licenseURL, String licenseLogo,
 			String licenseLabel, String title, String description, List<String> creator, String homePage, String tracker,
 			String mailingList, @NotNull(message = "Preferred Prefix is mandatory") String preferredPrefix,
-			String baseURI, String reasoner, String labelProperty, List<String> definitionProperty, List<String> synonymProperty,
+			String baseURI, ReasonerEnum reasoner, String labelProperty, List<String> definitionProperty, List<String> synonymProperty,
 			List<String> hierarchicalProperty, List<String> hiddenProperty,
 			@NotNull(message = "oboSlims is mandatory") boolean oboSlims, List<String> preferredRootTerm, String logo,
-			@NotNull(message = "isFoundary is mandatory") boolean foundary, String approval, String addedBy) {
+			@NotNull(message = "isFoundary is mandatory") boolean foundary, ApprovalEnum approval, String addedBy) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -245,11 +245,11 @@ public class UserOntology {
 		this.baseURI = baseURI;
 	}
 
-	public String getReasoner() {
+	public ReasonerEnum getReasoner() {
 		return reasoner;
 	}
 
-	public void setReasoner(String reasoner) {
+	public void setReasoner(ReasonerEnum reasoner) {
 		this.reasoner = reasoner;
 	}
 
@@ -325,11 +325,11 @@ public class UserOntology {
 		this.foundary = foundary;
 	}
 
-	public String getApproval() {
+	public ApprovalEnum getApproval() {
 		return approval;
 	}
 
-	public void setApproval(String approval) {
+	public void setApproval(ApprovalEnum approval) {
 		this.approval = approval;
 	}
 

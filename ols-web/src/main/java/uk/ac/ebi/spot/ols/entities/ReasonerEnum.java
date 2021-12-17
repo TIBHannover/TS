@@ -1,10 +1,12 @@
 package uk.ac.ebi.spot.ols.entities;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ReasonerEnum {
 	
-	NONE("none"),
-	OWL2("hermit"),
-	EL("ELK");
+	NONE("NONE"),
+	OWL2("OWL2"),
+	EL("EL");
     
 	
     private final String propertyName;
@@ -20,7 +22,8 @@ public enum ReasonerEnum {
     	}
     	return commands;
     }
-
+    
+    @JsonValue
     public String getPropertyName() {
         return propertyName;
     }

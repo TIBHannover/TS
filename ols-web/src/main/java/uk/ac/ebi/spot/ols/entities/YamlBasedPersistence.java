@@ -3,11 +3,7 @@ package uk.ac.ebi.spot.ols.entities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,8 +15,6 @@ import javax.validation.ValidatorFactory;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-
-import uk.ac.ebi.spot.ols.util.OLSEnv;
 
 public class YamlBasedPersistence {
 	
@@ -139,9 +133,9 @@ public class YamlBasedPersistence {
 		   if(!userOntology.getHiddenProperty().isEmpty())
 		      data.put("hidden_property", userOntology.getHiddenProperty());
 		   if(userOntology.getReasoner() != null)
-		   if(!userOntology.getReasoner().isEmpty()) 
-			   if(!userOntology.getReasoner().equals("NONE"))
-				   data.put("reasoner", userOntology.getReasoner());
+		   if(!userOntology.getReasoner().getPropertyName().isEmpty()) 
+			   if(!userOntology.getReasoner().getPropertyName().equals("none"))
+				   data.put("reasoner", userOntology.getReasoner().getPropertyName());
 		   if(userOntology.isOboSlims() == true)
 		      data.put("oboSlims", userOntology.isOboSlims());
 		   if(userOntology.getPreferredRootTerm() != null)
@@ -155,8 +149,8 @@ public class YamlBasedPersistence {
 		   
 		   if(includeUserData) {
 			   if(userOntology.getApproval() != null)
-				   if(!userOntology.getApproval().isEmpty())
-				      data.put("approval", userOntology.getApproval());
+				   if(!userOntology.getApproval().getPropertyName().isEmpty())
+				      data.put("approval", userOntology.getApproval().getPropertyName());
 			   
 			   if(userOntology.getAddedBy() != null)
 				   if(!userOntology.getAddedBy().isEmpty())
@@ -205,7 +199,8 @@ public class YamlBasedPersistence {
 			uo.setSynonymProperty((List<String>) map.get("synonym_property"));
 			uo.setHierarchicalProperty((List<String>) map.get("hierarchical_property"));
 			uo.setHiddenProperty((List<String>) map.get("hidden_property"));
-			uo.setReasoner((String) map.get("reasoner"));
+			if (map.get("reasoner") != null)
+			    uo.setReasoner(ReasonerEnum.valueOf((String) map.get("reasoner")));
 			if(map.get("oboSlims")!=null) {
 				if(map.get("oboSlims") instanceof java.lang.Integer) {
 					if ((int) map.get("oboSlims") ==1)
@@ -227,7 +222,8 @@ public class YamlBasedPersistence {
 					uo.setFoundary((boolean) map.get("is_foundary"));
 			}	
 			
-			uo.setApproval((String) map.get("approval"));
+			if (map.get("approval") != null)
+			    uo.setApproval(ApprovalEnum.valueOf((String) map.get("approval")));
 			uo.setAddedBy((String) map.get("added_by"));
 			
 			if(validator.validate(uo).isEmpty())

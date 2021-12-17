@@ -25,14 +25,20 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import uk.ac.ebi.spot.ols.config.OntologyResourceConfig;
+import uk.ac.ebi.spot.ols.entities.ApprovalEnum;
+import uk.ac.ebi.spot.ols.entities.ReasonerEnum;
 import uk.ac.ebi.spot.ols.entities.UserOntology;
 import uk.ac.ebi.spot.ols.entities.UserOntologyUtilities;
 import uk.ac.ebi.spot.ols.entities.YamlBasedPersistence;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.repositories.UserOntologyRepository;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
+import uk.ac.ebi.spot.ols.util.OLSEnv;
 import uk.ac.ebi.spot.ols.util.ReasonerType;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +46,14 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 /**
@@ -63,6 +76,28 @@ public class OntologyConfigController {
     
     @Autowired
     private UserOntologyRepository userOntologyRepository;
+    
+    
+    private File getFile (String fileName) throws FileNotFoundException {
+        File file = new File (OLSEnv.getOLSHome(), fileName);
+        if (!file.exists()) {
+            throw new FileNotFoundException();
+        }
+        return file;
+    }
+    
+    private boolean recordExists(String name, String preferredPrefix, UserOntologyRepository userOntologyRepository) {
+    	try {
+			for (UserOntology userOntology : userOntologyRepository.findAll()) {
+				if (userOntology.getName().equals(name) || userOntology.getPreferredPrefix().equals(preferredPrefix))
+					return true;
+			}
+		} catch (NullPointerException e) {
+			System.out.println(e.getMessage());
+		}	
+    	
+    	return false;
+    }
 
     @RequestMapping(path = "", produces = {"text/yaml"}, method = RequestMethod.GET)
     String getOntologies(
@@ -138,7 +173,7 @@ public class OntologyConfigController {
     		@RequestParam(value = "mailingList", required = false) String mailingList,
     		@RequestParam(value = "preferredPrefix", required = true) String preferredPrefix,
     		@RequestParam(value = "baseURI", required = false) String baseURI,
-            @RequestParam(value = "reasoner", required = false) String reasoner,
+            @RequestParam(value = "reasoner", required = false) ReasonerEnum reasoner,
     		@RequestParam(value = "labelProperty", required = false) String labelProperty,
     		@RequestParam(value = "definitionProperty", required = false) List<String> definitionProperty,
     		@RequestParam(value = "synanymProperty", required = false) List<String> synonymProperty,
@@ -148,7 +183,7 @@ public class OntologyConfigController {
     		@RequestParam(value = "preferredRootTerm", required = false) List<String> preferredRootTerm,
     		@RequestParam(value = "logo", required = false) String logo,
     		@RequestParam(value = "foundary", required = false) boolean foundary,
-    		@RequestParam(value = "approval", required = false) String approval,
+    		@RequestParam(value = "approval", required = false) ApprovalEnum approval,
 //    		@RequestParam(value = "addedBy", required = false, defaultValue = "") String addedBy
     		@RequestParam(value = "extractMetaData", required = false) boolean extractMetaData
     ) {
@@ -231,6 +266,50 @@ public class OntologyConfigController {
         Page<UserOntology> document = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
        
        return new ResponseEntity<>( assembler.toResource(document), HttpStatus.OK);
+    }
+    
+    @ApiOperation(value = "Load a YAML format ontology suggestions list in addition to the existing suggestions and return it in the same format")
+    @RequestMapping(path = "/load-ontology-suggestion-list", produces = {"text/yaml"}, method = RequestMethod.POST)
+    String loadSuggestionListfromYAML(@RequestParam(value = "file", required = true) MultipartFile file) throws FileNotFoundException {
+    	
+        Map<String,Object> error = new HashMap<String,Object>();
+
+    	// check if file is empty
+        if (file.isEmpty()) {
+      	  error.put("exceptionMessage", "Please select a file to upload.");
+
+      	return YamlBasedPersistence.genericDumpWriter(error);
+        }
+
+        // normalize the file path
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        System.out.println("File Name: "+fileName);
+        // save the file on the local file system
+        try {
+            Path path = Paths.get(OLSEnv.getOLSHome() + fileName);
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("copied to "+path.getFileName());
+        } catch (IOException e) {
+      	  e.printStackTrace();
+        }
+        
+        List<UserOntology> temp =YamlBasedPersistence.yamlReader(getFile(fileName));
+
+        if (temp == null || temp.isEmpty()) {
+  	     error.put("exceptionMessage", "Upload Operation is unsuccessfull due to Validation Errors in the YAML file");
+  	     return YamlBasedPersistence.genericDumpWriter(error);
+        }
+
+  	  for (UserOntology uo : temp) {
+  		  if (!recordExists(uo.getName(), uo.getPreferredPrefix(), userOntologyRepository)) {
+  			  userOntologyRepository.save(uo);
+  		  } else {
+  			  System.out.println(uo.getName()+" is not added due to an existing record with the same id or same preferred prefix.");
+  			  System.out.println("A record exists with either id: "+uo.getName()+" or preferredPrefix: "+uo.getPreferredPrefix());
+  		  }		  
+  	  }
+	
+    	return YamlBasedPersistence.allSuggestionsDumpWriter(temp, false);
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")

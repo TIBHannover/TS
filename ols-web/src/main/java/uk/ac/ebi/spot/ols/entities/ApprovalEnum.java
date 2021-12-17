@@ -1,9 +1,11 @@
 package uk.ac.ebi.spot.ols.entities;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ApprovalEnum {
 	
-	ONREVIEW("onreview"),
-	APPROVED("approved"),
+	ONREVIEW("ONREVIEW"),
+	APPROVED("APPROVED"),
 	REJECTED("REJECTED");
     
 	
@@ -20,7 +22,8 @@ public enum ApprovalEnum {
     	}
     	return commands;
     }
-
+    
+    @JsonValue
     public String getPropertyName() {
         return propertyName;
     }
