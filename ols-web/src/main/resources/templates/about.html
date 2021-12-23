@@ -27,21 +27,48 @@
 <section id="main-content-area" role="main">
     <div class="row">
         <h2>Welcome to the Central Portal of TIB Terminology Services</h2>
-
-        <h3>TIB Terminology Service</h3>
-
-                <p>
-                    The Terminology Service of <a href="http://www.tib.eu/">TIB &ndash; Leibniz Information Centre for Science and Technology and University Library</a> is a single-point-of-entry web-service providing access to terms from generic and domain-specific controlled vocabularies and ontologies.
-                    TIB Central Terminology Service is the backbone of all the Terminology Services presented by TIB. 
+        
+                <p th:inline="text">
+                    A [[${title}]] is a repository for terminological resources based on semantic <a href="https://www.w3.org/">W3C</a> standards like the <a href="https://www.w3.org/TR/owl2-overview/">Web Ontology Language (OWL 2)</a>.
+                    The [[${title}]] of <a href="http://www.tib.eu/">TIB &ndash; Leibniz Information Centre for Science and Technology and University Library</a> is a single-point-of-entry web-service providing access to terms from generic and domain-specific controlled vocabularies and ontologies.
+                    [[${org}]] Central [[${title}]] is the backbone of all the Terminology Services presented by [[${org}]]. 
                     It hosts and stores the terminologies of various research communities mainly through this web site. 
                 </p>
+                
+                <h3>Community Terminology Services</h3>
+                <p>
+                
+                 TIB classifies terminologies with respect to certain subject classification schemas and the needs of several research communities. In this context, it maintains additional Terminology Services of the following research communities as extensions to this service: 
+                       
+                <ul>
+                    <li>Engineering Terminologies in:
+                       <a style="text-decoration:none !important;border:0px !important; " th:href="@{https://service.tib.eu/ts4ing}" 
+            		   	    th:title="'Go to NFDI4ING TS homepage'">
+            		   	   <img class="orga-logo" th:src="@{/img/logo_nfdi4ing_rgb_quer_scaled.png}" style="width:150px;"/>
+        			   </a>  
+        			</li>
+                    <li>Chemistry Terminologies in:
+        			   <a style="text-decoration:none !important;border:0px !important; " th:href="@{https://terminology.nfdi4chem.de/ts}" 
+            			    th:title="'Go to NFDI4CHEM TS homepage'">
+            			   <img class="orga-logo" th:src="@{/img/nfdi4chem.png}" style="width:180px;"/>
+        			   </a>
+        			</li>
+        			<li>Economics Terminologies in:
+        			   <a style="text-decoration:none !important;border:0px !important; " th:href="@{https://www.digitale-technologien.de/DT/Redaktion/DE/Standardartikel/KuenstlicheIntelligenzProjekte/KuenstlicheIntelligenzProjekte_DritterFoerderaufruf/ki-projekt_CoyPu.html}" 
+            			    th:title="'Go to CoYPu homepage'">
+            			   <img class="orga-logo" th:src="@{/img/CoyPu_Logo.png}" style="width:150px;"/>
+        			   </a>
+        			</li>
+                </ul>
+                       
+			    Ontologies that belong to these research communities can also be filtered from this service. It is planned to host more community specific Terminology Services as extensions of the central service. 
+                
 
-                <h4>Functionalities</h4>
+                <h3>Functionalities</h3>
 
                 <p>In further stages, the service will be expanded by the following functionalities:</p>
                 <ul>
                     <li>reliable storage for newly created domain-specific vocabularies,</li>
-                    <li>a fine-grained classification of vocabularies</li>
                     <li>collaborative creation of ontologies including a governance structure, a versioning system, a management platform and the possibility to identify missing terms and make term suggestions</li>
                     <li>a help-desk to assist the user community in the curation of terminologies.</li>
                 </ul>
