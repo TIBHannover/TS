@@ -62,7 +62,7 @@
                         <a th:href="@{/about}">TIB&#146;s Terminology Service</a>
                     </h4>
                     <p class="about">
-                        With its new Terminology Service, <a href="http://www.tib.eu/">TIB &ndash; Leibniz Information Centre for Science and Technology and University Library</a> provides a single point of access to terminology from domains such as architecture, chemistry, computer science, mathematics and physics. The Terminology Service is a repository for terminological resources based on semantic <a href="https://www.w3.org/">W3C</a> standards like the <a href="https://www.w3.org/TR/owl2-overview/">Web Ontology Language (OWL 2)</a>. You can browse ontologies through the website or use its API to retrieve terminological information and use it in your technical services.
+                        With its new Terminology Service, <a href="http://www.tib.eu/">TIB &ndash; Leibniz Information Centre for Science and Technology and University Library</a> provides a single point of access to terminology from domains such as architecture, chemistry, computer science, mathematics and physics. You can browse ontologies through the website or use its <strong><a th:href="@{/swagger-ui.html}">API</a></strong> to retrieve terminological information and use it in your technical services.
                     </p>
                 </div>
 
@@ -81,7 +81,7 @@
         			   and     			
         			   <a style="text-decoration:none !important;border:0px !important; " th:href="@{https://terminology.nfdi4chem.de/ts}" 
             			    th:title="'Go to NFDI4CHEM TS homepage'">
-            			   <img class="orga-logo" th:src="@{/img/nfdi4chem.png}" style="width:72.54px;"/>
+            			   <img class="orga-logo" th:src="@{/img/nfdi4chem.png}" style="width:120px;"/>
         			   </a>
                         
                         Terminology Services are particular examples of these extensions.
@@ -95,7 +95,7 @@
                         <a th:href="@{${issuesPage}}">Report an Issue</a>
                     </h4>
                     <p class="about">
-                        For feedback, enquiries or suggestions on our service or to request a new ontology please use our GitHub <a th:href="@{${issuesPage}}">issue tracker</a>.
+                        For feedback, enquiries or suggestions on our service or to request a new ontology please use our GitHub <a th:href="@{${issuesPage}}">issue tracker</a> or use the <a th:href="@{/swagger-ui.html#/ontology-suggestion-controller/addSuggestionUsingGET}">Ontology Suggestion API Method</a>.
                         For contacting us about further matters regarding the TIB Terminology Service, send an e-mail to <a th:href="@{'mailto:' + ${supportMail}}" th:text="@{${supportMail}}"></a>
                     </p>
                 </div>
