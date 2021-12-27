@@ -101,27 +101,34 @@ public class HomeController {
         }
     }
     
-    public Set<String> getClassificationsForOntologyAndSchema(String ontology, String key){
+    public Set<String> getClassificationsForSchema(String key){
     	
         try {
-        	Set<String> temp = new HashSet<String>();
+        	Set<String> classifications = new HashSet<String>();
         	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-        		document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (k.equals(key) && document.getConfig().getId().equals(ontology)) temp.addAll(x.get(k));} ));
+				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (key.equals(k)) classifications.addAll(x.get(k));} ));
 			}
-            return temp;
+            return classifications;
         } catch (Exception e) {
         	return Collections.emptySet();
         }
     }
     
-    @ModelAttribute("availableSchemaKeys")
-    public Set<String> getAvailableKeys(){
+    @ModelAttribute("availableSchemas")
+    public Set<Schema> getAvailableSchemas(){
         try {
-        	Set<String> temp = new HashSet<String>();
+        	Set<String> schemaKeys = new HashSet<String>();
+        	Set<Schema> schemas = new HashSet<Schema>();
         	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-				document.getConfig().getClassifications().forEach(x -> temp.addAll(x.keySet()));
+				document.getConfig().getClassifications().forEach(x -> schemaKeys.addAll(x.keySet()));
 			}
-            return temp;
+        	
+        	for (String key : schemaKeys) {
+        		Schema schema = new Schema(key,getClassificationsForSchema(key));
+        		schemas.add(schema);
+        	}
+        	
+            return schemas;
         } catch (Exception e) {
         	return Collections.emptySet();
         }
@@ -262,17 +269,13 @@ public class HomeController {
         );
         
         if ( schemas != null && classifications != null) {
-        	Set<String> temp = new HashSet<String>();	
-        	for (OntologyDocument document : filterOntologiesByClassification(schemas, classifications)) 
-        		temp.add(document.getOntologyId());
-        	
+        	Set<String> filteredOntologies = new HashSet<String>();	
+        	filterOntologiesByClassification(schemas, classifications).forEach(x -> filteredOntologies.add(x.getOntologyId()));
         	String filterMessage = "Displaying results for schemas: "+String.join(",", schemas)+" and respective classifications: "+String.join(",",classifications);
         	model.addAttribute("filterMessage",filterMessage);
-        	
         	ontologies = new HashSet<String>();
-    		ontologies.addAll(temp);
-    		schemas = new HashSet<>();
-        	
+    		ontologies.addAll(filteredOntologies);
+    		schemas = new HashSet<>();	
         } 
         
         if(ontologies != null) {
@@ -300,7 +303,7 @@ public class HomeController {
         }
         
         model.addAttribute("searchOptions", searchOptions);
-        model.addAttribute("availableSchemaValues",getClassificationsForSchemas(searchOptions.getSchemas()));
+//        model.addAttribute("availableSchemaValues",getClassificationsForSchemas(searchOptions.getSchemas()));
         model.addAttribute("collectionValues",getClassificationsForSchemas(new ArrayList<String>(Arrays.asList("collection"))));
         customisationProperties.setCustomisationModelAttributes(model);
         return "search";
