@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -115,10 +116,10 @@ public class HomeController {
     }
     
     @ModelAttribute("availableSchemas")
-    public Set<Schema> getAvailableSchemas(){
+    public List<Schema> getAvailableSchemas(){
         try {
         	Set<String> schemaKeys = new HashSet<String>();
-        	Set<Schema> schemas = new HashSet<Schema>();
+        	List<Schema> schemas = new ArrayList<Schema>();
         	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
 				document.getConfig().getClassifications().forEach(x -> schemaKeys.addAll(x.keySet()));
 			}
@@ -127,10 +128,11 @@ public class HomeController {
         		Schema schema = new Schema(key,getClassificationsForSchema(key));
         		schemas.add(schema);
         	}
+        	schemas.sort(Comparator.comparing(Schema::getKey));
         	
             return schemas;
         } catch (Exception e) {
-        	return Collections.emptySet();
+        	return Collections.emptyList();
         }
     }
     
