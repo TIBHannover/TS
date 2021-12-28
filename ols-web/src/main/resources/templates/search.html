@@ -109,7 +109,14 @@
                     <!--<legend><span class="glyphicon glyphicon-filter">Filters</span></legend>-->
                      
                     <p th:if="${filterMessage != null}" th:text="${filterMessage}" style="color: #00827c;"></p>
-                                                    
+                    <br th:unless="${filterMessage != null}">                                
+                    <div class="checkbox-inline">
+                        <label>
+                            <input id="facetedview" type="checkbox" th:checked="${not #lists.isEmpty(availableSchemaValues)}"/> Faceted Filter View
+                        </label>
+                    </div>
+                    <div id="simplefiltering" th:style="${#lists.isEmpty(availableSchemaValues) ? 'display:block' : 'display:none'}">
+                    
                     <div th:each="schema : ${availableSchemas}">
                     
                     <h4 class="filterbox-header" th:text="${schema.getKey()}"></h4>
@@ -123,43 +130,48 @@
                             </option>
                      </select>
                     
-                    </div>                     
-                                                    
-<!--                     <h4 class="filterbox-header">Schemas</h4> -->
-<!--                     <div class="filterBoxes"> -->
-<!--                         <select id="schema-select-id" name="schema" class="schema-select" style="width:100%"> -->
-<!--                             <option disabled selected value="0">-- select a schema --</option> -->
-<!--                             <option -->
-<!--                                     th:value="${schema}" -->
-<!--                                     th:each="schema : ${availableSchemaKeys}" -->
-<!--                                     th:text="${schema}" -->
-<!--                                     th:attr="data-schema-title=${schema}" -->
-<!--                                     th:with="schemas=${searchOptions.getSchemas()}" -->
-<!--                                     th:selected="${#sets.contains(schemas , schema)}" -->
-<!--                             > -->
-<!--                             </option> -->
-<!--                         </select> -->
-<!--                         <div id="schema-summary"> -->
-<!--                         </div> -->
-<!--                     </div> -->
+                    </div>                                
+                    
+                    </div>
+                    
+                    <div id="facetedfiltering" th:style="${#lists.isEmpty(availableSchemaValues) ? 'display:none' : 'display:block'}">
+                    <h4 class="filterbox-header">Schemas</h4>
+                    <div class="filterBoxes">
+                        <select id="schema-select-id" name="schema" class="schema-select" style="width:100%">
+                            <option disabled selected value="0">-- select a schema --</option>
+                            <option
+                                    th:value="${schema.getKey()}"
+                                    th:each="schema : ${availableSchemas}"
+                                    th:text="${schema.getKey()}"
+                                    th:attr="data-schema-title=${schema.getKey()}"
+                                    th:with="schemas=${searchOptions.getSchemas()}"
+                                    th:selected="${#sets.contains(schemas , schema.getKey())}"
+                            >
+                            </option>
+                        </select>
+                        <div id="schema-summary">
+                        </div>
+                    </div>
                                                               
-<!--                     <h4 class="filterbox-header" th:if="${not #lists.isEmpty(availableSchemaValues)}">Classifications</h4> -->
-<!--                     <div class="filterBoxes" th:if="${not #lists.isEmpty(availableSchemaValues)}"> -->
-<!--                         <select id="classification-select-id" name="classification" class="classification-select" style="width:100%"> -->
-<!--                             <option disabled selected value="0">-- select a classification --</option> -->
-<!--                             <option -->
-<!--                                     th:value="${classification}" -->
-<!--                                     th:each="classification : ${availableSchemaValues}" -->
-<!--                                     th:text="${classification}" -->
-<!--                                     th:attr="data-classification-title=${classification}" -->
-<!--                                     th:with="classifications=${searchOptions.getClassifications()}" -->
-<!--                                     th:selected="${#sets.contains(classifications , classification)}" -->
-<!--                             > -->
-<!--                             </option> -->
-<!--                         </select> -->
-<!--                         <div id="classification-summary"> -->
-<!--                         </div> -->
-<!--                     </div> -->
+                    <h4 class="filterbox-header" th:if="${not #lists.isEmpty(availableSchemaValues)}">Classifications</h4>
+                    <div class="filterBoxes" th:if="${not #lists.isEmpty(availableSchemaValues)}">
+                        <select id="classification-select-id" name="classification" class="classification-select" style="width:100%">
+                            <option disabled selected value="0">-- select a classification --</option>
+                            <option
+                                    th:value="${classification}"
+                                    th:each="classification : ${availableSchemaValues}"
+                                    th:text="${classification}"
+                                    th:attr="data-classification-title=${classification}"
+                                    th:with="classifications=${searchOptions.getClassifications()}"
+                                    th:selected="${#sets.contains(classifications , classification)}"
+                            >
+                            </option>
+                        </select>
+                        <div id="classification-summary">
+                        </div>
+                    </div>                    
+                    
+                    </div>                                                                     
                     
                     <h4 class="filterbox-header">Term type</h4>
                     <div class="filterBoxes">
@@ -244,6 +256,26 @@
 <th:block th:include="fragments/footer :: footer"></th:block>
 
 <!-- <script type="text/javascript" src="/js/oxo.js" th:src="@{/js/oxo.js}"></script> -->
+
+<script>
+
+function toggleFacet() {
+	  var x = document.getElementById("facetedfiltering");
+	  var y = document.getElementById("simplefiltering");
+	  if (x.style.display === "none") {
+	    x.style.display = "block";
+	    y.style.display = "none";
+	  } else {
+	    x.style.display = "none";
+	    y.style.display = "block";
+	  }
+	}
+
+document.getElementById("facetedview").addEventListener("click", function() {
+    toggleFacet();
+	});
+</script>
+
 
 <script type="text/javascript" src="../static/js/ols.js" th:src="@{js/ols.js}"></script>
 <script type="text/javascript" src="../static/js/ols-termselect2.js" th:src="@{js/ols-termselect2.js (beta=r1)}"></script>
