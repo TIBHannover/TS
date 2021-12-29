@@ -18,7 +18,14 @@ import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Simon Jupp
@@ -44,11 +51,56 @@ public class OntologyControllerUI {
     // Reading these from application.properties
     @Value("${ols.downloads.folder:}")
     private String downloadsFolder;
+       
+    public Set<String> getClassificationsForSchema(String key){
+    	
+        try {
+        	Set<String> classifications = new HashSet<String>();
+        	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (key.equals(k)) classifications.addAll(x.get(k));} ));
+			}
+            return classifications;
+        } catch (Exception e) {
+        	return Collections.emptySet();
+        }
+    }
+    
+    public Set<OntologyDocument> filterOntologiesByClassification(Collection<String> schemas, Collection<String> classifications){ 	
+    	Set<OntologyDocument> temp = new HashSet<OntologyDocument>();
+    	 for (OntologyDocument ontologyDocument : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+    		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+    			for (Map.Entry<String, Collection<String>> entry : classificationSchema.entrySet()) {
+					if (schemas.contains(entry.getKey()))
+						for (String classification : entry.getValue()) {
+							if (classifications.contains(classification)) {
+								temp.add(ontologyDocument);
+							}		
+						}		
+				}
+            }
+    	 }
+    	 
+    	 return temp;
+    }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
-    String getAll(Model model) {
-        List list = repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")));
-        model.addAttribute("all_ontologies", list);
+    String getAll(
+    		@RequestParam(value = "classification", required = false) Collection<String> classifications,
+    		Model model) {
+    	
+    	if(classifications != null) {
+    		Set<OntologyDocument> set = filterOntologiesByClassification(new ArrayList<String>(Arrays.asList("collection")), classifications);
+    		model.addAttribute("all_ontologies", set);
+    		model.addAttribute("scope", String.join(", ", classifications).replaceAll("(.*), (.*)", "$1 and $2"));
+    	} else {
+    		List<OntologyDocument> list = repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")));
+            model.addAttribute("all_ontologies", list);
+            model.addAttribute("scope", "all");
+    	}
+    	
+    	
+    	
+        model.addAttribute("collectionValues", getClassificationsForSchema("collection"));
         customisationProperties.setCustomisationModelAttributes(model);
         return "browse";
     }

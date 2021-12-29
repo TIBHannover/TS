@@ -30,7 +30,7 @@
 
     <!--@thymesVar id="summary" type="uk.ac.ebi.spot.ols.controller.ui.HomeController.SummaryInfo" -->
     <div class="row">
-        <h3 class="strapline marginTop" th:inline="text">List of all [[${ontologyAliasPlural.toLowerCase()}]] in [[${org}]] [[${title}]]</h3>
+        <h3 class="strapline marginTop" th:inline="text">List of [[${scope}]] [[${ontologyAliasPlural.toLowerCase()}]] in [[${org}]] [[${title}]]</h3>
 
         <!-- Deactivate Ontology search box for now, since the new data tables have a build in search functionality
         <div class="small-12 columns">
@@ -43,10 +43,28 @@
                 </div>
             </form>
            </div>
-        </div> -->
+        </div> -->      
 
         <div class="small-12 columns">
             <div class="dataTables_wrapper dt-foundation no-footer">
+           <h4 class="filterbox-header">Collection</h4>
+	       <select th:onchange="'window.location.href =  this.value '" style="width:100%">
+	               <option disabled selected value="0">-- select a collection --</option>
+	               <option
+	                       th:value="${urlBuilder.replaceQueryParam('classification', '').toUriString()}"
+	                       th:text="all"
+	                       th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+	               >
+	               </option>
+	               <option
+	                       th:value="${urlBuilder.replaceQueryParam('classification', '__(${classification})__').toUriString()}"
+	                       th:each="classification : ${collectionValues}"
+	                       th:text="${classification}"
+	                       th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+	               >
+	               </option>
+	        </select>  
+            
             <table id="ontologiesTable" class="tdisplay dataTable no-footer" role="grid">
                 <thead>
                 <tr>

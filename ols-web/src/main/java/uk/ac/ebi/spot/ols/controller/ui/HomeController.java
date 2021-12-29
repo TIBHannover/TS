@@ -306,7 +306,6 @@ public class HomeController {
         
         model.addAttribute("searchOptions", searchOptions);
         model.addAttribute("availableSchemaValues",getClassificationsForSchemas(searchOptions.getSchemas()));
-        model.addAttribute("collectionValues",getClassificationsForSchemas(new ArrayList<String>(Arrays.asList("collection"))));
         customisationProperties.setCustomisationModelAttributes(model);
         return "search";
     }
