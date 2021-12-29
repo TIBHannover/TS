@@ -97,10 +97,8 @@ public class OntologyControllerUI {
             model.addAttribute("all_ontologies", list);
             model.addAttribute("scope", "all");
     	}
-    	
-    	
-    	
-        model.addAttribute("collectionValues", getClassificationsForSchema("collection"));
+    	if(getClassificationsForSchema("collection").size()>0)  	
+           model.addAttribute("collectionValues", getClassificationsForSchema("collection"));
         customisationProperties.setCustomisationModelAttributes(model);
         return "browse";
     }

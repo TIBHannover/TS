@@ -47,8 +47,8 @@
 
         <div class="small-12 columns">
             <div class="dataTables_wrapper dt-foundation no-footer">
-           <h4 class="filterbox-header">Collection</h4>
-	       <select th:onchange="'window.location.href =  this.value '" style="width:100%">
+           <h4 th:if="${collectionValues != null}" class="filterbox-header">Collection</h4>
+	       <select th:if="${collectionValues != null}" th:onchange="'window.location.href =  this.value '" style="width:100%">
 	               <option disabled selected value="0">-- select a collection --</option>
 	               <option
 	                       th:value="${urlBuilder.replaceQueryParam('classification', '').toUriString()}"
