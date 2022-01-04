@@ -1,6 +1,7 @@
 package uk.ac.ebi.spot.ols.config;
 
 
+import uk.ac.ebi.spot.ols.util.License;
 import uk.ac.ebi.spot.ols.util.ReasonerType;
 
 import java.net.URI;
@@ -50,6 +51,7 @@ public class OntologyResourceConfig  {
 
     private boolean allowDownload;
     private Collection<Map<String, Collection<String>>> classifications;
+    private License license;
 
     // these are any metadata properties for the ontology, such as title or definition that are included in the ontology as OWL ontology annotation
     private Collection<String> internalMetadataProperties;
@@ -61,7 +63,7 @@ public class OntologyResourceConfig  {
                                   Collection<URI> synonymProperties, Collection<URI> hierarchicalProperties,
                                   Collection<String> baseUris, Collection<URI> hiddenProperties, boolean isSkos,
                                   Collection<String> internalMetadataProperties, Collection<URI> preferredRootTerms,
-                                  boolean allowDownload, Collection<Map<String, Collection<String>>> classifications) {
+                                  boolean allowDownload, Collection<Map<String, Collection<String>>> classifications, License license) {
         this.id = id;
         this.versionIri = versionIri;
         this.title = title;
@@ -88,6 +90,7 @@ public class OntologyResourceConfig  {
         this.preferredRootTerms = preferredRootTerms;
         this.allowDownload = allowDownload;
         this.classifications = classifications;
+        this.license = license;
     }
 
     public OntologyResourceConfig() {
@@ -121,6 +124,7 @@ public class OntologyResourceConfig  {
         this.preferredRootTerms = builder.preferredRootTerms;
         this.allowDownload = builder.allowDownload;
         this.classifications = builder.classifications;
+        this.license = builder.license;
     }
 
     public void setId(String id) {
@@ -341,6 +345,14 @@ public class OntologyResourceConfig  {
 	public void setClassifications(Collection<Map<String, Collection<String>>> classifications) {
 		this.classifications = classifications;
 	}
+	
+    public License getLicense() {
+        return this.license;
+    }
+
+    public void setLicense(License license) {
+        this.license= license;
+    }
 
     public static class OntologyResourceConfigBuilder {
         private  String id;
@@ -370,6 +382,7 @@ public class OntologyResourceConfig  {
         private Collection<URI> preferredRootTerms = Collections.emptySet();
         private boolean allowDownload = true;
         private Collection<Map<String, Collection<String>>> classifications = new ArrayList<>();
+        private License license;
 
         public OntologyResourceConfigBuilder(String id, String title, String namespace, URI fileLocation) {
             this.id = id;
@@ -510,6 +523,10 @@ public class OntologyResourceConfig  {
         public OntologyResourceConfigBuilder setClassifications(Collection<Map<String, Collection<String>>> classifications) {
             this.classifications = classifications;
             return this;
+        }
+        
+        public void setLicense(License license) {
+            this.license = license;
         }
 
         public OntologyResourceConfig build() {
