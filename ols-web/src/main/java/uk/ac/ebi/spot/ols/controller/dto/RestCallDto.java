@@ -1,6 +1,7 @@
 package uk.ac.ebi.spot.ols.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
 import uk.ac.ebi.spot.ols.entities.RestCall;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ public class RestCallDto {
     private String address;
     private String parameters;
     private String keyValueParameters;
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdAt;
 
     public RestCallDto() {
