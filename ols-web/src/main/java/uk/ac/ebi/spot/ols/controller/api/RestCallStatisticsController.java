@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.spot.ols.controller.dto.KeyValueResultDto;
@@ -45,7 +46,7 @@ public class RestCallStatisticsController {
     }
 
     @ApiOperation(value = "REST Calls List")
-    @RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public HttpEntity<PagedResources<RestCallDto>> getList(
         PagedResourcesAssembler assembler,
         @PageableDefault(size = DEFAULT_PAGE_SIZE)
@@ -71,7 +72,7 @@ public class RestCallStatisticsController {
     }
 
     @ApiOperation(value = "REST Calls statistics by address")
-    @RequestMapping(value = "/byAddress", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/byAddress", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public HttpEntity<RestCallCountResultDto> getStatisticsByAddress(
         @RequestParam(name = "address", required = false) String address,
         @RequestParam(name = "dateTimeFrom", required = false)
@@ -91,7 +92,7 @@ public class RestCallStatisticsController {
     }
 
     @ApiOperation(value = "REST Calls total count")
-    @RequestMapping(value = "/totalCount", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/totalCount", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public HttpEntity<KeyValueResultDto> getTotalCount(
         @RequestParam(name = "address", required = false) String address,
         @RequestParam(name = "dateTimeFrom", required = false)
@@ -111,7 +112,7 @@ public class RestCallStatisticsController {
     }
 
     @ApiOperation(value = "REST Calls statistics by parameter")
-    @RequestMapping(value = "/byParameter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/byParameter", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public HttpEntity<RestCallCountResultDto> getStatisticsByParameter(
         @RequestParam(name = "address", required = false) String address,
         @RequestParam(name = "dateTimeFrom", required = false)
