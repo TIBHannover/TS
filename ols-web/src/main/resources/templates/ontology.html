@@ -180,7 +180,7 @@
                     <div>
                         <b>Last loaded: </b> <span property="dateModified" th:text="${ontologyDocument.getLoaded()}">NCBI_9606</span>
                     </div>
-                    <b th:if="${ontologyDocument.getConfig().getCreators().size() > 1}">Creators:</b>
+                    <b th:unless="${ontologyDocument.getConfig().getAnnotations().containsKey('creator') or ontologyDocument.getConfig().getAnnotations().containsKey('contributor') or ontologyDocument.getConfig().getCreators().size() < 1}">Creators:</b>
                     <div th:each="creator : ${ontologyDocument.getConfig().getCreators()}">
                         <b th:if="${ontologyDocument.getConfig().getCreators().size() == 1}">Creator: </b>
                         <span th:if="${ontologyDocument.getConfig().getCreators().size() == 1}" th:text="${creator}">NCBI:9606</span>
@@ -209,7 +209,7 @@
                         <a th:href="${ontologyDocument.getConfig().getLicense().getLogo()}" th:text="${ontologyDocument.getConfig().getLicense().getLogo()}">License Logo</a>
                     </div>
                                                      
-                    <div th:unless="${ontologyDocument.getConfig().getLicense().getUrl() == null}">
+                    <div th:unless="${ontologyDocument.getConfig().getAnnotations().containsKey('license') or ontologyDocument.getConfig().getAnnotations().containsKey('rights') or ontologyDocument.getConfig().getLicense().getUrl() == null}">
                         <b>License URL: </b>
                         <a th:href="${ontologyDocument.getConfig().getLicense().getUrl()}" th:text="${ontologyDocument.getConfig().getLicense().getUrl()}">License URL</a>
                     </div>
