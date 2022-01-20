@@ -181,7 +181,7 @@
                         <b>Last loaded: </b> <span property="dateModified" th:text="${ontologyDocument.getLoaded()}">NCBI_9606</span>
                     </div>
                     <div th:unless="${ontologyDocument.getConfig().getAnnotations().containsKey('creator') or ontologyDocument.getConfig().getAnnotations().containsKey('contributor') or ontologyDocument.getConfig().getCreators().size() < 1}">
-	                    <b>Creators:</b>
+	                    <b th:if="${ontologyDocument.getConfig().getCreators().size() > 1}">Creators:</b>
 	                    <div th:each="creator : ${ontologyDocument.getConfig().getCreators()}">
 	                        <b th:if="${ontologyDocument.getConfig().getCreators().size() == 1}">Creator: </b>
 	                        <span th:if="${ontologyDocument.getConfig().getCreators().size() == 1}" th:text="${creator}">NCBI:9606</span>
