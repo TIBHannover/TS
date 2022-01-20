@@ -180,11 +180,13 @@
                     <div>
                         <b>Last loaded: </b> <span property="dateModified" th:text="${ontologyDocument.getLoaded()}">NCBI_9606</span>
                     </div>
-                    <b th:unless="${ontologyDocument.getConfig().getAnnotations().containsKey('creator') or ontologyDocument.getConfig().getAnnotations().containsKey('contributor') or ontologyDocument.getConfig().getCreators().size() < 1}">Creators:</b>
-                    <div th:each="creator : ${ontologyDocument.getConfig().getCreators()}">
-                        <b th:if="${ontologyDocument.getConfig().getCreators().size() == 1}">Creator: </b>
-                        <span th:if="${ontologyDocument.getConfig().getCreators().size() == 1}" th:text="${creator}">NCBI:9606</span>
-                        <p th:if="${ontologyDocument.getConfig().getCreators().size() > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${creator}">NCBI:9606</p>
+                    <div th:unless="${ontologyDocument.getConfig().getAnnotations().containsKey('creator') or ontologyDocument.getConfig().getAnnotations().containsKey('contributor') or ontologyDocument.getConfig().getCreators().size() < 1}">
+	                    <b>Creators:</b>
+	                    <div th:each="creator : ${ontologyDocument.getConfig().getCreators()}">
+	                        <b th:if="${ontologyDocument.getConfig().getCreators().size() == 1}">Creator: </b>
+	                        <span th:if="${ontologyDocument.getConfig().getCreators().size() == 1}" th:text="${creator}">NCBI:9606</span>
+	                        <p th:if="${ontologyDocument.getConfig().getCreators().size() > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${creator}">NCBI:9606</p>
+	                    </div>                                      
                     </div>
                     
                     <b th:unless="${ontologyDocument.getConfig().getClassifications().isEmpty()}">Classifications: </b>
