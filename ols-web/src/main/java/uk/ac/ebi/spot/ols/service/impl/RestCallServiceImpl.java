@@ -10,6 +10,8 @@ import uk.ac.ebi.spot.ols.entities.RestCall;
 import uk.ac.ebi.spot.ols.repositories.RestCallRepository;
 import uk.ac.ebi.spot.ols.service.RestCallService;
 
+import java.util.List;
+
 @Service
 public class RestCallServiceImpl implements RestCallService {
     private final RestCallRepository restCallRepository;
@@ -29,5 +31,16 @@ public class RestCallServiceImpl implements RestCallService {
     public Page<RestCallDto> getList(RestCallRequest request, Pageable pageable) {
 
         return restCallRepository.query(request, pageable);
+    }
+
+    @Override
+    public List<RestCall> findAll() {
+        return restCallRepository.findAll();
+    }
+
+    @Override
+    public Long count(RestCallRequest request) {
+
+        return restCallRepository.count(request);
     }
 }
