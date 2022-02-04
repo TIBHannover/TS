@@ -2,25 +2,25 @@ package uk.ac.ebi.spot.ols.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.spot.ols.controller.dto.KeyValueResultDto;
-import uk.ac.ebi.spot.ols.controller.dto.RestCallCountResultDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
+import uk.ac.ebi.spot.ols.entities.RestCallParameter;
 import uk.ac.ebi.spot.ols.service.RestCallService;
 import uk.ac.ebi.spot.ols.service.RestCallStatisticsService;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class RestCallStatisticsServiceImpl implements RestCallStatisticsService {
-    public static final int MAX_PAGE_SIZE = 2147483647;
     private final RestCallService restCallService;
 
     @Autowired
@@ -29,9 +29,8 @@ public class RestCallStatisticsServiceImpl implements RestCallStatisticsService 
     }
 
     @Override
-    public RestCallCountResultDto getRestCallsCountsByAddress(RestCallRequest request) {
-        PageRequest pageRequest = new PageRequest(0, MAX_PAGE_SIZE);
-        Page<RestCallDto> page = restCallService.getList(request, pageRequest);
+    public Page<KeyValueResultDto> getRestCallsCountsByAddress(RestCallRequest request, Pageable pageable) {
+        Page<RestCallDto> page = restCallService.getList(request, pageable);
 
         Map<String, Long> countsMap = getCountsMap(page);
 
@@ -39,34 +38,28 @@ public class RestCallStatisticsServiceImpl implements RestCallStatisticsService 
             .map(entry -> new KeyValueResultDto(entry.getKey(), entry.getValue()))
             .collect(Collectors.toList());
 
-        return new RestCallCountResultDto(list);
+        return new PageImpl<>(list, pageable, list.size());
     }
 
     @Override
     public KeyValueResultDto getRestCallsTotalCount(RestCallRequest request) {
-        PageRequest pageRequest = new PageRequest(0, MAX_PAGE_SIZE);
-        Page<RestCallDto> page = restCallService.getList(request, pageRequest);
+        Long count = restCallService.count(request);
+        Long value = Optional.ofNullable(count).orElse(0L);
 
-        Map<String, Long> countsMap = getCountsMap(page);
-
-        long sum = countsMap.values().stream()
-            .mapToLong(value -> value)
-            .sum();
-
-        return new KeyValueResultDto("total", sum);
+        return new KeyValueResultDto("total", value);
     }
 
     @Override
-    public RestCallCountResultDto getRestCallsCountsByParameter(RestCallRequest request) {
-        PageRequest pageRequest = new PageRequest(0, MAX_PAGE_SIZE);
-        Page<RestCallDto> page = restCallService.getList(request, pageRequest);
+    public Page<KeyValueResultDto> getStatisticsByParameter(RestCallRequest request, Pageable pageable) {
+        Page<RestCallDto> page = restCallService.getList(request, pageable);
 
         Map<String, Long> parametersWithCountsMap = page.getContent().stream()
-            .flatMap(restCallDto -> Arrays.stream(restCallDto.getParameters().split(",")))
-            .sorted()
+            .flatMap(restCallDto -> restCallDto.getParameters().stream())
+            .filter(request.getParameterNamePredicate())
+            .filter(request.getParameterTypePredicate())
             .collect(
                 Collectors.groupingBy(
-                    s -> s,
+                    RestCallParameter::getValue,
                     Collectors.counting()
                 )
             )
@@ -85,14 +78,14 @@ public class RestCallStatisticsServiceImpl implements RestCallStatisticsService 
             .map(entry -> new KeyValueResultDto(entry.getKey(), entry.getValue()))
             .collect(Collectors.toList());
 
-        return new RestCallCountResultDto(list);
+        return new PageImpl<>(list, pageable, list.size());
     }
 
     private Map<String, Long> getCountsMap(Page<RestCallDto> page) {
         Map<String, Long> addressesWithCountsMap = page.getContent().stream()
             .collect(
                 Collectors.groupingBy(
-                    RestCallDto::getAddress,
+                    RestCallDto::getUrl,
                     Collectors.counting()
                 )
             );

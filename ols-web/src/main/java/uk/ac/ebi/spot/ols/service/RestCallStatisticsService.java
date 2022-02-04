@@ -1,13 +1,14 @@
 package uk.ac.ebi.spot.ols.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import uk.ac.ebi.spot.ols.controller.dto.KeyValueResultDto;
-import uk.ac.ebi.spot.ols.controller.dto.RestCallCountResultDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
 
 public interface RestCallStatisticsService {
-    RestCallCountResultDto getRestCallsCountsByAddress(RestCallRequest request);
+    Page<KeyValueResultDto> getRestCallsCountsByAddress(RestCallRequest request, Pageable pageable);
 
     KeyValueResultDto getRestCallsTotalCount(RestCallRequest request);
 
-    RestCallCountResultDto getRestCallsCountsByParameter(RestCallRequest request);
+    Page<KeyValueResultDto> getStatisticsByParameter(RestCallRequest request, Pageable pageable);
 }
