@@ -20,7 +20,8 @@ public class RestCallHandlerServiceImpl implements RestCallHandlerService {
     private final RestCallService restCallService;
 
     @Autowired
-    public RestCallHandlerServiceImpl(RestCallParserService restCallParserService, RestCallService restCallService) {
+    public RestCallHandlerServiceImpl(RestCallParserService restCallParserService,
+                                      RestCallService restCallService) {
         this.restCallParserService = restCallParserService;
         this.restCallService = restCallService;
     }
@@ -29,11 +30,9 @@ public class RestCallHandlerServiceImpl implements RestCallHandlerService {
     public void handle(HttpServletRequest request) {
         HttpServletRequestInfo requestInfo = restCallParserService.parse(request);
 
-        RestCall restCall = new RestCall(
-            requestInfo.getAddress(),
-            requestInfo.getParameters(),
-            requestInfo.getKeyValueParameters()
-        );
+        RestCall restCall = new RestCall(requestInfo.getUrl());
+        restCall.addParameters(requestInfo.getPathVariables());
+        restCall.addParameters(requestInfo.getQueryParameters());
 
         RestCall saved = restCallService.save(restCall);
 
