@@ -2,13 +2,19 @@ package uk.ac.ebi.spot.ols.entities;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "rest_call")
@@ -17,14 +23,11 @@ public class RestCall {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "address", nullable = false)
-    private String address;
+    @Column(name = "url", nullable = false)
+    private String url;
 
-    @Column(name = "parameters")
-    private String parameters;
-
-    @Column(name = "key_value_parameters")
-    private String keyValueParameters;
+    @OneToMany(mappedBy = "restCall", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<RestCallParameter> parameters = new HashSet<>();
 
     @Column(name = "created_at")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -33,11 +36,21 @@ public class RestCall {
     public RestCall() {
     }
 
-    public RestCall(String address, String parameters, String keyValueParameters) {
-        this.address = address;
-        this.parameters = parameters;
-        this.keyValueParameters = keyValueParameters;
+    public RestCall(String url) {
+        this.url = url;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public RestCall(String url,
+                    Set<RestCallParameter> parameters) {
+        this.url = url;
+        this.parameters = parameters;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void addParameters(Set<RestCallParameter> set) {
+        parameters.addAll(set);
+        set.forEach(parameter -> parameter.setRestCall(this));
     }
 
     public Long getId() {
@@ -48,28 +61,12 @@ public class RestCall {
         this.id = id;
     }
 
-    public String getAddress() {
-        return address;
+    public String getUrl() {
+        return url;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getParameters() {
-        return parameters;
-    }
-
-    public void setParameters(String parameters) {
-        this.parameters = parameters;
-    }
-
-    public String getKeyValueParameters() {
-        return keyValueParameters;
-    }
-
-    public void setKeyValueParameters(String keyValueParameters) {
-        this.keyValueParameters = keyValueParameters;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -80,13 +77,34 @@ public class RestCall {
         this.createdAt = createdAt;
     }
 
+    public Set<RestCallParameter> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Set<RestCallParameter> parameters) {
+        this.parameters = parameters;
+    }
+
     @Override
     public String toString() {
         return "RestCall{" +
             "id=" + id +
-            ", address='" + address + '\'' +
-            ", parameters='" + parameters + '\'' +
+            ", url='" + url + '\'' +
+            ", parameters=" + parameters +
             ", createdAt=" + createdAt +
             '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RestCall restCall = (RestCall) o;
+        return id.equals(restCall.id) && url.equals(restCall.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, url);
     }
 }

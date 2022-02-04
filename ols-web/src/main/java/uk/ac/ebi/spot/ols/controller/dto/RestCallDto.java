@@ -1,50 +1,54 @@
 package uk.ac.ebi.spot.ols.controller.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import uk.ac.ebi.spot.ols.entities.RestCall;
+import uk.ac.ebi.spot.ols.entities.RestCallParameter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class RestCallDto {
-    private String address;
-    private String parameters;
-    private String keyValueParameters;
+    private Long id;
+    private String url;
+    private Set<RestCallParameter> parameters;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdAt;
 
     public RestCallDto() {
     }
 
-    public RestCallDto(String address, String parameters, String keyValueParameters, LocalDateTime createdAt) {
-        this.address = address;
+    public RestCallDto(Long id,
+                       String url,
+                       Set<RestCallParameter> parameters,
+                       LocalDateTime createdAt) {
+        this.id = id;
+        this.url = url;
         this.parameters = parameters;
-        this.keyValueParameters = keyValueParameters;
         this.createdAt = createdAt;
     }
 
-    public String getAddress() {
-        return address;
+    public Long getId() {
+        return id;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getParameters() {
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Set<RestCallParameter> getParameters() {
         return parameters;
     }
 
-    public void setParameters(String parameters) {
+    public void setParameters(Set<RestCallParameter> parameters) {
         this.parameters = parameters;
-    }
-
-    public String getKeyValueParameters() {
-        return keyValueParameters;
-    }
-
-    public void setKeyValueParameters(String keyValueParameters) {
-        this.keyValueParameters = keyValueParameters;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -57,9 +61,9 @@ public class RestCallDto {
 
     public static RestCallDto of(RestCall restCall) {
         return new RestCallDto(
-            restCall.getAddress(),
+            restCall.getId(),
+            restCall.getUrl(),
             restCall.getParameters(),
-            restCall.getKeyValueParameters(),
             restCall.getCreatedAt()
         );
     }
