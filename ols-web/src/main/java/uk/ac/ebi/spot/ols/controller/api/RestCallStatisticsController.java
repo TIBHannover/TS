@@ -1,6 +1,7 @@
 package uk.ac.ebi.spot.ols.controller.api;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +23,12 @@ import uk.ac.ebi.spot.ols.controller.dto.KeyValueResultDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallCountResultDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
+import uk.ac.ebi.spot.ols.entities.RestCallParameterType;
 import uk.ac.ebi.spot.ols.service.RestCallService;
 import uk.ac.ebi.spot.ols.service.RestCallStatisticsService;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/rest/statistics")
@@ -35,14 +38,17 @@ public class RestCallStatisticsController {
     private final RestCallService restCallService;
     private final RestCallStatisticsService restCallStatisticsService;
     private final RestCallAssembler restCallAssembler;
+    private final KeyValueResultAssembler keyValueResultAssembler;
 
     @Autowired
     public RestCallStatisticsController(RestCallService restCallService,
                                         RestCallStatisticsService restCallStatisticsService,
-                                        RestCallAssembler restCallAssembler) {
+                                        RestCallAssembler restCallAssembler,
+                                        KeyValueResultAssembler keyValueResultAssembler) {
         this.restCallService = restCallService;
         this.restCallStatisticsService = restCallStatisticsService;
         this.restCallAssembler = restCallAssembler;
+        this.keyValueResultAssembler = keyValueResultAssembler;
     }
 
     @ApiOperation(value = "REST Calls List")
@@ -54,14 +60,14 @@ public class RestCallStatisticsController {
             @SortDefault(sort = "createdAt", direction = Sort.Direction.DESC)
         }) Pageable pageable,
 
-        @RequestParam(name = "address", required = false) String address,
+        @RequestParam(name = "url", required = false) String url,
         @RequestParam(name = "dateTimeFrom", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo
     ) {
         RestCallRequest request = new RestCallRequest(
-            address,
+            url,
             dateTimeFrom,
             dateTimeTo
         );
@@ -71,37 +77,39 @@ public class RestCallStatisticsController {
         return new ResponseEntity<>(assembler.toResource(page, restCallAssembler), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "REST Calls statistics by address")
-    @RequestMapping(value = "/byAddress", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public HttpEntity<RestCallCountResultDto> getStatisticsByAddress(
-        @RequestParam(name = "address", required = false) String address,
+    @ApiOperation(value = "REST Calls statistics by URL")
+    @RequestMapping(value = "/byUrl", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public HttpEntity<PagedResources<KeyValueResultDto>> getStatisticsByUrl(
+        @RequestParam(name = "url", required = false) String url,
         @RequestParam(name = "dateTimeFrom", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
+        Pageable pageable,
+        PagedResourcesAssembler assembler
     ) {
         RestCallRequest request = new RestCallRequest(
-            address,
+            url,
             dateTimeFrom,
             dateTimeTo
         );
 
-        RestCallCountResultDto counts = restCallStatisticsService.getRestCallsCountsByAddress(request);
+        Page<KeyValueResultDto> page = restCallStatisticsService.getRestCallsCountsByAddress(request, pageable);
 
-        return new ResponseEntity<>(counts, HttpStatus.OK);
+        return new ResponseEntity<>(assembler.toResource(page, keyValueResultAssembler), HttpStatus.OK);
     }
 
     @ApiOperation(value = "REST Calls total count")
-    @RequestMapping(value = "/totalCount", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = "/count", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public HttpEntity<KeyValueResultDto> getTotalCount(
-        @RequestParam(name = "address", required = false) String address,
+        @RequestParam(name = "url", required = false) String url,
         @RequestParam(name = "dateTimeFrom", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo
     ) {
         RestCallRequest request = new RestCallRequest(
-            address,
+            url,
             dateTimeFrom,
             dateTimeTo
         );
@@ -111,24 +119,32 @@ public class RestCallStatisticsController {
         return new ResponseEntity<>(counts, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "REST Calls statistics by parameter")
+    @ApiOperation(value = "REST Calls statistics by query parameters and path variables")
     @RequestMapping(value = "/byParameter", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public HttpEntity<RestCallCountResultDto> getStatisticsByParameter(
-        @RequestParam(name = "address", required = false) String address,
+    public HttpEntity<PagedResources<KeyValueResultDto>> getStatisticsByParameter(
+        @ApiParam(value = "Parameter type", allowableValues = "PATH,QUERY")
+        @RequestParam(name = "type", required = false) RestCallParameterType type,
+        @RequestParam(name = "url", required = false) String url,
+        @ApiParam(value = "Parameter name")
+        @RequestParam(name = "parameter", required = false) String parameter,
         @RequestParam(name = "dateTimeFrom", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
+        Pageable pageable,
+        PagedResourcesAssembler assembler
     ) {
         RestCallRequest request = new RestCallRequest(
-            address,
+            url,
+            Optional.ofNullable(type),
+            Optional.ofNullable(parameter),
             dateTimeFrom,
             dateTimeTo
         );
 
-        RestCallCountResultDto counts = restCallStatisticsService.getRestCallsCountsByParameter(request);
+        Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByParameter(request, pageable);
 
-        return new ResponseEntity<>(counts, HttpStatus.OK);
+        return new ResponseEntity<>(assembler.toResource(page, keyValueResultAssembler), HttpStatus.OK);
     }
 
 }
