@@ -7,4 +7,6 @@ import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
 
 public interface RestCallRepositoryCustom {
     Page<RestCallDto> query(RestCallRequest request, Pageable pageable);
+
+    Long count(RestCallRequest request);
 }
