@@ -11,4 +11,6 @@ public interface RestCallStatisticsService {
     KeyValueResultDto getRestCallsTotalCount(RestCallRequest request);
 
     Page<KeyValueResultDto> getStatisticsByParameter(RestCallRequest request, Pageable pageable);
+
+    Page<KeyValueResultDto> getStatisticsByDate(RestCallRequest request, Pageable pageable);
 }

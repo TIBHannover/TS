@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.spot.ols.controller.dto.KeyValueResultDto;
-import uk.ac.ebi.spot.ols.controller.dto.RestCallCountResultDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
 import uk.ac.ebi.spot.ols.entities.RestCallParameterType;
@@ -143,6 +142,34 @@ public class RestCallStatisticsController {
         );
 
         Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByParameter(request, pageable);
+
+        return new ResponseEntity<>(assembler.toResource(page, keyValueResultAssembler), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "REST Calls statistics by date")
+    @RequestMapping(value = "/byDate", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public HttpEntity<PagedResources<KeyValueResultDto>> getStatisticsByDate(
+        @ApiParam(value = "Parameter type", allowableValues = "PATH,QUERY")
+        @RequestParam(name = "type", required = false) RestCallParameterType type,
+        @RequestParam(name = "url", required = false) String url,
+        @ApiParam(value = "Parameter name")
+        @RequestParam(name = "parameter", required = false) String parameter,
+        @RequestParam(name = "dateTimeFrom", required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
+        @RequestParam(name = "dateTimeTo", required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
+        Pageable pageable,
+        PagedResourcesAssembler assembler
+    ) {
+        RestCallRequest request = new RestCallRequest(
+            url,
+            Optional.ofNullable(type),
+            Optional.ofNullable(parameter),
+            dateTimeFrom,
+            dateTimeTo
+        );
+
+        Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByDate(request, pageable);
 
         return new ResponseEntity<>(assembler.toResource(page, keyValueResultAssembler), HttpStatus.OK);
     }

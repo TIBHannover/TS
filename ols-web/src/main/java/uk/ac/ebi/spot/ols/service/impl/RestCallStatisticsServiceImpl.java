@@ -81,6 +81,35 @@ public class RestCallStatisticsServiceImpl implements RestCallStatisticsService 
         return new PageImpl<>(list, pageable, list.size());
     }
 
+    @Override
+    public Page<KeyValueResultDto> getStatisticsByDate(RestCallRequest request, Pageable pageable) {
+        Page<RestCallDto> page = restCallService.getList(request, pageable);
+
+        LinkedHashMap<String, Long> map = page.getContent().stream()
+            .collect(
+                Collectors.groupingBy(
+                    restCallDto -> restCallDto.getCreatedAt().toLocalDate().toString(),
+                    Collectors.counting()
+                )
+            )
+            .entrySet().stream()
+            .sorted(Map.Entry.comparingByKey())
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue,
+                    (oldValue, newValue) -> oldValue,
+                    LinkedHashMap::new
+                )
+            );
+
+        List<KeyValueResultDto> list = map.entrySet().stream()
+            .map(entry -> new KeyValueResultDto(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toList());
+
+        return new PageImpl<>(list, pageable, list.size());
+    }
+
     private Map<String, Long> getCountsMap(Page<RestCallDto> page) {
         Map<String, Long> addressesWithCountsMap = page.getContent().stream()
             .collect(
