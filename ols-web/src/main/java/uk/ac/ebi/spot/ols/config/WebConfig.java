@@ -2,13 +2,11 @@ package uk.ac.ebi.spot.ols.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.*;
-import org.springframework.web.util.UrlPathHelper;
+import uk.ac.ebi.spot.ols.converter.StringToEnumConverter;
+import uk.ac.ebi.spot.ols.service.RestCallHandlerService;
 
 /**
  * @author Simon Jupp
@@ -43,9 +41,14 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     @Autowired
     MaintenanceInterceptor interceptor;
+
+    @Autowired
+    RestCallHandlerService restCallHandlerService;
+
     @Override
      public void addInterceptors(InterceptorRegistry registry) {
          registry.addInterceptor(interceptor);
+         registry.addInterceptor(restCallInterceptor());
      }
 
     @Override
@@ -55,6 +58,16 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/custom/**").addResourceLocations("file:" + System.getProperty("ols.home") + "/web-custom/");
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new StringToEnumConverter());
+    }
+
+    @Bean
+    public RestCallInterceptor restCallInterceptor() {
+        return new RestCallInterceptor(restCallHandlerService);
     }
 
 }
