@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author Simon Jupp
@@ -55,7 +56,7 @@ public class OntologyControllerUI {
     public Set<String> getClassificationsForSchema(String key){
     	
         try {
-        	Set<String> classifications = new HashSet<String>();
+        	Set<String> classifications = new TreeSet<String>();
         	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
 				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (key.equals(k)) classifications.addAll(x.get(k));} ));
 			}
