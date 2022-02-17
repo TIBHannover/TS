@@ -1,6 +1,9 @@
 
 package uk.ac.ebi.spot.ols.controller.ui;
 
+import java.util.Date;
+import java.util.TimeZone;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,7 +21,13 @@ public class OlsErrorController implements ErrorController  {
 
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request,Model model) {
+    	
+    	Date now = new Date();
+    	TimeZone.setDefault( TimeZone.getTimeZone("GMT"));
+    	model.addAttribute("timestamp",now); 
     	model.addAttribute("message",request.getAttribute(RequestDispatcher.ERROR_MESSAGE));
+    	model.addAttribute("status",request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE));
+
         customisationProperties.setCustomisationModelAttributes(model);
 
         return "error";
@@ -26,7 +35,7 @@ public class OlsErrorController implements ErrorController  {
 
     @Override
     public String getErrorPath() {
-        return null;
+        return "/error";
     }
 }
 
