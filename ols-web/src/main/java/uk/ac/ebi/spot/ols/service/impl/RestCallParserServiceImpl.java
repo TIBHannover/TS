@@ -57,10 +57,15 @@ public class RestCallParserServiceImpl implements RestCallParserService {
         String[] parameters = queryString.split("&");
         for (String parameter : parameters) {
             String[] keyValuePair = parameter.split("=");
-            String[] values = keyValuePair[1].split(",");
-            for (String value : values) {
-                queryParameters.add(new RestCallParameter(keyValuePair[0], value, RestCallParameterType.QUERY));
-            }
+            String[] values = null;
+            if(keyValuePair.length >1)
+	            if(keyValuePair[1] != null)
+	            	if (!keyValuePair[1].isEmpty())
+	                    values = keyValuePair[1].split(",");
+	            if (values != null)
+		            for (String value : values) {
+		                queryParameters.add(new RestCallParameter(keyValuePair[0], value, RestCallParameterType.QUERY));
+		            }
         }
 
         return queryParameters;
