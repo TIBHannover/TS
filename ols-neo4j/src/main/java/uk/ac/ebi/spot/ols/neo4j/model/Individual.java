@@ -2,6 +2,10 @@ package uk.ac.ebi.spot.ols.neo4j.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.neo4j.annotation.*;
@@ -19,6 +23,7 @@ import java.util.TreeMap;
  */
 @NodeEntity
 @TypeAlias(value = "Individual")
+@ApiModel
 public class Individual {
 
     @GraphId
@@ -29,6 +34,7 @@ public class Individual {
     private String olsId;
 
     @GraphProperty(propertyName="iri")
+    @ApiModelProperty(value = "IRI of the individual", name = "iri", dataType = "String", example = "https://spec.edmcouncil.org/fibo/ontology/FBC/FunctionalEntities/MarketsIndividuals/MIC-24EX")
     private String iri;
 
     @GraphProperty(propertyName="label")

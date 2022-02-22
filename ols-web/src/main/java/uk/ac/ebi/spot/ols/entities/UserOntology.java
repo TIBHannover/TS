@@ -8,11 +8,16 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 
 @UniqueField(message = "The id or preferredPrefix exists in previous records")
 @Entity
+@ApiModel
 public class UserOntology {
     
     @Id
@@ -22,11 +27,13 @@ public class UserOntology {
     @NotNull(message = "Name is mandatory.")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters.")
     @Column(unique=true)
+    @ApiModelProperty(value = "Name/Ontology ID of the Suggestion", name = "name", dataType = "String", example = "iao")
     private String name;
     
     @ValidURL(message = "Enter a valid URL.")
     @NotNull(message = "PURL is mandatory.")
     @Size(min=1, message = "PURL is mandatory.")
+    @ApiModelProperty(value = "PURL of the Ontology Suggestion", name = "PURL", dataType = "String", example = "http://purl.obolibrary.org/obo/iao.owl")
     private String PURL;
     
     private String URI;
@@ -54,6 +61,7 @@ public class UserOntology {
     @NotNull(message = "Preferred Prefix is mandatory")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters")
     @Column(unique=true)
+    @ApiModelProperty(value = "Preferred Prefiy of the Ontology Suggestion", name = "preferredPrefix", dataType = "String", example = "iao")
     private String preferredPrefix;
     
     private String baseURI;
