@@ -2,6 +2,10 @@ package uk.ac.ebi.spot.ols.neo4j.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.neo4j.annotation.*;
@@ -19,6 +23,7 @@ import java.util.TreeMap;
  */
 @NodeEntity
 @TypeAlias(value = "Property")
+@ApiModel
 public class Property {
 
     @GraphId
@@ -30,6 +35,8 @@ public class Property {
 
     @GraphProperty(propertyName="iri")
     @JsonProperty(value = "iri")
+    
+    @ApiModelProperty(value = "IRI of the property", name = "iri", dataType = "String", example = "http://schema.mobivoc.org/#validForVehicle")
     private String iri;
 
     @GraphProperty(propertyName="label")

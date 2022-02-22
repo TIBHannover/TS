@@ -180,7 +180,7 @@ public class OntologyController implements
 
     @ApiOperation(value = "Retrieve a particular ontology")
     @RequestMapping(path = "/{onto}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<Resource<OntologyDocument>> getOntology(@PathVariable("onto") String ontologyId) throws ResourceNotFoundException {
+    HttpEntity<Resource<OntologyDocument>> getOntology(@ApiParam(value = "onto", required = true, example = "aeon") @PathVariable("onto") String ontologyId) throws ResourceNotFoundException {
         ontologyId = ontologyId.toLowerCase();
         OntologyDocument document = ontologyRepositoryService.get(ontologyId);
         if (document == null) throw new ResourceNotFoundException();

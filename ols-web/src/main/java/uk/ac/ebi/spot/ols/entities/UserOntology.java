@@ -8,11 +8,16 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 
 @UniqueField(message = "The id or preferredPrefix exists in previous records")
 @Entity
+@ApiModel
 public class UserOntology {
     
     @Id
@@ -22,12 +27,14 @@ public class UserOntology {
     @NotNull(message = "Name is mandatory.")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters.")
     @Column(unique=true)
+    @ApiModelProperty(value = "Name/Ontology ID of the Suggestion", name = "name", dataType = "String", example = "iao")
     private String name;
     
     @ValidURL(message = "Enter a valid URL.")
     @NotNull(message = "PURL is mandatory.")
     @Size(min=1, message = "PURL is mandatory.")
-    private String PURL;
+    @ApiModelProperty(value = "PURL of the Ontology Suggestion", name = "permanenturl", dataType = "String", example = "http://purl.obolibrary.org/obo/iao.owl")
+    private String permanenturl;
     
     private String URI;
     
@@ -54,6 +61,7 @@ public class UserOntology {
     @NotNull(message = "Preferred Prefix is mandatory")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters")
     @Column(unique=true)
+    @ApiModelProperty(value = "Preferred Prefiy of the Ontology Suggestion", name = "preferredPrefix", dataType = "String", example = "iao")
     private String preferredPrefix;
     
     private String baseURI;
@@ -88,7 +96,7 @@ public class UserOntology {
     public UserOntology() {}
 
 	public UserOntology(long id, @NotNull(message = "Name is mandatory") String name,
-			@NotNull(message = "PURL is mandatory") String pURL, String uRI, String licenseURL, String licenseLogo,
+			@NotNull(message = "PURL is mandatory") String permanenturl, String URI, String licenseURL, String licenseLogo,
 			String licenseLabel, String title, String description, List<String> creator, String homePage, String tracker,
 			String mailingList, @NotNull(message = "Preferred Prefix is mandatory") String preferredPrefix,
 			String baseURI, ReasonerEnum reasoner, String labelProperty, List<String> definitionProperty, List<String> synonymProperty,
@@ -98,8 +106,8 @@ public class UserOntology {
 		super();
 		this.id = id;
 		this.name = name;
-		PURL = pURL;
-		URI = uRI;
+		this.permanenturl = permanenturl;
+		this.URI = URI;
 		this.licenseURL = licenseURL;
 		this.licenseLogo = licenseLogo;
 		this.licenseLabel = licenseLabel;
@@ -141,20 +149,20 @@ public class UserOntology {
 		this.name = name;
 	}
 
-	public String getPURL() {
-		return PURL;
+	public String getPermanenturl() {
+		return permanenturl;
 	}
 
-	public void setPURL(String pURL) {
-		PURL = pURL;
+	public void setPermanenturl(String permanenturl) {
+		this.permanenturl = permanenturl;
 	}
 
 	public String getURI() {
 		return URI;
 	}
 
-	public void setURI(String uRI) {
-		URI = uRI;
+	public void setURI(String URI) {
+		this.URI = URI;
 	}
 
 	public String getLicenseURL() {
@@ -343,7 +351,7 @@ public class UserOntology {
 
 	@Override
 	public String toString() {
-		return "UserOntology [id=" + id + ", name=" + name + ", PURL=" + PURL + ", URI=" + URI + ", licenseURL="
+		return "UserOntology [id=" + id + ", name=" + name + ", PURL=" + permanenturl + ", URI=" + URI + ", licenseURL="
 				+ licenseURL + ", licenseLogo=" + licenseLogo + ", licenseLabel=" + licenseLabel + ", title=" + title
 				+ ", description=" + description + ", creator=" + creator + ", homePage=" + homePage + ", tracker="
 				+ tracker + ", mailingList=" + mailingList + ", preferredPrefix=" + preferredPrefix + ", baseURI="

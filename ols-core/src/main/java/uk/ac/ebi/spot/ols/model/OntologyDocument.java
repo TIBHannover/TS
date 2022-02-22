@@ -1,6 +1,10 @@
 package uk.ac.ebi.spot.ols.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import uk.ac.ebi.spot.ols.config.OntologyResourceConfig;
@@ -16,10 +20,12 @@ import java.util.Date;
  * This includes basic stats on an ontology that is loaded into the Ontology repository.
  *
  */
+@ApiModel
 @Document(collection = "olsadmin")
 public class OntologyDocument {
 
     @Id
+    @ApiModelProperty(value = "Ontology ID", name = "ontologyID", dataType = "String", example = "aeon")
     private String ontologyId;
 
     private Date loaded;

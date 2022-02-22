@@ -38,6 +38,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Simon Jupp
  * @date 30/04/2015
@@ -45,6 +48,7 @@ import com.fasterxml.jackson.annotation.JsonRawValue;
  */
 @NodeEntity
 @TypeAlias(value = "Class")
+@ApiModel
 public class Term {
 
     @GraphId
@@ -55,6 +59,7 @@ public class Term {
     private String olsId;
 
     @GraphProperty(propertyName=IRI)
+    @ApiModelProperty(value = "IRI of the term", name = "iri", dataType = "String", example = "http://purl.obolibrary.org/obo/IAO_0000423")
     private String iri;
 
     @GraphProperty(propertyName=LABEL)
