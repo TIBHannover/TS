@@ -23,7 +23,7 @@ public class UserOntologyUtilities {
 	    	org.apache.jena.rdf.model.Model modelQuery = null;
 	    	Query query;
 	    	try {
-				modelQuery = FileManager.get().loadModel(userOntology.getPURL());
+				modelQuery = FileManager.get().loadModel(userOntology.getPermanenturl());
 			} catch (org.apache.jena.riot.RiotException e) {
 				System.out.println(e.getMessage());
 			}

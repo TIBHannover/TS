@@ -84,7 +84,7 @@ public class OntologySuggestionController {
             @RequestParam(value = "PURL", required = true, defaultValue = "") String PURL
     ) {
     	UserOntology userOntology = new UserOntology();
-    	userOntology.setPURL(PURL);
+    	userOntology.setPermanenturl(PURL);
         return YamlBasedPersistence.singleSuggestionDumpWriter(UserOntologyUtilities.extractMetaData(userOntology), false);
 
     }
@@ -95,7 +95,7 @@ public class OntologySuggestionController {
             @RequestParam(value = "PURL", required = true, defaultValue = "") String PURL
     ) {
     	UserOntology userOntology = new UserOntology();
-    	userOntology.setPURL(PURL);
+    	userOntology.setPermanenturl(PURL);
     	
     	Resource<UserOntology> resourceUserOntology = new Resource<UserOntology>(UserOntologyUtilities.extractMetaData(userOntology));
 
@@ -138,7 +138,7 @@ public class OntologySuggestionController {
     ) {
     	UserOntology userOntology = new UserOntology();
     	userOntology.setName(name);
-    	userOntology.setPURL(PURL);
+    	userOntology.setPermanenturl(PURL);
     	userOntology.setURI(URI);
     	userOntology.setLicenseURL(licenseURL);
     	userOntology.setLicenseLogo(licenseLogo);

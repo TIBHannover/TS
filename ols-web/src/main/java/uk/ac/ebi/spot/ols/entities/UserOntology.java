@@ -33,8 +33,8 @@ public class UserOntology {
     @ValidURL(message = "Enter a valid URL.")
     @NotNull(message = "PURL is mandatory.")
     @Size(min=1, message = "PURL is mandatory.")
-    @ApiModelProperty(value = "PURL of the Ontology Suggestion", name = "PURL", dataType = "String", example = "http://purl.obolibrary.org/obo/iao.owl")
-    private String PURL;
+    @ApiModelProperty(value = "PURL of the Ontology Suggestion", name = "permanenturl", dataType = "String", example = "http://purl.obolibrary.org/obo/iao.owl")
+    private String permanenturl;
     
     private String URI;
     
@@ -96,7 +96,7 @@ public class UserOntology {
     public UserOntology() {}
 
 	public UserOntology(long id, @NotNull(message = "Name is mandatory") String name,
-			@NotNull(message = "PURL is mandatory") String PURL, String URI, String licenseURL, String licenseLogo,
+			@NotNull(message = "PURL is mandatory") String permanenturl, String URI, String licenseURL, String licenseLogo,
 			String licenseLabel, String title, String description, List<String> creator, String homePage, String tracker,
 			String mailingList, @NotNull(message = "Preferred Prefix is mandatory") String preferredPrefix,
 			String baseURI, ReasonerEnum reasoner, String labelProperty, List<String> definitionProperty, List<String> synonymProperty,
@@ -106,7 +106,7 @@ public class UserOntology {
 		super();
 		this.id = id;
 		this.name = name;
-		this.PURL = PURL;
+		this.permanenturl = permanenturl;
 		this.URI = URI;
 		this.licenseURL = licenseURL;
 		this.licenseLogo = licenseLogo;
@@ -149,12 +149,12 @@ public class UserOntology {
 		this.name = name;
 	}
 
-	public String getPURL() {
-		return PURL;
+	public String getPermanenturl() {
+		return permanenturl;
 	}
 
-	public void setPURL(String PURL) {
-		this.PURL = PURL;
+	public void setPermanenturl(String permanenturl) {
+		this.permanenturl = permanenturl;
 	}
 
 	public String getURI() {
@@ -351,7 +351,7 @@ public class UserOntology {
 
 	@Override
 	public String toString() {
-		return "UserOntology [id=" + id + ", name=" + name + ", PURL=" + PURL + ", URI=" + URI + ", licenseURL="
+		return "UserOntology [id=" + id + ", name=" + name + ", PURL=" + permanenturl + ", URI=" + URI + ", licenseURL="
 				+ licenseURL + ", licenseLogo=" + licenseLogo + ", licenseLabel=" + licenseLabel + ", title=" + title
 				+ ", description=" + description + ", creator=" + creator + ", homePage=" + homePage + ", tracker="
 				+ tracker + ", mailingList=" + mailingList + ", preferredPrefix=" + preferredPrefix + ", baseURI="

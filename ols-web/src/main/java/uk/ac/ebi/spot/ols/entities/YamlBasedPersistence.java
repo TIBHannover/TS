@@ -67,8 +67,8 @@ public class YamlBasedPersistence {
 		   if(userOntology.getName() != null)
 		   if(!userOntology.getName().isEmpty())
 		      data.put("id", userOntology.getName());
-		   if(!userOntology.getPURL().isEmpty())
-		      data.put("ontology_purl", userOntology.getPURL());
+		   if(!userOntology.getPermanenturl().isEmpty())
+		      data.put("ontology_purl", userOntology.getPermanenturl());
 		   if(userOntology.getURI() != null)
 		   if(!userOntology.getURI().isEmpty())
 		      data.put("uri", userOntology.getURI());
@@ -173,7 +173,7 @@ public class YamlBasedPersistence {
 		for (Map<String, Object> map : ontologyList) {
 			UserOntology uo = new UserOntology();
 			uo.setName((String) map.get("id"));
-			uo.setPURL((String) map.get("ontology_purl"));
+			uo.setPermanenturl((String) map.get("ontology_purl"));
 			uo.setURI((String) map.get("uri"));
 			
 			if (map.get("license") != null) {
