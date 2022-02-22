@@ -3,9 +3,7 @@ package uk.ac.ebi.spot.ols.controller.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomCollectionEditor;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,27 +21,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriUtils;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import uk.ac.ebi.spot.ols.exception.ErrorMessage;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
-import uk.ac.ebi.spot.ols.neo4j.model.Term;
-import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
-import uk.ac.ebi.spot.ols.util.OLSEnv;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +43,7 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping("/api/ontologies")
+@Api(value = "ontology", description = "The Ontologies resources is used to list ontologies in this service")
 @ExposesResourceFor(OntologyDocument.class)
 public class OntologyController implements
         ResourceProcessor<RepositoryLinksResource> {
@@ -180,7 +168,7 @@ public class OntologyController implements
 
     @ApiOperation(value = "Retrieve a particular ontology")
     @RequestMapping(path = "/{onto}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<Resource<OntologyDocument>> getOntology(@ApiParam(value = "onto", required = true, example = "aeon") @PathVariable("onto") String ontologyId) throws ResourceNotFoundException {
+    HttpEntity<Resource<OntologyDocument>> getOntology(@ApiParam(value = "The ontology id in this service", required = true, example = "aeon") @PathVariable("onto") String ontologyId) throws ResourceNotFoundException {
         ontologyId = ontologyId.toLowerCase();
         OntologyDocument document = ontologyRepositoryService.get(ontologyId);
         if (document == null) throw new ResourceNotFoundException();
