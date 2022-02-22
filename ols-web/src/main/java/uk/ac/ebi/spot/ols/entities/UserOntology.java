@@ -96,7 +96,7 @@ public class UserOntology {
     public UserOntology() {}
 
 	public UserOntology(long id, @NotNull(message = "Name is mandatory") String name,
-			@NotNull(message = "PURL is mandatory") String pURL, String uRI, String licenseURL, String licenseLogo,
+			@NotNull(message = "PURL is mandatory") String PURL, String URI, String licenseURL, String licenseLogo,
 			String licenseLabel, String title, String description, List<String> creator, String homePage, String tracker,
 			String mailingList, @NotNull(message = "Preferred Prefix is mandatory") String preferredPrefix,
 			String baseURI, ReasonerEnum reasoner, String labelProperty, List<String> definitionProperty, List<String> synonymProperty,
@@ -106,8 +106,8 @@ public class UserOntology {
 		super();
 		this.id = id;
 		this.name = name;
-		PURL = pURL;
-		URI = uRI;
+		this.PURL = PURL;
+		this.URI = URI;
 		this.licenseURL = licenseURL;
 		this.licenseLogo = licenseLogo;
 		this.licenseLabel = licenseLabel;
@@ -153,16 +153,16 @@ public class UserOntology {
 		return PURL;
 	}
 
-	public void setPURL(String pURL) {
-		PURL = pURL;
+	public void setPURL(String PURL) {
+		this.PURL = PURL;
 	}
 
 	public String getURI() {
 		return URI;
 	}
 
-	public void setURI(String uRI) {
-		URI = uRI;
+	public void setURI(String URI) {
+		this.URI = URI;
 	}
 
 	public String getLicenseURL() {
