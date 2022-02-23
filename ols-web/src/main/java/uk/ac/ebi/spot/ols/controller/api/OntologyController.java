@@ -22,6 +22,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.annotations.Example;
+import io.swagger.annotations.ExampleProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -31,6 +33,7 @@ import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +46,7 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping("/api/ontologies")
-@Api(value = "ontology", description = "The Ontologies resources is used to list ontologies in this service")
+@Api(value = "ontology", description = "The Ontologies resources are used to list ontologies in this service")
 @ExposesResourceFor(OntologyDocument.class)
 public class OntologyController implements
         ResourceProcessor<RepositoryLinksResource> {
@@ -168,7 +171,7 @@ public class OntologyController implements
 
     @ApiOperation(value = "Retrieve a particular ontology")
     @RequestMapping(path = "/{onto}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<Resource<OntologyDocument>> getOntology(@ApiParam(value = "The ontology id in this service", required = true, example = "aeon") @PathVariable("onto") String ontologyId) throws ResourceNotFoundException {
+    HttpEntity<Resource<OntologyDocument>> getOntology(@ApiParam(value = "The ontology id in this service", required = true) @PathVariable("onto") String ontologyId) throws ResourceNotFoundException {
         ontologyId = ontologyId.toLowerCase();
         OntologyDocument document = ontologyRepositoryService.get(ontologyId);
         if (document == null) throw new ResourceNotFoundException();

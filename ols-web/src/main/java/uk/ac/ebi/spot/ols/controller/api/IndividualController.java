@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriUtils;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.service.JsTreeBuilder;
@@ -41,6 +42,7 @@ import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 @Controller
 @RequestMapping("/api/individuals")
 @ExposesResourceFor(Individual.class)
+@Api(value = "individuals", description = "The Individuals resources are used to list ontology individuals (instances) from a particular ontology in this service")
 public class IndividualController implements
         ResourceProcessor<RepositoryLinksResource> {
     @Autowired
