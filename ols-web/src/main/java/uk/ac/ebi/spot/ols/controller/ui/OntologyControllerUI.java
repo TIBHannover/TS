@@ -58,7 +58,7 @@ public class OntologyControllerUI {
         try {
         	Set<String> classifications = new TreeSet<String>();
         	for (OntologyDocument document : repositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (key.equals(k)) classifications.addAll(x.get(k));} ));
+				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (x.get(k)!=null) if (!x.get(k).isEmpty()) if (key.equals(k)) classifications.addAll(x.get(k));} ));
 			}
             return classifications;
         } catch (Exception e) {
@@ -72,9 +72,11 @@ public class OntologyControllerUI {
     		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
     			for (Map.Entry<String, Collection<String>> entry : classificationSchema.entrySet()) {
 					if (schemas.contains(entry.getKey()))
-						for (String classification : entry.getValue()) {
-							if (classifications.contains(classification)) {
-								temp.add(ontologyDocument);
+						if(entry.getValue() != null)
+							if(!entry.getValue().isEmpty())
+						        for (String classification : entry.getValue()) {
+							        if (classifications.contains(classification)) {
+								        temp.add(ontologyDocument);
 							}		
 						}		
 				}
