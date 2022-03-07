@@ -97,7 +97,6 @@
             <artifactId>libsass-maven-plugin</artifactId>
             <version>0.2.10-libsass_3.5.3</version>
         </dependency>
-<<<<<<< HEAD
         
         <dependency>
             <groupId>io.springfox</groupId>
@@ -145,8 +144,6 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     </dependencies>
 
