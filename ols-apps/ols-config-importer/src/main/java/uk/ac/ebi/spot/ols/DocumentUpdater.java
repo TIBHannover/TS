@@ -47,37 +47,16 @@ public class DocumentUpdater {
             originalDocument.getConfig().setLocalizedTitles(newDocument.getLocalizedTitles());
         }
 
-<<<<<<< HEAD
-        // check description
-        if (newDocument.getDescription() != null &&
-                !newDocument.getDescription().equals(originalDocument.getConfig().getDescription()) &&
-                !dontUpdate.contains(OntologyDefaults.DEFINITION)) {
-=======
         if (!dontUpdate.contains(OntologyDefaults.DEFINITION)) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             originalDocument.getConfig().setDescription(newDocument.getDescription());
             originalDocument.getConfig().setLocalizedDescriptions(newDocument.getLocalizedDescriptions());
         }
 
-<<<<<<< HEAD
-        // check homepage
-        if (newDocument.getHomepage() != null &&
-                !newDocument.getHomepage().equals(originalDocument.getConfig().getHomepage()) &&
-                !dontUpdate.contains(OntologyDefaults.HOMEPAGE)) {
-            originalDocument.getConfig().setHomepage(newDocument.getHomepage());
-        }
-
-        // check mailing list
-        if (newDocument.getMailingList() != null &&
-                !newDocument.getMailingList().equals(originalDocument.getConfig().getMailingList()) &&
-                !dontUpdate.contains(OntologyDefaults.MAILINGLIST)) {
-=======
         if (!dontUpdate.contains(OntologyDefaults.HOMEPAGE)) {
             originalDocument.getConfig().setHomepage(newDocument.getHomepage());
         }
 
         if (!dontUpdate.contains(OntologyDefaults.MAILINGLIST)) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             originalDocument.getConfig().setMailingList(newDocument.getMailingList());
         }
 
@@ -119,10 +98,7 @@ public class DocumentUpdater {
 
         originalDocument.getConfig().setAllowDownload(newDocument.getAllowDownload());
 
-<<<<<<< HEAD
         originalDocument.getConfig().setClassifications(newDocument.getClassifications());
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
         // Henriette To do: Remove because this is not used.
         if (newDocument.getHiddenProperties() != null) {
