@@ -35,12 +35,8 @@ public class Individual {
     @JsonIgnore
     private String olsId;
 
-<<<<<<< HEAD
     @GraphProperty(propertyName="iri")
     @ApiModelProperty(value = "IRI of the individual", name = "iri", dataType = "String", example = "https://spec.edmcouncil.org/fibo/ontology/FBC/FunctionalEntities/MarketsIndividuals/MIC-24EX")
-=======
-    @GraphProperty(propertyName = "iri")
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     private String iri;
 
     @GraphProperty(propertyName = "label")
