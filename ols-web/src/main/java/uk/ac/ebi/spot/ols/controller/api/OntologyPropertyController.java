@@ -24,10 +24,7 @@ import uk.ac.ebi.spot.ols.neo4j.service.JsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyPropertyGraphService;
 import uk.ac.ebi.spot.ols.neo4j.service.PropertyJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.ViewMode;
-<<<<<<< HEAD
-=======
 import uk.ac.ebi.spot.ols.controller.api.localization.LocalizedProperty;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -212,11 +209,7 @@ public class OntologyPropertyController {
         try {
             String decoded = UriUtils.decode(termId, "UTF-8");
 
-<<<<<<< HEAD
-            Object object= jsTreeBuilder.getJsTreeChildren(ontologyId, decoded, nodeId);
-=======
             Object object= jsTreeBuilder.getJsTreeChildren(lang, ontologyId, decoded, nodeId);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             return new HttpEntity<String>(ow.writeValueAsString(object));
         } catch (JsonProcessingException e) {
@@ -232,10 +225,7 @@ public class OntologyPropertyController {
             method = RequestMethod.GET)
     HttpEntity<String> getJsTree(
             @PathVariable("onto") String ontologyId,
-<<<<<<< HEAD
-=======
             @RequestParam(value = "lang", required = false, defaultValue = "en") String lang,
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             @PathVariable("id") String termId,
             @RequestParam(value = "siblings", defaultValue = "false", required = false) boolean siblings,
             @RequestParam(value = "viewMode", defaultValue = "PreferredRoots", required = false) String viewMode)
@@ -245,11 +235,7 @@ public class OntologyPropertyController {
         try {
             String decoded = UriUtils.decode(termId, "UTF-8");
 
-<<<<<<< HEAD
-            Object object= jsTreeBuilder.getJsTree(ontologyId, decoded, siblings, ViewMode.getFromShortName(viewMode));
-=======
             Object object= jsTreeBuilder.getJsTree(lang, ontologyId, decoded, siblings, ViewMode.getFromShortName(viewMode));
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             return new HttpEntity<String>(ow.writeValueAsString(object));
         } catch (JsonProcessingException e) {
