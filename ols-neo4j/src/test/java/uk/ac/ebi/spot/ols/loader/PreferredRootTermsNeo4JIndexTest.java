@@ -13,6 +13,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+<<<<<<< HEAD
+=======
+import java.util.Map;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
@@ -40,6 +44,10 @@ import org.slf4j.LoggerFactory;
 import uk.ac.ebi.spot.ols.config.OntologyLoadingConfiguration;
 import uk.ac.ebi.spot.ols.config.OntologyResourceConfig;
 import uk.ac.ebi.spot.ols.exception.OntologyLoadingException;
+<<<<<<< HEAD
+=======
+import uk.ac.ebi.spot.ols.util.LocalizedStrings;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 @TestInstance(Lifecycle.PER_CLASS)
 @Tag("integrationTest")
@@ -126,6 +134,7 @@ public class PreferredRootTermsNeo4JIndexTest {
 	}
 	
 	
+<<<<<<< HEAD
 	private static OntologyLoader createOntologyLoader(String id, String title, String namespace, 
 			String fileLocation, String baseURI) {
 
@@ -133,6 +142,15 @@ public class PreferredRootTermsNeo4JIndexTest {
                 new OntologyResourceConfig.OntologyResourceConfigBuilder(id, title, namespace,
                 		new File(fileLocation).toURI());
         
+=======
+	private static OntologyLoader createOntologyLoader(String id, String namespace, 
+			String fileLocation, String baseURI) {
+
+		OntologyResourceConfig.OntologyResourceConfigBuilder builder =
+                new OntologyResourceConfig.OntologyResourceConfigBuilder(id, namespace,
+                		new File(fileLocation).toURI());
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         builder.setBaseUris(Collections.singleton(baseURI));		
         OntologyResourceConfig config = builder.build();
 
@@ -153,10 +171,17 @@ public class PreferredRootTermsNeo4JIndexTest {
 		Collection<String> expectedPreferredRootTermIRIs = new LinkedList<String>(
 				Arrays.asList("http://purl.obolibrary.org/obo/DUO_0000001",
 						"http://purl.obolibrary.org/obo/DUO_0000017",
+<<<<<<< HEAD
 						"http://purl.obolibrary.org/obo/OBI_0000066"));		
 		
 	    return Stream.of(
 	      Arguments.of(createOntologyLoader("http://purl.obolibrary.org/obo/duo", "Data Use Ontology", 
+=======
+                        "http://purl.obolibrary.org/obo/OBI_0000066"));		
+                        
+	    return Stream.of(
+	      Arguments.of(createOntologyLoader("http://purl.obolibrary.org/obo/duo",
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 	    		  "DUO", "./src/test/resources/duo-preferred-roots.owl", 
 	    		  "http://purl.obolibrary.org/obo/DUO_"), PREFERRED_ROOT_TERMS_TEST_NEO4J_DIR, 
 	    		  expectedPreferredRootTermIRIs));

@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class IndividualJsTreeBuilder extends AbstractJsTreeBuilder {
     @Override
+<<<<<<< HEAD
     String getJsTreeParentQuery() {
+=======
+    String getJsTreeParentQuery(String lang) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         StringBuilder query = new StringBuilder();
 
         query.append("MATCH path = (n:Individual)-[r:INSTANCEOF|SUBCLASSOF*]->(parent)\n");
@@ -23,22 +27,38 @@ public class IndividualJsTreeBuilder extends AbstractJsTreeBuilder {
     }
 
     @Override
+<<<<<<< HEAD
     String getJsTreeParentQuery(ViewMode viewMode) {
+=======
+    String getJsTreeParentQuery(String lang, ViewMode viewMode) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         throw new UnsupportedOperationException("Implementation not necessary.");
     }
 
     @Override
+<<<<<<< HEAD
     String getJsTreeParentSiblingQuery() {
+=======
+    String getJsTreeParentSiblingQuery(String lang) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         throw new UnsupportedOperationException("Implementation not necessary.");
     }
 
     @Override
+<<<<<<< HEAD
     String getJsTreeParentSiblingQuery(ViewMode viewMode) {
+=======
+    String getJsTreeParentSiblingQuery(String lang, ViewMode viewMode) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         throw new UnsupportedOperationException("Implementation not necessary.");
     }
 
     @Override
+<<<<<<< HEAD
     String getJsTreeChildrenQuery() {
+=======
+    String getJsTreeChildrenQuery(String lang) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         throw new UnsupportedOperationException("Implementation not necessary.");
     }
 
@@ -48,7 +68,11 @@ public class IndividualJsTreeBuilder extends AbstractJsTreeBuilder {
     }
 
     @Override
+<<<<<<< HEAD
     String getJsTreeRoots(ViewMode viewMode) {
+=======
+    String getJsTreeRoots(String lang, ViewMode viewMode) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         throw new UnsupportedOperationException("Implementation not necessary.");
     }
 }

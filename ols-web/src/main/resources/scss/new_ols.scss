@@ -1,4 +1,5 @@
 :root {
+<<<<<<< HEAD
     --ols_orange: #ffac1b;
     --ols_green: #00827c;
 }
@@ -9,6 +10,29 @@
     background: #F0F0F0;
     padding: 35px 35px 35px 35px;
     border-radius: 5px;
+=======
+  --ols_orange: #ffac1b;
+  --ols_green: #00827c;
+}
+
+#main-content-area {
+  min-height: 75vh;
+
+  .row {
+    max-width: 80rem;
+  }
+
+  h2 {
+    color: var(--ols_green)
+  }
+}
+
+#mainpageSearchBox {
+  margin: 30px 15px 30px 15px;
+  background: #F0F0F0;
+  padding: 35px 35px 35px 35px;
+  border-radius: 5px;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /*
@@ -18,21 +42,35 @@
 }*/
 
 #dataContentDiv {
+<<<<<<< HEAD
     margin-top: 30px;
+=======
+  margin-top: 30px;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /* search button css */
 .searchButton {
+<<<<<<< HEAD
     margin-left: 7px;
     // margin-bottom: 0.1em;
     margin-bottom: 0;
     line-height: 0.88em;
     position: relative;
     vertical-align: top;
+=======
+  margin-left: 7px;
+  // margin-bottom: 0.1em;
+  margin-bottom: 0;
+  line-height: 0.88em;
+  position: relative;
+  vertical-align: top;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /* Next/Prev button */
 a.pagingButton {
+<<<<<<< HEAD
     display: inline-block;
     /* padding: 8px 14px 6px 14px; */
     padding: 9px 15px 7px 15px;
@@ -41,10 +79,23 @@ a.pagingButton {
     color: white;
     border-radius: /* 12px */ 0.8em;
     border-bottom: none;
+=======
+  display: inline-block;
+  /* padding: 8px 14px 6px 14px; */
+  padding: 9px 15px 7px 15px;
+  background-color: /* #fff */
+          rgb(0, 130, 124);
+  /* border: 1px solid /**//* #ddd *//* rgb(0, 130, 124); */
+  color: white;
+  border-radius: /* 12px */
+          0.8em;
+  border-bottom: none;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /* Overwritting padding that comes from global ebi css */
+<<<<<<< HEAD
 #ontologiesTable_paginate .pagination .current{
     padding: 0 !important;
 }
@@ -52,6 +103,15 @@ a.pagingButton {
 #ontologiesTable_paginate a, a:visited {
     border-bottom-width: 0;
     border-bottom-style: none;
+=======
+#ontologiesTable_paginate .pagination .current {
+  padding: 0 !important;
+}
+
+#ontologiesTable_paginate a, a:visited {
+  border-bottom-width: 0;
+  border-bottom-style: none;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /*
@@ -61,16 +121,29 @@ a.pagingButton {
  */
 
 #ontologiesTable_paginate .paginate_button .current {
+<<<<<<< HEAD
     background: transparent;
 }
 
 #ontologiesTable td {
     vertical-align: top !important;
+=======
+  background: transparent;
+}
+
+#ontologiesTable {
+  width: 100%;
+
+  td {
+    vertical-align: top !important;
+  }
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /* Search Page */
 #filterBox {
+<<<<<<< HEAD
     margin-top: /* 60px */ 8px;
     border-radius: /* 5px */ 9px;
     padding-top: /* 20px */ 12px;
@@ -157,11 +230,105 @@ a.nounderline.ontology-link {
 
 .select2-container .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
     white-space: normal;
+=======
+  margin-top: /* 60px */
+          8px;
+  border-radius: /* 5px */
+          9px;
+  padding-top: /* 20px */
+          12px;
+  padding-right: 18px;
+  padding-left: 18px;
+  background: rgba(0, 124, 130, .2);
+}
+
+.filterbox-header {
+  color: rgb(0, 130, 124);
+}
+
+.button.secondary.filterbox-button, .button.secondary.searchButton {
+  background-color: rgb(0, 130, 124);
+  border-radius: 6px;
+}
+
+fieldset {
+  min-width: 0;
+}
+
+#filter_form .input-group {
+  display: flex;
+}
+
+#filter_form .checkbox-inline {
+  margin-right: 24px;
+}
+
+#search-results {
+  margin-top: /* 50px */
+          1.5rem;
+  /* padding-left: 30px */
+;
+}
+
+#search-results > section {
+  margin-bottom: 2rem;
+}
+
+#search-results-summary {
+  padding-left: 10px;
+}
+
+.search-results-count {
+  font-style: italic;
+  /* display: inline-block; */
+  padding: 0 0.5rem;
+}
+
+.search-results-count span {
+  font-style: italic;
+  font-weight: bold;
+}
+
+.search-results-header {
+  margin-bottom: 0;
+}
+
+.search-results-top-navbar {
+  text-align: left;
+  margin-bottom: 2.33rem;
+}
+
+.search-results-bottom-navbar {
+  text-align: left;
+  margin-top: 3rem;
+}
+
+.search-results-url {
+  color: dimgrey;
+  font-size: 88%;
+}
+
+#bloodhound {
+  padding-bottom: 8px;
+}
+
+span.twitter-typeahead:first-child .form-control.typeahead.tt-input {
+  border-radius: 4px;
+}
+
+a.nounderline.ontology-link {
+  color: rgb(0, 130, 124);
+}
+
+.select2-container .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
+  white-space: normal;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /**/
 
 #termPageSearchBox {
+<<<<<<< HEAD
     display: inline;
 }
 
@@ -179,11 +346,31 @@ a.nounderline.ontology-link {
     margin-top: -5px;
     margin-right: 4px;
     margin-left: 4px;
+=======
+  display: inline;
+}
+
+#bloodhound {
+  display: flex;
+}
+
+#bloodhound .form-control.typeahead {
+  margin: 0;
+}
+
+.source-wrapper {
+  color: white;
+  display: inline-block;
+  margin-top: -5px;
+  margin-right: 4px;
+  margin-left: 4px;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /// An element of class 'decoy' can be thrown in to deconfuse button effect styling in lists.
 
 .decoy {
+<<<<<<< HEAD
     display: inline-block;
     // visibility: hidden;
     margin: 0 0.2rem;
@@ -191,11 +378,21 @@ a.nounderline.ontology-link {
 
 #exact-id, #obsolete-id {
     margin-right: 4px;
+=======
+  display: inline-block;
+  // visibility: hidden;
+  margin: 0 0.2rem;
+}
+
+#exact-id, #obsolete-id {
+  margin-right: 4px;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /********Search page new css tries********/
 .static_search_ontology_badge {
+<<<<<<< HEAD
     display: inline;
     margin-left: 20px;
 }
@@ -211,11 +408,29 @@ a.nounderline.ontology-link {
 
 .search-results-label {
     font-size: x-large;
+=======
+  display: inline;
+  margin-left: 20px;
+}
+
+.search_sub_result {
+  margin-bottom: 20px;
+}
+
+.search_static_ontology {
+  font-size: smaller;
+  color: #ddd;
+}
+
+.search-results-label {
+  font-size: x-large;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /*Ontology View*/
 .panel {
+<<<<<<< HEAD
     border: solid 1px #F0F0F0;
 }
 
@@ -292,6 +507,88 @@ input[type="search"].select2-search__field {
 
 #termPageSearchBox .twitter-typeahead {
     width: 100%;
+=======
+  border: solid 1px #F0F0F0;
+}
+
+#ontology_info_box .panel-heading {
+  background: #00827c;
+  text-align: center;
+}
+
+#ontology_info_box .panel-heading h4 {
+  color: white;
+}
+
+#ontology_info_box .panel-body {
+  padding: 10px 10px 10px 10px;
+}
+
+#onto-tab-content .tabs-content {
+  min-height: 500px;
+  margin-bottom: 40px;
+}
+
+#bloodhound .twitter-typeahead {
+  width: inherit;
+}
+
+input[type="search"].select2-search__field {
+  margin-bottom: 0;
+}
+
+#individual-tree-tab {
+  tbody {
+    border: none;
+
+    tr {
+      background-color: transparent;
+
+      td {
+        padding: 0 0 0 0.2rem;
+
+        i {
+          font-size: xx-small;
+          color: #3c3c3c;
+        }
+      }
+    }
+  }
+}
+
+/* Term page */
+#right_info_box .panel-heading {
+  background: #00827c;
+  padding-top: 0.4rem;
+  padding-left: 0.4rem;
+  padding-bottom: 0.05rem;
+}
+
+.panel-heading .toggle {
+  cursor: pointer;
+  float: right;
+  margin-right: 0.4rem;
+}
+
+#right_info_box .panel-heading h4 {
+  color: white;
+}
+
+#right_info_box .panel-body {
+  padding: 10px 10px 10px 10px;
+}
+
+#terms-tab-content .tabs-content {
+  min-height: 500px;
+}
+
+#termPageSearchBox {
+  margin-top: 10px;
+}
+
+#termPageSearchBox .twitter-typeahead {
+  width: 100%;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /*
@@ -300,6 +597,7 @@ input[type="search"].select2-search__field {
 }*/
 
 #termPageSearchBox .button {
+<<<<<<< HEAD
     vertical-align: top;
 }
 
@@ -307,11 +605,21 @@ input[type="search"].select2-search__field {
     vertical-align: baseline;
     cursor: pointer;
     margin-left: 10px;
+=======
+  vertical-align: top;
+}
+
+.copyButton {
+  vertical-align: baseline;
+  cursor: pointer;
+  margin-left: 10px;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /* Adding some space on the term page*/
 .breadcrumbDiv {
+<<<<<<< HEAD
     margin-top: 10px;
 }
 
@@ -322,11 +630,24 @@ input[type="search"].select2-search__field {
 
 #showSliblingsButton {
     min-width: 120px;
+=======
+  margin-top: 10px;
+}
+
+#tree_tab_button_box {
+  float: right;
+  padding-top: 5px;
+}
+
+#showSliblingsButton {
+  min-width: 120px;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /* generic marginTop class */
 .marginTop {
+<<<<<<< HEAD
     margin-top: 20px;
     padding-left: 13px;
 }
@@ -394,24 +715,110 @@ input[type="search"].select2-search__field {
 .awesomplete {
     vertical-align: top;
     width: 160px;
+=======
+  margin-top: 20px;
+  padding-left: 13px;
+}
+
+
+/* Additional style for the graphview - copy/paste for now from foundation button secondary css */
+.ols-graphview-button {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 0 1rem 0;
+  font-family: inherit;
+  padding: 0.85em 1em;
+  -webkit-appearance: none;
+  border: 1px solid transparent;
+  border-radius: 0;
+  transition: background-color 0.25s ease-out, color 0.25s ease-out;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  background-color: #777;
+  color: #fefefe;
+}
+
+#tree-tab {
+  position: relative;
+}
+
+.ols-tree-buttons {
+  background-color: white;
+  padding-top: 5px;
+  padding-right: 5px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.ols-tree-buttons .toggle {
+  float: right;
+  padding: 4px;
+  padding-top: 0;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.ols-tree-button {
+  display: block;
+  margin: 0 0 2px 0;
+  width: 10rem;
+  font-family: inherit;
+  padding: 0.85em 1em;
+  -webkit-appearance: none;
+  border: 1px solid transparent;
+  border-radius: 0;
+  transition: background-color 0.25s ease-out, color 0.25s ease-out;
+  font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  background-color: #777;
+  color: #fefefe;
+}
+
+.awesomplete {
+  vertical-align: top;
+  width: 160px;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /* maintenance page css*/
 .alert {
+<<<<<<< HEAD
     padding: 15px;
     margin-bottom: 20px;
     border: 1px solid transparent;
     border-radius: 4px
+=======
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /* Main content area: adjust margins */
 #content {
+<<<<<<< HEAD
     padding-top: 12px;
     padding-left: 12px;
+=======
+  padding-top: 12px;
+  padding-left: 12px;
+}
+
+.term-section#content,
+.property-section#content {
+  padding: 0;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 /* Search Box stuff(?) */
 .checkbox-inline {
+<<<<<<< HEAD
     margin-top: -20px;
 }
 
@@ -481,20 +888,106 @@ button.list-group-item:hover, button.list-group-item:focus {
 
 #mainSearchDiv .twitter-typeahead {
     width: 80%;
+=======
+  margin-top: -20px;
+}
+
+.badge {
+  min-width: /* 10px */
+          7px;
+  padding: /* 3px 7px */
+          5px 7px 3px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  background-color: /* #777 */
+          rgb(0, 124, 130);
+  border-radius: 10px;
+  float: right;
+}
+
+.list-group {
+  margin-bottom: 20px;
+}
+
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  // margin-bottom: -1px;
+  margin: auto;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  width: /* 85% */
+          100%;
+  text-align: left;
+}
+
+button.list-group-item {
+  cursor: pointer;
+}
+
+button.list-group-item:hover, button.list-group-item:focus {
+  background-color: rgba(0, 124, 130, .3);
+}
+
+.filter-type {
+  vertical-align: middle;
+}
+
+.filterBoxes .select2-selection {
+  width: /* 85% */
+          100%;
+  /* height: 40px; */
+  margin: -0.2rem auto auto;
+}
+
+.select2-search__field {
+  margin-top: 0 !important;
+}
+
+#clearFilters {
+  float: right;
+  margin-top: 10px;
+}
+
+#mainSearchDiv {
+  margin-top: 40px;
+  margin-bottom: /* 30px */
+          0;
+  /* padding-left:150px; */
+}
+
+#mainSearchDiv .twitter-typeahead {
+  width: 80%;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /* Styling for code part in the documentation */
 .highlight {
+<<<<<<< HEAD
     padding-left: 50px;
     margin-left: 20px;
     margin-right: 50px;
     background-color: #F2F2EC;
     border-color: #999;
+=======
+  padding-left: 50px;
+  margin-left: 20px;
+  margin-right: 50px;
+  background-color: #F2F2EC;
+  border-color: #999;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /* keywords - default cyan */
+<<<<<<< HEAD
 .keyword {color: #007777;}
 .comment {color: green;}
 .some {color: #770077;}
@@ -526,11 +1019,83 @@ button.list-group-item:hover, button.list-group-item:focus {
     float: left;
     // margin: 4px 6px 0 0;
     margin: 4px 6px 0 2px;
+=======
+.keyword {
+  color: #007777;
+}
+
+.comment {
+  color: green;
+}
+
+.some {
+  color: #770077;
+}
+
+.only {
+  color: #770077;
+}
+
+.value {
+  color: #770077;
+}
+
+.min {
+  color: #770077;
+}
+
+.max {
+  color: #770077;
+}
+
+.exactly {
+  color: #770077;
+}
+
+.ObjectProperty {
+  font-style: italic;
+}
+
+.synonym {
+  padding: 0.125rem 0.3125rem 0.0625rem;
+  border: 1px solid #777;
+  background-color: #e6e6e6;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+  font-weight: normal;
+  color: #0a0a0a;
+}
+
+.jstree-anchor {
+  // Part Of icon identifier
+  &.part_of:before {
+    background: url("../img/part_of.png") no-repeat;
+    background-size: 16px;
+    content: "";
+    display: block;
+    width: 16px;
+    height: 16px;
+    float: left;
+    margin: 3px 4px 0 1px;
+  }
+
+  // Instance Of icon identifier
+  &.type:before {
+    background: url("../img/instance_of.png") no-repeat;
+    background-size: 16px;
+    content: "";
+    display: block;
+    width: 16px;
+    height: 16px;
+    float: left;
+    margin: 3px 4px 0 1px;
+  }
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
 /* Modify classes from ebi-global.css */
 .breadcrumbs {
+<<<<<<< HEAD
     padding-left: 13px;
     font-size: 0;
     > * {
@@ -560,6 +1125,35 @@ div.row {
 [type="text"]:focus {
     border: 1px solid rgb(0, 130, 124);
     box-shadow: 0 0 7px rgba(0, 130, 124, 0.7);
+=======
+  padding-left: 13px;
+  font-size: 0;
+
+  > * {
+    font-size: 1rem;
+  }
+
+  > li {
+    height: 100%;
+    vertical-align: middle;
+    font-size: 0.84rem;
+    text-transform: none;
+
+    &:not(:last-child)::after {
+      margin: 0 0.4rem;
+    }
+  }
+}
+
+[type="search"], [type="search"]:focus {
+  box-shadow: none;
+  transition: none;
+}
+
+[type="text"]:focus {
+  border: 1px solid rgb(0, 130, 124);
+  box-shadow: 0 0 7px rgba(0, 130, 124, 0.7);
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 
@@ -576,6 +1170,7 @@ div.row {
 ///                     within button list, otherwise 0.
 
 @mixin aligned_button($padfactor, $vertmarginfactor, $padcolour, $leftshift) {
+<<<<<<< HEAD
     @if $vertmarginfactor == 0 {
         font-size: 1em;
     } @else if $vertmarginfactor == 1 {
@@ -652,15 +1247,99 @@ a + a > .ontology-source-valign {
 
 .jstree-proton * {
     transition: none !important;
+=======
+  @if $vertmarginfactor == 0 {
+    font-size: 1em;
+  } @else if $vertmarginfactor == 1 {
+    font-size: 1rem;
+  }
+  position: relative;
+  color: white;
+  display: inline-block;
+  margin-top: 0.25em * $vertmarginfactor;
+  // margin-right: 1.25em * $padfactor;
+  margin-right: 0.625em * ($padfactor + $vertmarginfactor);
+  margin-bottom: 0.125em * $vertmarginfactor;
+  // margin-left: 1.25em * $padfactor;
+  // margin-left: 0.625em * ($padfactor + (1 - $leftshift) * $vertmarginfactor);
+  margin-left: 0.625em * ($padfactor + $vertmarginfactor - $leftshift);
+  z-index: 2;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -0.25em * $padfactor;
+    right: -0.625em * $padfactor;
+    bottom: -0.125em * $padfactor;
+    left: -0.625em * $padfactor;
+    background-color: $padcolour;
+    border-radius: 0.5em * $padfactor;
+    z-index: -1;
+  }
+}
+
+.term-source {
+  @include aligned_button(1, 1, var(--ols_orange), 0);
+}
+
+a + a > .term-source {
+  @include aligned_button(1, 1, var(--ols_orange), 1);
+}
+
+.term-source-valign {
+  @include aligned_button(1, 0, var(--ols_orange), 0);
+}
+
+a + a > .term-source-valign {
+  @include aligned_button(1, 0, var(--ols_orange), 1);
+}
+
+.ontology-source {
+  @include aligned_button(1, 1, var(--ols_green), 0);
+}
+
+a + a > .ontology-source {
+  @include aligned_button(1, 1, var(--ols_green), 1);
+}
+
+.ontology-source-valign {
+  @include aligned_button(1, 0, var(--ols_green), 0);
+}
+
+a + a > .ontology-source-valign {
+  @include aligned_button(1, 0, var(--ols_green), 1);
+}
+
+.jstree-proton {
+  font-family: Helvetica, Arial, FreeSans, 'Liberation Sans', sans-serif !important;
+}
+
+.jstree-hovered {
+  background: #6dadab !important;
+  box-shadow: inset 0 0 1px #6dadab !important;
+}
+
+.jstree-clicked {
+  background: #00938d !important;
+  box-shadow: inset 0 0 1px #00938d !important;
+}
+
+.jstree-proton * {
+  transition: none !important;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 .icheck-belizehole > input:first-child:not(:checked):not(:disabled):hover + label::before,
 .icheck-belizehole > input:first-child:not(:checked):not(:disabled):hover + input[type="hidden"] + label::before {
+<<<<<<< HEAD
     border-color:#00827c !important;
+=======
+  border-color: #00827c !important;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
 
 .icheck-belizehole > input:first-child:checked + label::before,
 .icheck-belizehole > input:first-child:checked + input[type="hidden"] + label::before {
+<<<<<<< HEAD
     background-color:#00827c !important;
     border-color:#00827c !important;
 }
@@ -683,3 +1362,82 @@ a + a > .ontology-source-valign {
 #docs-content h1 {
     color: black !important;
 }
+=======
+  background-color: #00827c !important;
+  border-color: #00827c !important;
+}
+
+#ontologiesTable a, #ontologiesTable a:visited {
+  color: #00827c;
+}
+
+#ontologiesTable a:hover {
+  color: #00938d;
+}
+
+.tabs-content {
+  overflow: auto;
+}
+
+.toggle-hide {
+  display: none;
+}
+
+#docs-content h1 {
+  color: black !important;
+}
+
+/* header */
+#masthead {
+  .row {
+    max-width: 80rem;
+  }
+}
+
+/* footer */
+footer {
+  padding: 1rem 0 1rem;
+
+  .footer-link-list {
+    .link-list {
+      padding: 0;
+      list-style: none;
+      text-align: center;
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 0;
+
+      .link-list-item {
+        padding: 0 10px;
+        display: inline-block;
+
+        a {
+          border: none;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
+  .ols-logo {
+    text-align: center;
+
+    a {
+      border: none;
+
+      img {
+        height: 50px;
+        padding: 0.3rem;
+        border-radius: 0.2rem;
+        background-color: #004443;
+      }
+    }
+
+    .ols-version {
+      color: #777;
+      font-size: small;
+      font-family: monospace;
+    }
+  }
+}
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802

@@ -89,7 +89,10 @@ function hideLegend() {
     $("#LegendDiv").fadeOut(200, function() {
         // alert('non-diachron tab clicked');
         $("#ontology_info_box").fadeIn();
+<<<<<<< HEAD
         $("#ontology_info_box2").fadeIn();
+=======
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     });
 }
 

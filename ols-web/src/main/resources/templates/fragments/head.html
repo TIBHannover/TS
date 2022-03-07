@@ -4,6 +4,7 @@
 <th:block th:fragment="head">
 
     <!-- Your [project-name] here -->
+<<<<<<< HEAD
     <meta name="author" content="Ontology Xref Service" />
     <meta name="HandheldFriendly" content="true" />
     <meta name="MobileOptimized" content="width" />
@@ -27,6 +28,51 @@
     <link rel="mask-icon" href="https://www.tib.eu/typo3conf/ext/tib_tmpl_bootstrap/Resources/Public/Icons/apple-touch.png" color="#ffffff" /> <!-- Safari icon for pinned tab -->
     <meta name="msapplication-TileColor" content="#2b5797" /> <!-- MS Icons -->
     <meta name="msapplication-TileImage" content="https://www.tib.eu/typo3conf/ext/tib_tmpl_bootstrap/Resources/Public/Icons/apple-touch-144px.png" />
+=======
+    <meta name="author" content="Ontology Xref Service"/>
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="MobileOptimized" content="width"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="theme-color" content="#70BDBD"/> <!-- Android Chrome mobile browser tab color -->
+
+    <!-- Add information on the life cycle of this page -->
+    <meta th:if="${debrand} == false" name="ebi:owner" content="Henriette Harmse"/>
+    <!-- Who should be contacted about changes -->
+    <meta th:if="${debrand} == false" name="ebi:review-cycle" content="365"/>
+    <!-- In days, how often should the content be reviewed -->
+
+    <!-- If you link to any other sites frequently, consider optimising performance with a DNS prefetch -->
+    <link rel="dns-prefetch" href="//embl.de"/>
+
+    <!-- If you have custom icon, replace these as appropriate.
+     You can generate them at realfavicongenerator.net -->
+    <link rel="icon" type="image/x-icon"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/favicon.ico"/>
+    <link rel="icon" type="image/png"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/favicon-32x32.png"/>
+    <link rel="icon" type="image/png" sizes="192x192"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/android-chrome-192x192.png"/>
+    <!-- Android (192px) -->
+    <link rel="apple-touch-icon-precomposed" sizes="114x114"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/apple-icon-114x114.png"/>
+    <!-- For iPhone 4 Retina display (114px) -->
+    <link rel="apple-touch-icon-precomposed" sizes="72x72"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/apple-icon-72x72.png"/>
+    <!-- For iPad (72px) -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/apple-icon-144x144.png"/>
+    <!-- For iPad retinat (144px) -->
+    <link rel="apple-touch-icon-precomposed"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/apple-icon-57x57.png"/>
+    <!-- For iPhone (57px) -->
+    <link rel="mask-icon"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/safari-pinned-tab.svg"
+          color="#ffffff"/> <!-- Safari icon for pinned tab -->
+    <meta name="msapplication-TileColor" content="#2b5797"/> <!-- MS Icons -->
+    <meta name="msapplication-TileImage"
+          content="//wwwdev.ebi.ac.uk/web_guidelines/EBI-Framework/v1.3/images/logos/EMBL-EBI/favicons/mstile-144x144.png"/>
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     <!-- CSS: implied media=all -->
     <!-- CSS concatenated and minified via ant build script -->
@@ -45,9 +91,21 @@
 
 
     <!-- Trying to get v1.3 working -->
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css" type="text/css" media="all" />
     <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css" type="text/css" media="all" />
     <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css" type="text/css" />
+=======
+    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/ebi-global.css"
+          type="text/css" media="all"/>
+    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.2/fonts.css"
+          type="text/css" media="all"/>
+    <link rel="stylesheet" href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.3/fonts.css"
+          type="text/css" media="all"/>
+    <link rel="stylesheet"
+          href="https://dev.ebi.emblstatic.net/web_guidelines/EBI-Framework/v1.3/css/theme-embl-petrol.css"
+          type="text/css"/>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     <!--
     <link rel="stylesheet" href="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.2/libraries/foundation-6/css/foundation.css" />
@@ -55,7 +113,12 @@
     -->
 
     <!-- jstree -->
+<<<<<<< HEAD
     <link rel="stylesheet" href="/js/jstree/themes/proton/style.min.css" th:href="@{/js/jstree/themes/proton/style.min.css}" type="text/css" media="screen" />
+=======
+    <link rel="stylesheet" href="/js/jstree/themes/proton/style.min.css"
+          th:href="@{/js/jstree/themes/proton/style.min.css}" type="text/css" media="screen"/>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     <!-- Use this CSS file for any custom styling -->
     <!-- Css taken from old oxo
@@ -90,6 +153,10 @@
     <meta name="ebi:masthead-color" th:content="@{${backgroundColor}}" />
     <meta name="ebi:masthead-image"  th:content="@{${backgroundImage}}"/>
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     <link rel="stylesheet" th:href="@{/css/new_ols.css}" href="/css/new_ols.css" type="text/css" media="screen"/>
 
     <!-- you can replace this with theme-[projectname].css. See http://www.ebi.ac.uk/web/style/colour for details of how to do this -->
@@ -104,10 +171,21 @@
     <!-- All JavaScript at the bottom, except for Modernizr - - >
     <script src="https://www.ebi.ac.uk/web_guidelines/EBI-Framework/v1.1/libraries/modernizr/modernizr.custom.49274.js"></script>
     -->
+<<<<<<< HEAD
     <link th:if="${proton} == true" rel="stylesheet" th:href="@{/js/jstree/themes/proton/style.min.css}" type="text/css" media="screen" />
     <link th:if="${diachron} == true" rel="stylesheet" th:href="@{/css/diachron/pikaday.css}" type="text/css" media="screen" />
     <link th:if="${diachron} == true" rel="stylesheet" th:href="@{/css/diachron/widget.css}" type="text/css" media="screen" />
     <link th:if="${olscss} == true" rel="stylesheet" th:href="@{/css/typeahead/typeaheadjs.css}" type="text/css" media="screen" />
+=======
+    <link th:if="${proton} == true" rel="stylesheet" th:href="@{/js/jstree/themes/proton/style.min.css}" type="text/css"
+          media="screen"/>
+    <link th:if="${diachron} == true" rel="stylesheet" th:href="@{/css/diachron/pikaday.css}" type="text/css"
+          media="screen"/>
+    <link th:if="${diachron} == true" rel="stylesheet" th:href="@{/css/diachron/widget.css}" type="text/css"
+          media="screen"/>
+    <link th:if="${olscss} == true" rel="stylesheet" th:href="@{/css/typeahead/typeaheadjs.css}" type="text/css"
+          media="screen"/>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     <!-- TABLE css (originally from ontology.html, already commented out)
     <link rel="stylesheet" href="../static/css/diachron/tablesort-blue/style.css"
@@ -115,6 +193,7 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.css" />
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css" /-->
     <link th:if="${datatables} == true" rel="stylesheet" type="text/css"
+<<<<<<< HEAD
           th:href="@{//cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css}" />
 
     <!-- originally from browse.html -->
@@ -129,10 +208,31 @@
     <link th:if="${visualise} == true" rel="stylesheet" th:href="@{/css/ontology_vis_plugin/ontology_vis_plugin.css}" type="text/css" media="screen" />
     <!-- THIS is for the VIS BUTTONS -->
     <link th:if="${visualise} == true" rel="stylesheet" th:href="@{../../../css/ontology_vis_plugin/vis.css}" type="text/css" />
+=======
+          th:href="@{//cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css}"/>
+
+    <!-- originally from browse.html -->
+    <link th:if="${datatables_old} == true" rel="stylesheet" type="text/css"
+          th:href="@{//cdn.datatables.net/r/zf-5.5.2/jqc-1.11.3,dt-1.10.8/datatables.min.css}"/>
+
+    <!-- originally from search.html -->
+    <link th:if="${select2} == true" rel="stylesheet" th:href="@{/css/select2/4.0.0/select2.min.css}" type="text/css"
+          media="screen"/>
+
+    <!-- originally from graph.html -->
+    <link th:if="${visualise} == true" rel="stylesheet" th:href="@{/css/ontology_vis_plugin/awesomplete.css}"
+          type="text/css"/>
+    <link th:if="${visualise} == true" rel="stylesheet" th:href="@{/css/ontology_vis_plugin/ontology_vis_plugin.css}"
+          type="text/css" media="screen"/>
+    <!-- THIS is for the VIS BUTTONS -->
+    <link th:if="${visualise} == true" rel="stylesheet" th:href="@{../../../css/ontology_vis_plugin/vis.css}"
+          type="text/css"/>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     <!-- Also needed? (originally from ontology.html, already commented out)
     <link rel="stylesheet" href="../static/css/bootstrap/3.3/css/bootstrap.min.css" th:href="@{../css/bootstrap/3.3/css/bootstrap.min.css}" type="text/css" media="screen" /-->
 
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/icheck-bootstrap@3.0.1/icheck-bootstrap.min.css" />
     <!-- Matomo -->
     <script type="text/javascript">
@@ -150,9 +250,17 @@
       })();
     </script>
     <!-- End Matomo Code --> 
+=======
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/icheck-bootstrap@3.0.1/icheck-bootstrap.min.css"/>
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 </th:block>
 
 <body>
 
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802

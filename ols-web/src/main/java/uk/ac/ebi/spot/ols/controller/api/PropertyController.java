@@ -28,8 +28,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriUtils;
 
+<<<<<<< HEAD
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+=======
+import uk.ac.ebi.spot.ols.controller.api.localization.LocalizedProperty;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 import uk.ac.ebi.spot.ols.neo4j.model.Property;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyPropertyGraphService;
 
@@ -58,7 +62,8 @@ public class PropertyController implements
     }
     @ApiOperation(value = "Retrieve a particular property.")
     @RequestMapping(path = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<PagedResources<Property>> getPropertiesByIri( @PathVariable("id") String termId,
+    HttpEntity<PagedResources<LocalizedProperty>> getPropertiesByIri( @PathVariable("id") String termId,
+            @RequestParam(value = "lang", defaultValue = "en", required = false) String lang,
                                                              Pageable pageable,
                                                              PagedResourcesAssembler assembler
 
@@ -70,14 +75,15 @@ public class PropertyController implements
         } catch (UnsupportedEncodingException e) {
             throw new ResourceNotFoundException("Can't decode IRI: " + termId);
         }
-        return getAllProperties(decoded, null, null, pageable, assembler);
+        return getAllProperties(decoded, null, null, lang, pageable, assembler);
     }
     @ApiOperation(value = "List all properties")
     @RequestMapping(path = "", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<PagedResources<Property>> getAllProperties(
+    HttpEntity<PagedResources<LocalizedProperty>> getAllProperties(
             @RequestParam(value = "iri", required = false) String iri,
             @RequestParam(value = "short_form", required = false) String shortForm,
             @RequestParam(value = "obo_id", required = false) String oboId,
+            @RequestParam(value = "lang", defaultValue = "en", required = false) String lang,
             Pageable pageable,
             PagedResourcesAssembler assembler) {
 
@@ -96,12 +102,21 @@ public class PropertyController implements
             terms = ontologyPropertyGraphService.findAll(pageable);
         }
 
-        return new ResponseEntity<>( assembler.toResource(terms, termAssembler), HttpStatus.OK);
+	Page<LocalizedProperty> localized = terms.map(term -> LocalizedProperty.fromProperty(lang, term));
+
+        return new ResponseEntity<>( assembler.toResource(localized, termAssembler), HttpStatus.OK);
     }
 
+<<<<<<< HEAD
     @ApiOperation(value = "Find property based on defining ontology")
     @RequestMapping(path = "/findByIdAndIsDefiningOntology/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<Property>> getPropertiesByIriAndIsDefiningOntology( @PathVariable("id") String termId,
+=======
+
+    @RequestMapping(path = "/findByIdAndIsDefiningOntology/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<PagedResources<LocalizedProperty>> getPropertiesByIriAndIsDefiningOntology( @PathVariable("id") String termId,
+            @RequestParam(value = "lang", defaultValue = "en", required = false) String lang,
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                                                              Pageable pageable,
                                                              PagedResourcesAssembler assembler
 
@@ -113,6 +128,7 @@ public class PropertyController implements
         } catch (UnsupportedEncodingException e) {
             throw new ResourceNotFoundException("Can't decode IRI: " + termId);
         }
+<<<<<<< HEAD
         return getPropertiesByIdAndIsDefiningOntology(decoded, null, null, pageable, assembler);
     }    
     @ApiOperation(value = "List properties based on defining ontology")
@@ -121,6 +137,17 @@ public class PropertyController implements
             @RequestParam(value = "iri", required = false) String iri,
             @RequestParam(value = "short_form", required = false) String shortForm,
             @RequestParam(value = "obo_id", required = false) String oboId,
+=======
+        return getPropertiesByIdAndIsDefiningOntology(decoded, null, null, lang, pageable, assembler);
+    }    
+    
+    @RequestMapping(path = "/findByIdAndIsDefiningOntology", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<PagedResources<LocalizedProperty>> getPropertiesByIdAndIsDefiningOntology(
+            @RequestParam(value = "iri", required = false) String iri,
+            @RequestParam(value = "short_form", required = false) String shortForm,
+            @RequestParam(value = "obo_id", required = false) String oboId,
+            @RequestParam(value = "lang", defaultValue = "en", required = false) String lang,
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             Pageable pageable,
             PagedResourcesAssembler assembler) {
 
@@ -139,7 +166,13 @@ public class PropertyController implements
             terms = ontologyPropertyGraphService.findAllByIsDefiningOntology(pageable);
         }
 
+<<<<<<< HEAD
         return new ResponseEntity<>( assembler.toResource(terms, termAssembler), HttpStatus.OK);
+=======
+	Page<LocalizedProperty> localized = terms.map(term -> LocalizedProperty.fromProperty(lang, term));
+
+        return new ResponseEntity<>( assembler.toResource(localized, termAssembler), HttpStatus.OK);
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     }
     
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")

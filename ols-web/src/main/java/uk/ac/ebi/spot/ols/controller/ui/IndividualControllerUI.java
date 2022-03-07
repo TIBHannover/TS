@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,11 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
-import uk.ac.ebi.spot.ols.neo4j.model.Property;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
-
-import java.util.Collections;
 
 /**
  * @author Simon Jupp
@@ -48,6 +44,7 @@ public class IndividualControllerUI {
             @PathVariable("onto") String ontologyId,
             @RequestParam(value = "iri", required = false) String termIri,
             @RequestParam(value = "short_form", required = false) String shortForm,
+            @RequestParam(value = "lang", required = false, defaultValue = "en") String lang,
             @RequestParam(value = "obo_id", required = false) String oboId,
             Pageable pageable,
             Model model) throws ResourceNotFoundException {
@@ -56,13 +53,16 @@ public class IndividualControllerUI {
 
         Individual term = null;
 
+	model.addAttribute("lang", lang);
+
+        OntologyDocument document = repositoryService.get(ontologyId);
+	model.addAttribute("ontologyLanguages", document.getConfig().getLanguages());
+
         if (termIri != null) {
             term = ontologyIndividualService.findByOntologyAndIri(ontologyId, termIri);
-        }
-        else if (shortForm != null) {
+        } else if (shortForm != null) {
             term = ontologyIndividualService.findByOntologyAndShortForm(ontologyId, shortForm);
-        }
-        else if (oboId != null) {
+        } else if (oboId != null) {
             term = ontologyIndividualService.findByOntologyAndOboId(ontologyId, oboId);
         }
 
@@ -74,9 +74,8 @@ public class IndividualControllerUI {
 
             Page<Individual> termsPage = ontologyIndividualService.findAllByOntology(ontologyId, pageable);
 
-            OntologyDocument document = repositoryService.get(ontologyId);
             model.addAttribute("ontologyName", document.getOntologyId());
-            model.addAttribute("ontologyTitle", document.getConfig().getTitle());
+            model.addAttribute("ontologyTitle", document.getConfig().getLocalizedTitle(lang));
             model.addAttribute("ontologyPrefix", document.getConfig().getPreferredPrefix());
             model.addAttribute("pageable", pageable);
             model.addAttribute("allindividuals", termsPage);
@@ -93,7 +92,7 @@ public class IndividualControllerUI {
         model.addAttribute("ontologyIndividual", term);
         model.addAttribute("indvidualTypes", ontologyIndividualService.getDirectTypes(ontologyId, term.getIri(), new PageRequest(0, 10)));
 
-        String title = repositoryService.get(ontologyId).getConfig().getTitle();
+        String title = repositoryService.get(ontologyId).getConfig().getLocalizedTitle(lang);
         model.addAttribute("ontologyName", title);
         customisationProperties.setCustomisationModelAttributes(model);
         return "individual";

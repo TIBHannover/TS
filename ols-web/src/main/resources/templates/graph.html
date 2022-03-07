@@ -36,7 +36,11 @@
                        style="border-bottom-width: 0px;"><span class="ontology-source"
                                                                th:text="${ontologyTerm.getOntologyPrefix()}">parent 1</span></a>   &gt;
                     <span th:text="${ontologyTerm.getShortForm()}">id</span>
+<<<<<<< HEAD
                     <a th:href="@{/graphview-help}"
+=======
+                    <a href="../../../docs/graphview-help"
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                        style="position: absolute; right: 20px;">Help with this visualisation</a>
                 </p>
             </nav>
@@ -49,7 +53,11 @@
                     <div class="small-12 columnx">
                         <div class="grid_24 clearfix">
                             <span style="font-size: small; color: grey; padding: 9px;"
+<<<<<<< HEAD
                                   th:text="${'Visualized term: '+ontologyTerm.getLabel()+' ('+ontologyTerm.getIri()+')'}">http://www.example.com/onto/id</span>
+=======
+                                  th:text="${'Visualized term: '+ontologyTerm.getLabelByLang(lang)+' ('+ontologyTerm.getIri()+')'}">http://www.example.com/onto/id</span>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                             <a id="dataElement"
                                th:data="${ontologyTerm.getIri()}"
                                th:href="@{${ontologyTerm.getIri()}}"

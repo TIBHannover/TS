@@ -24,7 +24,11 @@ public class NoReasonerLoaderTest {
                 new OntologyResourceConfig.OntologyResourceConfigBuilder(
                         "http://www.ebi.ac.uk/test2",
                         "test2",
+<<<<<<< HEAD
                         "test2",
+=======
+                        // "test2",
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                         (new File("ontology-tools/src/test/resources/test2.owl").toURI())
 
                 );
@@ -59,7 +63,11 @@ public class NoReasonerLoaderTest {
         OntologyResourceConfig.OntologyResourceConfigBuilder builder =
                 new OntologyResourceConfig.OntologyResourceConfigBuilder(
                         "http://purl.obolibrary.org/obo/duo",
+<<<<<<< HEAD
                         "Data Use Ontology",
+=======
+                        // "Data Use Ontology",
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                         "DUO",
                         (new File("ontology-tools/src/test/resources/duo-preferred-roots.owl").toURI())
 
@@ -85,7 +93,11 @@ public class NoReasonerLoaderTest {
         OntologyResourceConfig.OntologyResourceConfigBuilder builder =
                 new OntologyResourceConfig.OntologyResourceConfigBuilder(
                         "http://purl.obolibrary.org/obo/mondo",
+<<<<<<< HEAD
                         "Mondo",
+=======
+                        // "Mondo",
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                         "mondo",
                         (new File("ontology-tools/src/test/resources/mondo.owl").toURI())
 
@@ -111,7 +123,11 @@ public class NoReasonerLoaderTest {
         OntologyResourceConfig.OntologyResourceConfigBuilder builder =
                 new OntologyResourceConfig.OntologyResourceConfigBuilder(
                         "http://purl.obolibrary.org/obo/mondo",
+<<<<<<< HEAD
                         "Mondo",
+=======
+                        // "Mondo",
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                         "mondo",
                         (new File("ontology-tools/src/test/resources/mondo.obo").toURI())
 

@@ -28,6 +28,7 @@ public class JsTreeBuilder {
 
     private String rootName = "Thing";
 
+<<<<<<< HEAD
     // CLASS queries
     String getJsTreeClassChildren = "MATCH path = (child)-[r:SUBCLASSOF|RelatedTree]->(n:Class)\n"+
             "USING INDEX n:Class(iri)\n" +
@@ -94,6 +95,8 @@ public class JsTreeBuilder {
             "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri, startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, r1.label as relation, collect( distinct id(endNode(r1)) ) as parents";
 
 
+=======
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     public JsTreeBuilder() {
 
     }
@@ -102,54 +105,70 @@ public class JsTreeBuilder {
         this.rootName = rootName;
     }
 
+<<<<<<< HEAD
     public Object getIndividualJsTree(String ontologyName, String iri) {
+=======
+    public Object getIndividualJsTree(String lang, String ontologyName, String iri) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         Map<String, Object> paramt = new HashMap<>();
         paramt.put("0", ontologyName);
         paramt.put("1", iri);
-        Result res = graphDatabaseService.execute(individualParentTreeQuery, paramt);
+        Result res = graphDatabaseService.execute(JsTreeQueries.individualParentTreeQuery(lang), paramt);
 
         setRootName("Thing");
-        return getJsTreeObject(ontologyName, iri, res);
+        return getJsTreeObject(lang, ontologyName, iri, res);
     }
 
+<<<<<<< HEAD
     public Object getPropertyJsTree(String ontologyName, String iri, boolean siblings) {
+=======
+    public Object getPropertyJsTree(String lang, String ontologyName, String iri, boolean siblings) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         Map<String, Object> paramt = new HashMap<>();
         paramt.put("0", ontologyName);
         paramt.put("1", iri);
-        String query = siblings ? propertyParentSiblingTreeQuery : propertyParentTreeQuery;
+        String query = siblings ? JsTreeQueries.propertyParentSiblingTreeQuery(lang) : JsTreeQueries.propertyParentTreeQuery(lang);
         Result res = graphDatabaseService.execute(query, paramt);
 
         setRootName("TopObjectProperty");
-        return getJsTreeObject(ontologyName, iri, res);
+        return getJsTreeObject(lang, ontologyName, iri, res);
     }
 
 
+<<<<<<< HEAD
     public Object getClassJsTree(String ontologyName, String iri, boolean siblings) {
+=======
+    public Object getClassJsTree(String lang, String ontologyName, String iri, boolean siblings) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         Map<String, Object> paramt = new HashMap<>();
         paramt.put("0", ontologyName);
         paramt.put("1", iri);
-        String query = siblings ? parentSiblingTreeQuery : parentTreeQuery;
+        String query = siblings ? JsTreeQueries.parentSiblingTreeQuery(lang) : JsTreeQueries.parentTreeQuery(lang);
         Result res = graphDatabaseService.execute(query, paramt);
 
         setRootName("Thing");
-        return getJsTreeObject(ontologyName, iri, res);
+        return getJsTreeObject(lang, ontologyName, iri, res);
     }
 
-    public Object getJsTreeClassChildren(String ontologyName, String iri, String parentNodeId) {
-        return getJsTreeChildren("term", ontologyName, iri, parentNodeId);
+    public Object getJsTreeClassChildren(String lang, String ontologyName, String iri, String parentNodeId) {
+        return getJsTreeChildren(lang, "term", ontologyName, iri, parentNodeId);
     }
 
-    public Object getJsTreePropertyChildren(String ontologyName, String iri, String parentNodeId) {
-        return getJsTreeChildren("property", ontologyName, iri, parentNodeId);
+    public Object getJsTreePropertyChildren(String lang, String ontologyName, String iri, String parentNodeId) {
+        return getJsTreeChildren(lang, "property", ontologyName, iri, parentNodeId);
     }
 
+<<<<<<< HEAD
     private Object getJsTreeChildren(String type,String ontologyName, String iri, String parentNodeId) {
+=======
+    private Object getJsTreeChildren(String lang, String type,String ontologyName, String iri, String parentNodeId) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         Map<String, Object> paramt = new HashMap<>();
         paramt.put("0", ontologyName);
         paramt.put("1", iri);
-        String query = getJsTreeClassChildren;
+        String query = JsTreeQueries.getJsTreeClassChildren(lang);
         if (type.equals("property")) {
-            query = getJsTreePropertyChildren;
+            query = JsTreeQueries.getJsTreePropertyChildren(lang);
         }
         Result res = graphDatabaseService.execute(query, paramt);
 
@@ -161,6 +180,7 @@ public class JsTreeBuilder {
             String nodeId = row.get("startId").toString();
             String startIri = row.get("startIri").toString();
             String startLabel = row.get("startLabel").toString();
+            String startLabelLocalized = row.get("startLabelLocalized") != null ? row.get("startLabelLocalized").toString() : null;
             String relation = row.get("relation").toString().replaceAll(" ", "_");
             boolean hasChildren = Boolean.parseBoolean(row.get("hasChildren").toString());
 
@@ -171,7 +191,7 @@ public class JsTreeBuilder {
                     startNode,
                     startIri,
                     ontologyName,
-                    startLabel,
+                    startLabelLocalized != null ? startLabelLocalized : startLabel,
                     relation,
                     hasChildren,
                     parentNodeId
@@ -189,7 +209,7 @@ public class JsTreeBuilder {
         return treeObjects;
     }
 
-    private Object getJsTreeObject(String ontologyName, String iri, Result res) {
+    private Object getJsTreeObject(String lang, String ontologyName, String iri, Result res) {
 
         // create a map of the start node to the rows in the results
         Map<String, List<Map<String, Object>>> resultsMap = new HashMap<>();
@@ -206,7 +226,7 @@ public class JsTreeBuilder {
         Collection<String> parentIds = new HashSet<>();
 
         for (String id : resultsMap.keySet()) {
-            generateJsTreeObject(id, ontologyName, jsTreeObjectMap, resultsMap, parentIds);
+            generateJsTreeObject(lang, id, ontologyName, jsTreeObjectMap, resultsMap, parentIds);
         }
 
         // find all the nodes that are parents (i.e. should be expanded)
@@ -246,15 +266,15 @@ public class JsTreeBuilder {
      * @param resultsMap a map of the start nodes to the rows in the results table
      * @param parentIdCollector collect parent Ids that we've had to create
      */
-    private void generateJsTreeObject(String nodeId, String ontologyName, Map<String, Collection<JsTreeObject>> jsTreeObjectMap, Map<String, List<Map<String, Object>>> resultsMap, Collection<String> parentIdCollector) {
+    private void generateJsTreeObject(String lang, String nodeId, String ontologyName, Map<String, Collection<JsTreeObject>> jsTreeObjectMap, Map<String, List<Map<String, Object>>> resultsMap, Collection<String> parentIdCollector) {
         try {
-            Collection<JsTreeObject> objectVersions = getJsObjectTree(nodeId, ontologyName, resultsMap, jsTreeObjectMap, parentIdCollector);
+            Collection<JsTreeObject> objectVersions = getJsObjectTree(lang, nodeId, ontologyName, resultsMap, jsTreeObjectMap, parentIdCollector);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private Collection<JsTreeObject> getJsObjectTree(String nodeId, String ontologyName, Map<String, List<Map<String, Object>>> resultsMap, Map<String, Collection<JsTreeObject>> jsTreeObjectMap, Collection<String> parentIdCollector) throws IOException {
+    private Collection<JsTreeObject> getJsObjectTree(String lang, String nodeId, String ontologyName, Map<String, List<Map<String, Object>>> resultsMap, Map<String, Collection<JsTreeObject>> jsTreeObjectMap, Collection<String> parentIdCollector) throws IOException {
 
         // return the object if we have seen it before
         if (jsTreeObjectMap.containsKey(nodeId)) {
@@ -263,7 +283,7 @@ public class JsTreeBuilder {
 
         // if no key, then we are at a root
         if (!resultsMap.containsKey(nodeId)) {
-            return Collections.singleton(new JsTreeObject("#", "#", ontologyName, "",rootName, false, "#"));
+            return Collections.singleton(new JsTreeObject("#", "#", ontologyName, "", rootName, false, "#"));
         }
 
         int x = 1;
@@ -275,10 +295,11 @@ public class JsTreeBuilder {
 
                 String parentId = pid.toString();
 
-                for (JsTreeObject parentObject : getJsObjectTree(parentId, ontologyName, resultsMap, jsTreeObjectMap, parentIdCollector)) {
+                for (JsTreeObject parentObject : getJsObjectTree(lang, parentId, ontologyName, resultsMap, jsTreeObjectMap, parentIdCollector)) {
 
                     String startIri = row.get("startIri").toString();
                     String startLabel = row.get("startLabel").toString();
+		    String startLabelLocalized = row.get("startLabelLocalized") != null ? row.get("startLabelLocalized").toString() : null;
                     String relation = row.get("relation").toString().replaceAll(" ", "_");
                     boolean hasChildren = Boolean.parseBoolean(row.get("hasChildren").toString());
 
@@ -289,7 +310,7 @@ public class JsTreeBuilder {
                             startNode,
                             startIri,
                             ontologyName,
-                            startLabel,
+                            startLabelLocalized != null ? startLabelLocalized : startLabel,
                             relation,
                             hasChildren,
                             parentObject.getId()

@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.*;
+
 /**
  * @author Simon Jupp
  * @date 17/08/2015
@@ -33,51 +35,69 @@ public class Individual {
     @JsonIgnore
     private String olsId;
 
+<<<<<<< HEAD
     @GraphProperty(propertyName="iri")
     @ApiModelProperty(value = "IRI of the individual", name = "iri", dataType = "String", example = "https://spec.edmcouncil.org/fibo/ontology/FBC/FunctionalEntities/MarketsIndividuals/MIC-24EX")
+=======
+    @GraphProperty(propertyName = "iri")
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     private String iri;
 
-    @GraphProperty(propertyName="label")
+    @GraphProperty(propertyName = "label")
     private String label;
 
-    @GraphProperty(propertyName="synonym")
+    @GraphProperty(propertyName = "synonym")
     private Set<String> synonym;
 
-    @GraphProperty(propertyName="description")
+    @GraphProperty(propertyName = "description")
     private Set<String> description;
 
-    @GraphProperty(propertyName="ontology_name")
+    @GraphProperty(propertyName = LOCALIZED_LABELS)
+    @JsonProperty(value = LOCALIZED_LABELS)
+    private DynamicProperties localizedLabels = new DynamicPropertiesContainer();
+
+    @GraphProperty(propertyName = LOCALIZED_SYNONYMS)
+    @JsonProperty(value = LOCALIZED_SYNONYMS)
+    private DynamicProperties localizedSynonyms = new DynamicPropertiesContainer();
+
+    @GraphProperty(propertyName = LOCALIZED_DESCRIPTIONS)
+    @JsonProperty(value = LOCALIZED_DESCRIPTIONS)
+    private DynamicProperties localizedDescriptions = new DynamicPropertiesContainer();
+
+    @GraphProperty(propertyName = "ontology_name")
     @JsonProperty(value = "ontology_name")
     private String ontologyName;
 
-    @GraphProperty(propertyName="ontology_prefix")
+    @GraphProperty(propertyName = "ontology_prefix")
     @JsonProperty(value = "ontology_prefix")
     private String ontologyPrefix;
 
-    @GraphProperty(propertyName="ontology_iri")
+    @GraphProperty(propertyName = "ontology_iri")
     @JsonProperty(value = "ontology_iri")
     private String ontologyIri;
 
-    @GraphProperty(propertyName="is_obsolete")
+    @GraphProperty(propertyName = "is_obsolete")
     @JsonProperty(value = "is_obsolete")
     private boolean isObsolete;
 
-    @GraphProperty(propertyName="is_defining_ontology")
+    @GraphProperty(propertyName = "is_defining_ontology")
     @JsonProperty(value = "is_defining_ontology")
     private boolean isLocal;
 
-    @GraphProperty(propertyName="short_form")
+    @GraphProperty(propertyName = "short_form")
     @JsonProperty(value = "short_form")
     private String shortForm;
 
-    @GraphProperty(propertyName="obo_id")
+    @GraphProperty(propertyName = "obo_id")
     @JsonProperty(value = "obo_id")
     private String oboId;
 
     private DynamicProperties annotation = new DynamicPropertiesContainer();
+    private DynamicProperties localizedAnnotation = new DynamicPropertiesContainer();
 
-    @RelatedTo(type="INSTANCEOF", direction = Direction.OUTGOING)
-    @Fetch Set<Term> type;
+    @RelatedTo(type = "INSTANCEOF", direction = Direction.OUTGOING)
+    @Fetch
+    Set<Term> type;
 
     public Individual() {
     }
@@ -94,8 +114,55 @@ public class Individual {
         return iri;
     }
 
-    public String getLabel() {
-        return label;
+    public String[] getDescriptionsByLang(String lang) {
+
+        String[] localizedDescriptions = (String[])
+                this.localizedDescriptions.getProperty(lang);
+
+        if (localizedDescriptions != null && localizedDescriptions.length > 0) {
+            return (String[]) localizedDescriptions;
+        }
+
+        if (description != null) {
+            return description.toArray(new String[0]);
+        }
+
+        return new String[0];
+    }
+
+    public String[] getSynonymsByLang(String lang) {
+
+        String[] localizedSynonyms = (String[])
+                this.localizedSynonyms.getProperty(lang);
+
+        if (localizedSynonyms != null) {
+            return localizedSynonyms;
+        }
+
+        if (synonym != null) {
+            return synonym.toArray(new String[0]);
+        }
+
+        return new String[0];
+    }
+
+    public String getLabelByLang(String lang) {
+        return getLabelsByLang(lang)[0];
+    }
+
+    public String[] getLabelsByLang(String lang) {
+
+        String[] localizedLabels = (String[]) this.localizedLabels.getProperty(lang);
+
+        if (localizedLabels != null && localizedLabels.length > 0) {
+            return localizedLabels;
+        }
+
+        if (label != null) {
+            return new String[]{label};
+        }
+
+        return new String[0];
     }
 
     public Set<String> getSynonyms() {
@@ -141,8 +208,22 @@ public class Individual {
         return type;
     }
 
+    public Map<String, Object> getAnnotationByLang(String lang) {
 
-    public Map getAnnotation() {
-        return new TreeMap<String, Object>(annotation.asMap());
+        Map<String, Object> localizedAnnotations = localizedAnnotation.asMap();
+
+        Map<String, Object> res = new TreeMap<>();
+
+        if (lang.equals("en") && annotation != null) {
+            res.putAll(annotation.asMap());
+        }
+
+        for (String k : localizedAnnotations.keySet()) {
+            if (k.indexOf(lang + "-") == 0) {
+                res.put(k.substring(lang.length() + 1), localizedAnnotations.get(k));
+            }
+        }
+
+        return res;
     }
 }

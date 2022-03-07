@@ -7,22 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 import uk.ac.ebi.spot.ols.config.OntologyLoadingConfiguration;
 import uk.ac.ebi.spot.ols.config.OntologyResourceConfig;
 import uk.ac.ebi.spot.ols.exception.IndexingException;
-import uk.ac.ebi.spot.ols.exception.OntologyLoadingException;
 import uk.ac.ebi.spot.ols.loader.OntologyLoader;
 import uk.ac.ebi.spot.ols.loader.OntologyLoaderFactory;
-import uk.ac.ebi.spot.ols.model.Status;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.model.OntologyIndexer;
+import uk.ac.ebi.spot.ols.model.Status;
 import uk.ac.ebi.spot.ols.xrefs.DatabaseService;
 import uk.ac.ebi.spot.usage.ResourceUsage;
 
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -101,7 +101,7 @@ public class MongoOntologyIndexingService implements OntologyIndexingService{
         document.setStatus(Status.LOADING);
         ontologyRepositoryService.update(document);
         // if we get to here, we should have at least loaded the ontology
-        try {
+//        try {
 
             // get all the available indexers
             for (OntologyIndexer indexer : indexers) {
@@ -117,12 +117,21 @@ public class MongoOntologyIndexingService implements OntologyIndexingService{
             // update any ontology meta data
             OntologyResourceConfig config = document.getConfig();
 
-            if (loader.getTitle() != null) {
-                config.setTitle(loader.getTitle());
-            }
-            if (loader.getOntologyDescription() != null) {
-                config.setDescription(loader.getOntologyDescription());
-            }
+            config.setLocalizedTitles(loader.getLocalizedTitles());
+            config.setLocalizedDescriptions(loader.getLocalizedDescriptions());
+
+	    String enTitle = loader.getLocalizedTitles().get("en");
+	    if(enTitle != null) {
+		    config.setTitle(enTitle);
+	    }
+
+	    String enDesc = loader.getLocalizedDescriptions().get("en");
+	    if(enDesc != null) {
+		    config.setDescription(enDesc);
+	    }
+
+	    config.setLanguages(loader.getOntologyLanguages());
+
             if (loader.getHomePage() != null) {
                 config.setHomepage(loader.getHomePage());
             }
@@ -139,7 +148,7 @@ public class MongoOntologyIndexingService implements OntologyIndexingService{
                 config.setCreators(loader.getCreators());
             }
             if (!loader.getOntologyAnnotations().keySet().isEmpty()) {
-                config.setAnnotations(loader.getOntologyAnnotations());
+                config.setLocalizedAnnotations(loader.getOntologyAnnotations());
             }
             if (loader.getOntologyVersionIRI() != null) {
                 config.setVersionIri(loader.getOntologyVersionIRI().toString());
@@ -150,11 +159,17 @@ public class MongoOntologyIndexingService implements OntologyIndexingService{
             if (!loader.getOntologyIRI().toString().equals(config.getId())) {
                 config.setId(loader.getOntologyIRI().toString());
             }
+            // if null, removes version number from document
+            config.setVersion(loader.getVersionNumber());
 
             // check for a version number or set to today date
             if (loader.getVersionNumber() != null) {
                 config.setVersion(loader.getVersionNumber());
             }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             document.setConfig(config);
             document.setNumberOfTerms(classes.size());
             document.setNumberOfProperties(properties.size());
@@ -162,13 +177,49 @@ public class MongoOntologyIndexingService implements OntologyIndexingService{
             status = Status.LOADED;
             document.setLoaded(new Date());
             result = true;
+<<<<<<< HEAD
         } catch (Throwable t) {
         	logger.error("Error indexing " + document.getOntologyId(), t);
             status = Status.FAILED;
             message = t.getMessage();
+=======
+//        } catch (Throwable t) {
+//        	logger.error("Error indexing " + document.getOntologyId(), t);
+//            status = Status.FAILED;
+//            message = t.getMessage();
+//        }
+//        finally {
+
+            document.setStatus(status);
+            document.setUpdated(new Date());
+            document.setMessage(message);
+            ontologyRepositoryService.update(document);
+            return result;
+//        }
+    }
+
+    @Override
+    public void removeOntologyDocumentFromIndex(OntologyDocument document) throws IndexingException {
+        String message = "";
+        Status status = Status.FAILED;
+
+        try {
+
+            // get all the available indexers
+            for (OntologyIndexer indexer : indexers) {
+                // delete the ontology
+                indexer.dropIndex(document.getOntologyId());
+            }
+            status = Status.REMOVED;
+
+        } catch (Throwable t) {
+        	logger.error("Error removing index for " + document.getOntologyId(), t.getMessage());
+            status = Status.FAILED;
+            message = t.getMessage();
+            throw t;
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         }
         finally {
-
             document.setStatus(status);
             document.setUpdated(new Date());
             document.setMessage(message);

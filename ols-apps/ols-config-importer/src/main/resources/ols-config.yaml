@@ -2,6 +2,7 @@
 
 ontologies:
 
+<<<<<<< HEAD
   ## EFO
 
   - id: efo
@@ -57,3 +58,5 @@ ontologies:
           - NFDI4CHEM
       - subject:
           - Epidemiology
+=======
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802

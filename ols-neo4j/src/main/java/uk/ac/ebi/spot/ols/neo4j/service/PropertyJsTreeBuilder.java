@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class PropertyJsTreeBuilder extends AbstractJsTreeBuilder {
     @Override
+<<<<<<< HEAD
     String getJsTreeParentQuery() {
+=======
+    String getJsTreeParentQuery(String lang) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         StringBuilder query = new StringBuilder();
 
         query.append("MATCH path = (n:Property)-[r:SUBPROPERTYOF*]->(parent)\n");
@@ -21,12 +25,21 @@ public class PropertyJsTreeBuilder extends AbstractJsTreeBuilder {
     }
 
     @Override
+<<<<<<< HEAD
     String getJsTreeParentQuery(ViewMode viewMode) {
         return getJsTreeParentQuery();
     }
 
     @Override
     String getJsTreeParentSiblingQuery() {
+=======
+    String getJsTreeParentQuery(String lang, ViewMode viewMode) {
+        return getJsTreeParentQuery(lang);
+    }
+
+    @Override
+    String getJsTreeParentSiblingQuery(String lang) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         StringBuilder query = new StringBuilder();
 
         query.append("MATCH path = (n:Property)-[r:SUBPROPERTYOF*]->(parent)<-[r2:SUBPROPERTYOF]-(n1:Property)\n");
@@ -43,12 +56,21 @@ public class PropertyJsTreeBuilder extends AbstractJsTreeBuilder {
     }
 
     @Override
+<<<<<<< HEAD
     String getJsTreeParentSiblingQuery(ViewMode viewMode) {
         return getJsTreeParentSiblingQuery();
     }
 
     @Override
     String getJsTreeChildrenQuery() {
+=======
+    String getJsTreeParentSiblingQuery(String lang ,ViewMode viewMode) {
+        return getJsTreeParentSiblingQuery(lang);
+    }
+
+    @Override
+    String getJsTreeChildrenQuery(String lang) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         StringBuilder query = new StringBuilder();
 
         query.append("MATCH path = (child)-[r:SUBPROPERTYOF]->(n:Property)\n");
@@ -67,7 +89,11 @@ public class PropertyJsTreeBuilder extends AbstractJsTreeBuilder {
     }
 
     @Override
+<<<<<<< HEAD
     String getJsTreeRoots(ViewMode viewMode) {
+=======
+    String getJsTreeRoots(String lang, ViewMode viewMode) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         throw new UnsupportedOperationException("Implementation not necessary.");
     }
 }

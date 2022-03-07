@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
-<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"/> <![endif]-->
-<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"/> <![endif]-->
-<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"/> <![endif]-->
+<!--[if lt IE 7]>
+<html class="no-js ie6 oldie" lang="en"/> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js ie7 oldie" lang="en"/> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js ie8 oldie" lang="en"/> <![endif]-->
 <!-- Consider adding an manifest.appcache: h5bp.com/d/Offline -->
+<<<<<<< HEAD
 <!--[if gt IE 8]><!--> <html  xmlns:th="https://www.thymeleaf.org" class="no-js" lang="en"> <!--<![endif]-->
 
 
 <head>
     <div th:replace="fragments/head :: head(olscss=true)"></div>
     <title id="pageTitle" th:text="${ontologyIndividual.getLabel()}">Individual</title>
+=======
+<!--[if gt IE 8]><!-->
+<html xmlns:th="https://www.thymeleaf.org" class="no-js" lang="en"> <!--<![endif]-->
+
+<head>
+    <div th:replace="fragments/head :: head(olscss=true)"></div>
+    <title id="pageTitle" th:text="${ontologyIndividual.getLabelByLang(lang)}">Individual</title>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     <!-- A few keywords that relate to the content of THIS PAGE (not the whole project)
     <meta name="keywords" content="biosamples, europe, EBI" />
     <!- - Describe what this page is about - ->
@@ -18,13 +30,23 @@
     <!- - The last time the content was reviewed - ->
     <meta name="ebi:expiry" content="2017-12-20" />
     <!- - When this content is no longer relevant -->
+<<<<<<< HEAD
 </head>
 
 
+=======
+    <script type="text/javascript" th:inline="javascript">
+        ontologyLanguages = [[${ontologyLanguages}]]
+        lang = [[${lang}]]
+    </script>
+</head>
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 <body>
 <th:block th:include="fragments/header :: header"></th:block>
 
 <section id="main-content-area" role="main">
+<<<<<<< HEAD
 
     <div class="row">
 
@@ -46,18 +68,131 @@
             <div property="description">
                 <p th:each="description : ${ontologyIndividual.getDescription()}" th:text="${description}">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget <nulla class=""></nulla>                    Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh. Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. Proin ut ligula vel nunc egestas porttitor. Morbi lectus risus, iaculis vel, suscipit quis, luctus non, massa. Fusce ac turpis quis ligula lacinia aliquet. Mauris ipsum.
+=======
+
+    <div class="row breadcrumbDiv">
+        <div style="float: right; padding-right: 15px;">
+            <a style="float: right; border-bottom: none;"
+               th:href="@{../../api/ontologies/__${ontologyIndividual.getOntologyName()}__/individuals (iri=${ontologyIndividual.getIri()})}"
+               href="#">
+                <img th:src="@{../../img/file_JSON.png}"
+                     src="../static/img/file_JSON.png"
+                     alt="JSON"
+                     title="Get data as JSON"/>
+            </a>
+        </div>
+
+        <nav aria-label="Here you are" role="navigation">
+            <ul class="breadcrumbs">
+                <li><a th:inline="text" href="../../index">[[${shortTitle}]]</a></li>
+                <li><a th:href="@{../../ontologies/__${ontologyIndividual.getOntologyName()}__}"
+                       th:text="${ontologyName}">ontology</a>
+                    <div class="decoy"></div>
+                    <a property="codingSystem"
+                       th:attr="content=${ontologyIndividual.getOntologyName()}"
+                       th:href="@{../../ontologies/__${ontologyIndividual.getOntologyName()}__}"
+                       data-x-style="border-bottom-width: 0px;"
+                       href="#"><span class="ontology-source-valign"
+                                      th:text="${ontologyIndividual.getOntologyPrefix()}">parent 1</span></a></li>
+                <li>
+                    <span id="INDIVIDUAL_ID"
+                          class="term-source-valign"
+                          property="codeValue"
+                          th:text="${ontologyIndividual.getOboId()}? ${ontologyIndividual.getOboId()} : ${ontologyIndividual.getShortForm()}">id</span>
+                    <button id='copyIndividualShortForm'
+                            data-x-class="button tiny third copyButton"
+                            class="secondary-color tiny copyButton"
+                            data-clipboard-action="copy"
+                            data-clipboard-target="#INDIVIDUAL_ID"
+                            type="button"><i class="icon icon-functional"
+                                             data-icon="0"></i> Copy
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="row">
+        <div class="small-8 columns">
+            <h2 property="name" style="margin: 0;" th:text="${ontologyIndividual.getLabelByLang(lang)}">Term label</h2>
+            <a style="padding-left: 3px; border-bottom: none;" th:href="@{${ontologyIndividual.getIri()}}"
+               class="nounderline secondary-color" title="Go to external page" target="blank">
+                <span class="show-for-sr">Go to external page</span>
+                <i class="icon icon-generic" data-icon="x"></i>
+                <span property="url" id="INDIVIDUAL_IRI" style="font-size: small;"
+                      th:text="${ontologyIndividual.getIri()}">http://www.example.com/onto/id</span>
+            </a>
+            <p style="display: inline;">
+                <button title="Copy id to clipboard" id="copyIndividualIri" data-clipboard-action="copy"
+                        data-clipboard-target="#INDIVIDUAL_IRI" class="secondary-color small copyButton"
+                        type="button">
+                    <i class="icon icon-functional" data-icon="0"></i>
+                    Copy
+                </button>
+            </p>
+        </div>
+        <div class="small-4 columns">
+            <form name="local-search" action="../../search" method="get">
+                <div id="bloodhound" class="input-group">
+                    <input style="margin-bottom: 0.1em;"
+                           class="form-control typeahead"
+                           autofocus="autofocus"
+                           type="text"
+                           name="q"
+                           data-olswidget="select"
+                           th:placeholder="'Search ' + ${ontologyIndividual.getOntologyPrefix()}"
+                           th:attr="data-olsontology=${ontologyIndividual.getOntologyName()}"
+                           data-olsontology=""
+                           data-selectpath="../../"
+                           th:attr="placeholder='Search ' + ${shortTitle}"
+                           aria-describedby="basic-addon1"/>
+                    <input type="hidden" name="ontology" th:value="${ontologyIndividual.getOntologyName()}"/>
+                    <button class="button secondary searchButton glyphicon glyphicon-search"
+                            type="submit">Search
+                    </button>
+                </div><!-- /input-group -->
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 columns">
+            <hr/>
+            <div property="description">
+                <p th:each="description : ${ontologyIndividual.getDescriptionsByLang(lang)}" th:text="${description}">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed
+                    cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis
+                    ipsum.
+                    Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu
+                    eget
+                    <nulla class=""></nulla>
+                    Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+                    Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque
+                    nibh.
+                    Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. Proin ut
+                    ligula vel nunc egestas porttitor. Morbi lectus risus, iaculis vel, suscipit quis, luctus non,
+                    massa. Fusce ac turpis quis ligula lacinia aliquet. Mauris ipsum.
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 </p>
             </div>
 
             <div th:if="${ontologyIndividual.getSynonyms() !=null}">
                 <p><b>Synonyms:</b>
+<<<<<<< HEAD
                    <span property="alternateName"
                          style="margin-left: 9px;"
                          th:text="${#strings.setJoin(ontologyIndividual.getSynonyms(), ', ')}">NCBI_9606</span>
+=======
+                    <span property="alternateName"
+                          style="margin-left: 9px;"
+                          th:text="${#strings.setJoin(ontologyIndividual.getSynonyms(), ', ')}">NCBI_9606</span>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 </p>
             </div>
         </div>
+    </div>
 
+<<<<<<< HEAD
         <div class="small-8 column">
             <h2 property="name" style="margin: 0;" th:text="${ontologyIndividual.getLabel()}">Term label</h2>
         </div>
@@ -88,6 +223,20 @@
                 <li class="tabs-title active"><a data-toggle="tab"
                                                  id="tree-tab"
                                                  href="#tree-tab"><i class="icon icon-functional" data-icon="h"></i> Tree view</a></li>
+=======
+    <div class="row">
+        <div id="terms-tab-content" class="small-8 columns">
+            <ul class="tabs" data-tabs="true" id="terms_tabs">
+                <li class="tabs-title is-active">
+                    <a id="tree-link"
+                       data-tabs-target="tree-tab"
+                       href="#tree-tab"
+                       aria-selected="true">
+                        <i class="icon icon-functional" data-icon="h"></i>
+                        Tree view
+                    </a>
+                </li>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             </ul>
 
             <!-- Tab panes -->
@@ -105,7 +254,11 @@
                 </div>
 
                 <!--div role="tabpanel" class="tab-pane" id="graph-tab"-->
+<<<<<<< HEAD
                     <!--graph goes here-->
+=======
+                <!--graph goes here-->
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 <!--/div-->
             </div>
 
@@ -126,6 +279,7 @@
                 <div class="tab-content">
             -->
         </div>
+<<<<<<< HEAD
 
         <div id="right_info_box" class="small-4 columns">
             <div id="term_info_box" class="panel">
@@ -135,6 +289,16 @@
                 <div class="panel-body">
 
                     <div th:each="annotations: ${ontologyIndividual.getAnnotation()}">
+=======
+        <div id="right_info_box" class="small-4 columns">
+            <div id="term_info_box" class="panel">
+                <div class="panel-heading">
+                    <h4>Instance information</h4>
+                </div>
+                <div class="panel-body">
+
+                    <div th:each="annotations: ${ontologyIndividual.getAnnotationByLang(lang)}">
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                         <b>
                             <a href="#"
                                th:href="@{../../search(q=${annotations.key},exact='true', type=property, ontology=${ontologyIndividual.ontologyName})}"
@@ -149,15 +313,27 @@
             <div id="term_relation_box" class="panel">
 
                 <div class="panel-heading">
+<<<<<<< HEAD
                     <h3 class="panel-title">Instance relations</h3>
+=======
+                    <h4 class="panel-title">Instance relations</h4>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 </div>
 
                 <div class="panel-body">
                     <div th:if="${indvidualTypes != null}">
                         <b>Types</b>
+<<<<<<< HEAD
                         <br />
                         <div th:each="type : ${indvidualTypes}">
                             <a href="#" th:href="@{terms (iri=${type.getIri()})}" th:text="${type.getLabel()}">parent 1</a>
+=======
+                        <br/>
+                        <div th:each="type : ${indvidualTypes}">
+                            <a href="#" th:href="@{terms (iri=${type.getIri()})}"
+                               th:text="${type.getLabelByLang(lang)}">parent
+                                1</a>
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                         </div>
                     </div>
                 </div>
@@ -167,43 +343,61 @@
 </section>
 
 <th:block th:include="fragments/footer :: footer"></th:block>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
-<script type="text/javascript" src="../static/js/jquery/1.11.1/jquery.min.js" th:src="@{../../js/jquery/1.11.1/jquery.min.js}"></script>
-<script type="text/javascript" src="../static/js/typeahead/typeahead.bundle.js" th:src="@{../../js/typeahead/typeahead.bundle.js}"></script>
-<script type="text/javascript" src="../static/js/handlebars/4.0.5/handlebars.min.js" th:src="@{../../js/handlebars/4.0.5/handlebars.min.js}"></script>
+<script type="text/javascript" src="../static/js/jquery/1.11.1/jquery.min.js"
+        th:src="@{../../js/jquery/1.11.1/jquery.min.js}"></script>
+<script type="text/javascript" src="../static/js/typeahead/typeahead.bundle.js"
+        th:src="@{../../js/typeahead/typeahead.bundle.js}"></script>
+<script type="text/javascript" src="../static/js/handlebars/4.0.5/handlebars.min.js"
+        th:src="@{../../js/handlebars/4.0.5/handlebars.min.js}"></script>
 
 <script type="text/javascript" src="../static/js/ols.js" th:src="@{../../js/ols.js}"></script>
 <script src="../static/js/jstree/jstree.min.js" th:src="@{../../js/jstree/jstree.min.js}"></script>
 
 <script type="text/javascript" src="../static/js/ols-termselect.js" th:src="@{../../js/ols-termselect2.js}"></script>
 <!--script type="text/javascript" src="../static/js/ols-treeview.min.js" th:src="@{../../js/ols-treeview.min.js}"></script-->
+<<<<<<< HEAD
 <script type="text/javascript" src="../static/js/ols-term-type-treeview.js" th:src="@{../../js/ols-term-type-treeview.js  (v=0.0.42)}"></script>
 <script type="text/javascript" src="../static/js/bootstrap/bootstrap.min.js" th:src="@{../../js/bootstrap/bootstrap.min.js}"></script>
 <script>
     $(document).ready(function() {
         $('.mansyntax').each(function ()
         {
+=======
+<script type="text/javascript" src="../static/js/ols-term-type-treeview.js"
+        th:src="@{../../js/ols-term-type-treeview.js  (v=0.0.42)}"></script>
+<script type="text/javascript" src="../static/js/bootstrap/bootstrap.min.js"
+        th:src="@{../../js/bootstrap/bootstrap.min.js}"></script>
+<script>
+    $(document).ready(function () {
+        $('.mansyntax').each(function () {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             // $(this).trigger('click');//for clicking element
             var href = $(this).attr("href");
 
             if ($(this).hasClass('ObjectProperty')) {
                 $(this).attr("href", getUrlType('property') + '?iri=' + encodeURIComponent(href));
-            }
-            else if ($(this).hasClass('Class')) {
+            } else if ($(this).hasClass('Class')) {
                 $(this).attr("href", getUrlType('class') + '?iri=' + encodeURIComponent(href));
-            }
-            else if ($(this).hasClass('Individual')) {
+            } else if ($(this).hasClass('Individual')) {
                 $(this).attr("href", getUrlType('individual') + '?iri=' + encodeURIComponent(href));
             }
         });
     });
 </script>
-
+<script type="text/javascript" src="../static/js/clipboard.min.js" th:src="@{../../js/clipboard.min.js}"></script>
 <script>
     //  Initialise the tree
+<<<<<<< HEAD
 
     var div=$("#term-tree");
+=======
+    var div = $("#term-tree");
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     var ontologyName = $("#term-tree").data("olsontology");
     var termType = $("#term-tree").data("ols-termtype");
     var termIri = $("#term-tree").data("ols-iri");
@@ -225,6 +419,7 @@
     console.log("showSiblings = ", showSiblings);
     console.log("viewMode = ", viewMode);
     instance.draw(showSiblings, viewMode);
+<<<<<<< HEAD
 </script>
 
 <script th:if="${ebiInfo == true and debrand == false}" defer="defer" src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
@@ -240,6 +435,35 @@
   ga('send', 'pageview');
   ga('set', 'anonymizeIp', true);
 
+=======
+
+    new Clipboard('#copyIndividualIri');
+    new Clipboard('#copyIndividualShortForm');
+</script>
+
+<script th:if="${ebiInfo == true and debrand == false}" defer="defer"
+        src="//www.ebi.ac.uk/web_guidelines/js/cookiebanner.js"></script>
+<script th:if="${ebiInfo == true and debrand == false}" defer="defer"
+        src="//www.ebi.ac.uk/web_guidelines/js/foot.js"></script>
+<script>
+
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-69391170-1', 'auto');
+    ga('send', 'pageview');
+    ga('set', 'anonymizeIp', true);
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 </script>
 </body>
 </html>

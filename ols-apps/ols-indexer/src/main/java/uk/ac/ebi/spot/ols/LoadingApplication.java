@@ -11,16 +11,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.neo4j.config.EnableNeo4jRepositories;
-import org.springframework.data.neo4j.core.GraphDatabase;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+<<<<<<< HEAD:ols-apps/ols-indexer/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
 
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import uk.ac.ebi.spot.ols.config.OntologyLoadingConfiguration;
+=======
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802:ols-apps/ols-loading-app/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
+import uk.ac.ebi.spot.ols.model.Status;
 import uk.ac.ebi.spot.ols.service.FileUpdatingService;
 import uk.ac.ebi.spot.ols.service.OntologyIndexingService;
-import uk.ac.ebi.spot.ols.model.Status;
-import uk.ac.ebi.spot.ols.model.OntologyIndexer;
+import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import uk.ac.ebi.spot.ols.util.FileUpdater;
 
 import javax.mail.internet.AddressException;
@@ -61,9 +63,15 @@ public class LoadingApplication implements CommandLineRunner {
     private static String email;
 
     private static String [] deleteOntologies = {};
+<<<<<<< HEAD:ols-apps/ols-indexer/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
 
+=======
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802:ols-apps/ols-loading-app/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
 
     private static boolean offline = false;
+
+    @Value("#{new Boolean('${fileUpdating.skip.enabled}')}")
+    private Boolean isSkipEnabled;
 
     @Override
     public void run(String... args) throws Exception {
@@ -125,7 +133,11 @@ public class LoadingApplication implements CommandLineRunner {
         }
 
         CountDownLatch latch = new CountDownLatch(allDocuments.size());
+<<<<<<< HEAD:ols-apps/ols-indexer/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
         FileUpdatingService service = new FileUpdatingService(ontologyRepositoryService, executor, latch);
+=======
+        FileUpdatingService service = new FileUpdatingService(ontologyRepositoryService, executor, latch, isSkipEnabled);
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802:ols-apps/ols-loading-app/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
         service.checkForUpdates(allDocuments, fileUpdater, forcedOntologies.length>0);
 
         // wait for ontologies to have been checked
@@ -144,9 +156,10 @@ public class LoadingApplication implements CommandLineRunner {
             for (String ontologyName : forcedOntologies) {
                 OntologyDocument document = ontologyRepositoryService.get(ontologyName);
                 if (document != null) {
-                    try {
+//                    try {
                         ontologyIndexingService.indexOntologyDocument(document);
                         updatedOntologies.add(document.getOntologyId());
+<<<<<<< HEAD:ols-apps/ols-indexer/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
                     } catch (Throwable t) {
                         logger.error("Application failed creating indexes for " + 
                         		document.getOntologyId() + ": " + t.getMessage(), t);
@@ -169,6 +182,30 @@ public class LoadingApplication implements CommandLineRunner {
                                 t.getMessage(), t);
                         haserror = true;
                         failingOntologies.put(document.getOntologyId(), t.getMessage());
+=======
+//                    } catch (Throwable t) {
+//                        logger.error("Application failed creating indexes for " +
+//                        		document.getOntologyId() + ": " + t.getMessage(), t);
+//                        haserror = true;
+//                        failingOntologies.put(document.getOntologyId(), t.getMessage());
+//                    }
+                }
+            }
+        }
+        else if (deleteOntologies.length > 0){
+            for (String ontologyName : deleteOntologies) {
+                OntologyDocument document = ontologyRepositoryService.get(ontologyName);
+                if (document != null) {
+                    try {
+                        ontologyIndexingService.removeOntologyDocumentFromIndex(document);
+                        ontologyRepositoryService.delete(document);
+                        updatedOntologies.add(document.getOntologyId());
+                    } catch (Throwable t) {
+                    	logger.error("Application failed deleting indexes for " + document.getOntologyId() + ": " +
+                                t.getMessage(), t);
+                        haserror = true;
+                        failingOntologies.put(document.getOntologyId(), t.getMessage());
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802:ols-apps/ols-loading-app/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
                     }
                 }
             }
@@ -176,7 +213,11 @@ public class LoadingApplication implements CommandLineRunner {
         else {
             // otherwise load everything set TOLOAD
             for (OntologyDocument document : ontologyRepositoryService.getAllDocumentsByStatus(Status.TOLOAD)) {
+<<<<<<< HEAD:ols-apps/ols-indexer/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
                 try {
+=======
+                // try {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802:ols-apps/ols-loading-app/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
                     boolean loadResult = ontologyIndexingService.indexOntologyDocument(document);
                     if (loadResult)
                         updatedOntologies.add(document.getOntologyId());
@@ -184,6 +225,7 @@ public class LoadingApplication implements CommandLineRunner {
                         haserror = true;
                         failingOntologies.put(document.getOntologyId(), "An error occurred. Check logs.");
                     }
+<<<<<<< HEAD:ols-apps/ols-indexer/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
                 } catch (Throwable t) {
                 	logger.error("Application failed creating indexes for " + document.getOntologyId() + ": " +
                             t.getMessage(), t);
@@ -192,6 +234,16 @@ public class LoadingApplication implements CommandLineRunner {
                     haserror = true;
                     failingOntologies.put(document.getOntologyId(),t.getMessage());
                 }
+=======
+                // } catch (Throwable t) {
+                // 	logger.error("Application failed creating indexes for " + document.getOntologyId() + ": " +
+                //             t.getMessage(), t);
+                //     exceptions.append(t.getMessage());
+                //     exceptions.append("\n");
+                //     haserror = true;
+                //     failingOntologies.put(document.getOntologyId(),t.getMessage());
+                // }
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802:ols-apps/ols-loading-app/src/main/java/uk/ac/ebi/spot/ols/LoadingApplication.java
             }
         }
 

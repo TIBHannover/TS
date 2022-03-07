@@ -14,6 +14,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashSet;
 
+<<<<<<< HEAD
+=======
+import uk.ac.ebi.spot.ols.controller.api.localization.LocalizedTerm;
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 /**
  * @author Henriette Harmse
  * @date 2019/06/03
@@ -25,12 +30,17 @@ import java.util.HashSet;
  * extend the TermAssembler class.
  */
 @Component
+<<<<<<< HEAD
 public class PreferredRootTermAssembler implements ResourceAssembler<Term, Resource<Term>> {
+=======
+public class PreferredRootTermAssembler implements ResourceAssembler<LocalizedTerm, Resource<LocalizedTerm>> {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     @Autowired
     EntityLinks entityLinks;
 
     @Override
+<<<<<<< HEAD
     public Resource<Term> toResource(Term term) {
         Resource<Term> resource = new Resource<Term>(term);
         try {
@@ -41,6 +51,18 @@ public class PreferredRootTermAssembler implements ResourceAssembler<Term, Resou
             resource.add(lb.withSelfRel());
 
             if (!term.isPreferredRoot()) {
+=======
+    public Resource<LocalizedTerm> toResource(LocalizedTerm term) {
+        Resource<LocalizedTerm> resource = new Resource<LocalizedTerm>(term);
+        try {
+            String id = UriUtils.encode(term.iri, "UTF-8");
+            final ControllerLinkBuilder lb = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(OntologyTermController.class).getTerm(term.ontologyName, term.lang, id));
+
+            resource.add(lb.withSelfRel());
+
+            if (!term.isPreferredRoot) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 resource.add(lb.slash("parents").withRel("parents"));
                 resource.add(lb.slash("ancestors").withRel("ancestors"));
                 resource.add(lb.slash("hierarchicalParents").withRel("hierarchicalParents"));
@@ -48,7 +70,11 @@ public class PreferredRootTermAssembler implements ResourceAssembler<Term, Resou
                 resource.add(lb.slash("jstree").withRel("jstree"));
             }
 
+<<<<<<< HEAD
             if (term.hasChildren()) {
+=======
+            if (term.hasChildren) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 resource.add(lb.slash("children").withRel("children"));
                 resource.add(lb.slash("descendants").withRel("descendants"));
                 resource.add(lb.slash("hierarchicalChildren").withRel("hierarchicalChildren"));
@@ -58,7 +84,11 @@ public class PreferredRootTermAssembler implements ResourceAssembler<Term, Resou
             resource.add(lb.slash("graph").withRel("graph"));
 
             Collection<String> relation = new HashSet<>();
+<<<<<<< HEAD
             for (Related related : term.getRelated()) {
+=======
+            for (Related related : term.related) {
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 if (!relation.contains(related.getLabel())) {
                     String relationId = UriUtils.encode(related.getUri(), "UTF-8");
 

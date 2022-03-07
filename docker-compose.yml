@@ -41,11 +41,18 @@ services:
         - ols.customisation.backgroundColor=${BACKGROUND_COLOR}
         - ols.customisation.issuesPage=${ISSUES_PAGE}
         - ols.customisation.supportMail=${SUPPORT_MAIL}
+<<<<<<< HEAD
         - ols.downloads.folder=/mnt/downloads
         - OLS_HOME=/mnt/
       volumes:
         - ols-neo4j-data:/mnt/neo4j
         - ols-downloads:/mnt/downloads
+=======
+        - OLS_HOME=/mnt/
+      volumes:
+        - ols-neo4j-data:/mnt/neo4j
+        - ols-downloads:/mnt/downloads        
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
       ports:
       - 8080:8080
 volumes:
@@ -57,3 +64,7 @@ volumes:
         external: true
     ols-downloads:
         external: true
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
