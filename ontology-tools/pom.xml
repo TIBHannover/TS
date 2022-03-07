@@ -82,7 +82,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
         </dependency>
-<<<<<<< HEAD
         
         <dependency>
             <groupId>io.springfox</groupId>
@@ -95,8 +94,6 @@
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.0</version>
         </dependency>
-        
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
+
     </dependencies>
 </project>
