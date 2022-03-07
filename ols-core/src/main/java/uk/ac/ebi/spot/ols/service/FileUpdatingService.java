@@ -37,8 +37,6 @@ public class FileUpdatingService {
 
     private Logger log = LoggerFactory.getLogger(getClass());
 
-    private static int MAX_LOAD_ATTEMPTS = 3;
-
     public Logger getLog() {
         return log;
     }
@@ -79,17 +77,6 @@ public class FileUpdatingService {
                 }
             }
 
-<<<<<<< HEAD
-            boolean skip = document.getStatus() == Status.SKIP;
-
-            if(!skip) {
-                if(wasFailing) {
-                    int newLoadAttempts = document.getLoadAttempts() + 1;
-                    document.setLoadAttempts(newLoadAttempts);
-                    
-                    getLog().info(document.getOntologyId() + " has failed " + newLoadAttempts + " times out of " + MAX_LOAD_ATTEMPTS + " max");
-
-=======
             boolean skip = isSkipEnabled && document.getStatus() == Status.SKIP;
 
             if(!skip) {
@@ -99,7 +86,6 @@ public class FileUpdatingService {
                     
                     getLog().info(document.getOntologyId() + " has failed " + newLoadAttempts + " times out of " + MAX_LOAD_ATTEMPTS + " max");
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                     if(newLoadAttempts >= MAX_LOAD_ATTEMPTS) {
                         getLog().info(document.getOntologyId() + " failed too many times; skipping now and in future");
                         document.setStatus(Status.SKIP);
@@ -138,11 +124,8 @@ public class FileUpdatingService {
                     document.setStatus(Status.FAILED);
                 }
                 document.setMessage(e.getMessage());
-<<<<<<< HEAD
-                log.error("Error checking: " + config.getTitle() + e.getMessage(), e);
-=======
+
                 log.error("Error checking: " + config.getId() + e.getMessage(), e);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             } catch (IOException e) {
                 if (document.getLoaded() == null) {
                     document.setStatus(Status.NOTLOADED);
