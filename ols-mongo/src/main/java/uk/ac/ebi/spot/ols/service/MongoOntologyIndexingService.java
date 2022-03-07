@@ -7,10 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
-<<<<<<< HEAD
-
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 import uk.ac.ebi.spot.ols.config.OntologyLoadingConfiguration;
 import uk.ac.ebi.spot.ols.config.OntologyResourceConfig;
 import uk.ac.ebi.spot.ols.exception.IndexingException;
@@ -166,10 +162,7 @@ public class MongoOntologyIndexingService implements OntologyIndexingService{
             if (loader.getVersionNumber() != null) {
                 config.setVersion(loader.getVersionNumber());
             }
-<<<<<<< HEAD
-=======
-
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
+ 
             document.setConfig(config);
             document.setNumberOfTerms(classes.size());
             document.setNumberOfProperties(properties.size());
@@ -177,12 +170,7 @@ public class MongoOntologyIndexingService implements OntologyIndexingService{
             status = Status.LOADED;
             document.setLoaded(new Date());
             result = true;
-<<<<<<< HEAD
-        } catch (Throwable t) {
-        	logger.error("Error indexing " + document.getOntologyId(), t);
-            status = Status.FAILED;
-            message = t.getMessage();
-=======
+
 //        } catch (Throwable t) {
 //        	logger.error("Error indexing " + document.getOntologyId(), t);
 //            status = Status.FAILED;
@@ -217,7 +205,6 @@ public class MongoOntologyIndexingService implements OntologyIndexingService{
             status = Status.FAILED;
             message = t.getMessage();
             throw t;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         }
         finally {
             document.setStatus(status);
