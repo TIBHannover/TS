@@ -151,11 +151,7 @@ public class OntologyIndividualController {
         try {
             String decoded = UriUtils.decode(termId, "UTF-8");
 
-<<<<<<< HEAD
-            Object object = jsTreeBuilder.getJsTree(ontologyId, decoded, false);
-=======
             Object object = jsTreeBuilder.getJsTree(lang, ontologyId, decoded, false);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             return new HttpEntity<String>(ow.writeValueAsString(object));
         } catch (JsonProcessingException e) {
