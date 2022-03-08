@@ -59,7 +59,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/custom/**").addResourceLocations("file:" + System.getProperty("ols.home") + "/web-custom/");
     }
-<<<<<<< HEAD
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
@@ -70,7 +69,5 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public RestCallInterceptor restCallInterceptor() {
         return new RestCallInterceptor(restCallHandlerService);
     }
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 }
