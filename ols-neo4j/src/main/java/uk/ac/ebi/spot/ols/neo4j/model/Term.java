@@ -1,6 +1,5 @@
 package uk.ac.ebi.spot.ols.neo4j.model;
 
-<<<<<<< HEAD
 import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.DESCRIPTION;
 import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.HAS_CHILDREN;
 import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.IN_SUBSET;
@@ -26,11 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-=======
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.neo4j.annotation.Fetch;
 import org.springframework.data.neo4j.annotation.GraphId;
@@ -40,21 +37,11 @@ import org.springframework.data.neo4j.annotation.RelatedToVia;
 import org.springframework.data.neo4j.fieldaccess.DynamicProperties;
 import org.springframework.data.neo4j.fieldaccess.DynamicPropertiesContainer;
 
-<<<<<<< HEAD
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRawValue;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-=======
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.*;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 /**
  * @author Simon Jupp
@@ -73,31 +60,8 @@ public class Term {
     @JsonIgnore
     private String olsId;
 
-<<<<<<< HEAD
     @GraphProperty(propertyName=IRI)
     @ApiModelProperty(value = "IRI of the term", name = "iri", dataType = "String", example = "http://purl.obolibrary.org/obo/IAO_0000423")
-    private String iri;
-
-    @GraphProperty(propertyName=LABEL)
-    private String label;
-
-    @GraphProperty(propertyName=SYNONYM)
-    private Set<String> synonym;
-
-    @GraphProperty(propertyName=DESCRIPTION)
-    private Set<String> description;
-
-    @GraphProperty(propertyName=ONTOLOGY_NAME)
-    @JsonProperty(value = ONTOLOGY_NAME)
-    private String ontologyName;
-
-    @GraphProperty(propertyName=ONTOLOGY_PREFIX)
-    @JsonProperty(value = ONTOLOGY_PREFIX)
-    private String ontologyPrefix;
-
-    @GraphProperty(propertyName=ONTOLOGY_IRI)
-=======
-    @GraphProperty(propertyName = IRI)
     private String iri;
 
     @GraphProperty(propertyName = LABEL)
@@ -110,6 +74,13 @@ public class Term {
     @GraphProperty(propertyName = SYNONYM)
     private Set<String> synonym;
 
+    @GraphProperty(propertyName=ONTOLOGY_NAME)
+    @JsonProperty(value = ONTOLOGY_NAME)
+    private String ontologyName;
+
+    @GraphProperty(propertyName=ONTOLOGY_PREFIX)
+    @JsonProperty(value = ONTOLOGY_PREFIX)
+    private String ontologyPrefix;
 
     @GraphProperty(propertyName = LOCALIZED_LABELS)
     @JsonProperty(value = LOCALIZED_LABELS)
@@ -123,16 +94,7 @@ public class Term {
     @JsonProperty(value = LOCALIZED_DESCRIPTIONS)
     private DynamicProperties localizedDescriptions = new DynamicPropertiesContainer();
 
-    @GraphProperty(propertyName = ONTOLOGY_NAME)
-    @JsonProperty(value = ONTOLOGY_NAME)
-    private String ontologyName;
-
-    @GraphProperty(propertyName = ONTOLOGY_PREFIX)
-    @JsonProperty(value = ONTOLOGY_PREFIX)
-    private String ontologyPrefix;
-
     @GraphProperty(propertyName = ONTOLOGY_IRI)
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     @JsonProperty(value = ONTOLOGY_IRI)
     private String ontologyIri;
 
@@ -142,37 +104,6 @@ public class Term {
     @JsonIgnore
     private Set<String> equivalentClassDescription;
 
-<<<<<<< HEAD
-    @GraphProperty(propertyName=IS_OBSOLETE)
-    @JsonProperty(value = IS_OBSOLETE)
-    private boolean isObsolete;
-
-    @GraphProperty(propertyName=TERM_REPLACED_BY)
-    @JsonProperty(value = TERM_REPLACED_BY)
-    private String termReplacedBy;
-
-    @GraphProperty(propertyName=IS_DEFINING_ONTOLOGY)
-    @JsonProperty(value = IS_DEFINING_ONTOLOGY)
-    private boolean isLocal;
-
-    @GraphProperty(propertyName=HAS_CHILDREN)
-    @JsonProperty(value = HAS_CHILDREN)
-    private boolean hasChildren;
-
-    @GraphProperty(propertyName=IS_ROOT)
-    @JsonProperty(value = IS_ROOT)
-    private boolean isRoot;
-
-    @GraphProperty(propertyName=SHORT_FORM)
-    @JsonProperty(value = SHORT_FORM)
-    private String shortForm;
-
-    @GraphProperty(propertyName=OBO_ID)
-    @JsonProperty(value = OBO_ID)
-    private String oboId;
-
-    @GraphProperty(propertyName=IN_SUBSET)
-=======
     @GraphProperty(propertyName = IS_OBSOLETE)
     @JsonProperty(value = IS_OBSOLETE)
     private boolean isObsolete;
@@ -202,36 +133,23 @@ public class Term {
     private String oboId;
 
     @GraphProperty(propertyName = IN_SUBSET)
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     @JsonProperty(value = IN_SUBSET)
     private Set<String> inSubsets;
 
     private DynamicProperties annotation = new DynamicPropertiesContainer();
     private DynamicProperties localizedAnnotation = new DynamicPropertiesContainer();
 
-<<<<<<< HEAD
-    @GraphProperty(propertyName=OBO_DEFINITION_CITATION)
-=======
     @GraphProperty(propertyName = OBO_DEFINITION_CITATION)
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     @JsonProperty(value = OBO_DEFINITION_CITATION)
     @JsonRawValue
     private Set<String> oboDefinitionCitations;
 
-<<<<<<< HEAD
-    @GraphProperty(propertyName=OBO_XREF)
-=======
     @GraphProperty(propertyName = OBO_XREF)
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     @JsonProperty(value = OBO_XREF)
     @JsonRawValue
     private Set<String> oboXrefs;
 
-<<<<<<< HEAD
-    @GraphProperty(propertyName=OBO_SYNONYM)
-=======
     @GraphProperty(propertyName = OBO_SYNONYM)
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     @JsonProperty(value = OBO_SYNONYM)
     @JsonRawValue
     private Set<String> oboSynonyms;
@@ -242,10 +160,6 @@ public class Term {
     Set<Related> related;
 
     @GraphProperty(propertyName = IS_PREFERRED_ROOT)
-    @JsonProperty(value = IS_PREFERRED_ROOT)
-    private boolean isPreferredRoot;
-
-    @GraphProperty(propertyName=IS_PREFERRED_ROOT)
     @JsonProperty(value = IS_PREFERRED_ROOT)
     private boolean isPreferredRoot;
     
@@ -480,17 +394,9 @@ public class Term {
     public void setEquivalentClassDescription(Set<String> equivalentClassDescription) {
         this.equivalentClassDescription = equivalentClassDescription;
     }
-<<<<<<< HEAD
-    
-    @JsonProperty(value = IS_PREFERRED_ROOT)
-    public boolean isPreferredRoot() {
-        return isPreferredRoot;
-    }    
-=======
 
     @JsonProperty(value = IS_PREFERRED_ROOT)
     public boolean isPreferredRoot() {
         return isPreferredRoot;
     }
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
