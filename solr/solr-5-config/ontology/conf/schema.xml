@@ -118,11 +118,8 @@
 
     -->
 
-<<<<<<< HEAD
-=======
     <field name="language" type="string" indexed="true" stored="true" required="false" multiValued="false" />
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     <field name="iri" type="string" indexed="true" stored="true" required="true" multiValued="false" />
     <field name="iri_key" type="int" indexed="true" stored="false" multiValued="false" />
     <field name="obo_id" type="string" indexed="true" stored="true" required="false" multiValued="false" />

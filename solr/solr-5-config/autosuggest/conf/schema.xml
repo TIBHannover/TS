@@ -118,11 +118,8 @@
 
     -->
 
-<<<<<<< HEAD
-=======
     <field name="language" type="string" indexed="true" stored="true" required="false" multiValued="false" />
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     <field name="autosuggest" type="string" indexed="true" stored="true" required="true" multiValued="false" />
     <field name="ontology_name" type="string" indexed="true" stored="true" required="true" multiValued="false" />
 
