@@ -185,46 +185,6 @@ public class TermDocumentBuilder {
     }
     
     
-<<<<<<< HEAD
-
-    public TermDocumentBuilder setPreferredRoot(boolean isPreferredRoot) {
-		this.isPreferredRoot = isPreferredRoot;
-		return this;
-	}
-
-	public TermDocument createTermDocument() {
-        return new TermDocument(
-                id,
-                uri,
-                uri_key,
-                label,
-                synonyms,
-                description,
-                shortForm,
-                oboId,
-                ontologyName,
-                ontologyTitle,
-                ontologyPrefix,
-                ontologyUri,
-                type,
-                isDefiningOntology,
-                subsets,
-                isObsolete,
-                hasChildren,
-                isRoot,
-                equivalentUris,
-                logicalDescription,
-                annotation,
-                parents,
-                ancestors,
-                children,
-                descendants,
-                hierarchical_parents,
-                hierarchical_ancestors,
-                relatedTerms,
-                isPreferredRoot
-                );
-=======
 
     public TermDocumentBuilder setPreferredRoot(boolean isPreferredRoot) {
 		this.isPreferredRoot = isPreferredRoot;
@@ -282,6 +242,5 @@ public class TermDocumentBuilder {
         }
 
         return docs;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     }
 }
