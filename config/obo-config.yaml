@@ -31,9 +31,6 @@ ontologies:
   preferred_root_term:
     - http://purl.obolibrary.org/obo/DUO_0000001
     - http://purl.obolibrary.org/obo/DUO_0000017
-<<<<<<< HEAD
-    - http://purl.obolibrary.org/obo/OBI_0000066
-=======
     - http://purl.obolibrary.org/obo/OBI_0000066
 - activity_status: active
   contact:
@@ -75,4 +72,3 @@ ontologies:
   title: FOODON
   tracker: https://github.com/FoodOntology/foodon/issues/
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
