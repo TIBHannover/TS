@@ -187,18 +187,6 @@ public interface OntologyLoader {
     String getLogo();
 
     /**
-     * Get an issue tracker associated with this ontology
-     * @return
-     */
-    String getTracker();
-
-    /**
-     * Get a logo associated with this ontology
-     * @return
-     */
-    String getLogo();
-
-    /**
      * Get a version number for the ontology
      * @return
      */
@@ -281,10 +269,6 @@ public interface OntologyLoader {
      * @return a list of terms that are considered to be the preferred roots of the ontology.
      */
     Collection<IRI> getPreferredRootTerms();
-<<<<<<< HEAD
-=======
-
 
     Set<String> getOntologyLanguages();
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 }
