@@ -2,7 +2,6 @@ package uk.ac.ebi.spot.ols.controller.ui;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -14,13 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-=======
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,11 +33,8 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-<<<<<<< HEAD
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -318,10 +307,7 @@ public class HomeController {
         }
         
         model.addAttribute("searchOptions", searchOptions);
-<<<<<<< HEAD
         model.addAttribute("availableSchemaValues",getClassificationsForSchemas(searchOptions.getSchemas()));
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         customisationProperties.setCustomisationModelAttributes(model);
         return "search";
     }
@@ -351,7 +337,6 @@ public class HomeController {
     public String showSparql() {
         return "comingsoon";
     }
-<<<<<<< HEAD
 	
 	@RequestMapping({"dataprotection"})
     public String showDataProtection(Model model) {
@@ -364,8 +349,6 @@ public class HomeController {
     	customisationProperties.setCustomisationModelAttributes(model);
         return "imprint";
     }
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     @RequestMapping({"about"})
     public String showAbout(Model model) {
