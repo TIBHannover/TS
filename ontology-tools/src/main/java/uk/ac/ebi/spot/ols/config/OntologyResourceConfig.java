@@ -1,11 +1,8 @@
 package uk.ac.ebi.spot.ols.config;
 
 
-<<<<<<< HEAD
 import uk.ac.ebi.spot.ols.util.License;
-=======
 import uk.ac.ebi.spot.ols.util.LocalizedStrings;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 import uk.ac.ebi.spot.ols.util.ReasonerType;
 
 import java.net.URI;
@@ -14,10 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-<<<<<<< HEAD
-=======
 import java.util.List;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 import java.util.Map;
 
 /**
@@ -65,7 +59,6 @@ public class OntologyResourceConfig  {
     private  Collection<URI> preferredRootTerms = new HashSet<>();
     private boolean isSkos;
 
-<<<<<<< HEAD
     private boolean allowDownload;
     private Collection<Map<String, Collection<String>>> classifications;
     private License license;
@@ -75,7 +68,7 @@ public class OntologyResourceConfig  {
 
     public OntologyResourceConfig(String id, String versionIri, String title, String namespace, String preferredPrefix,
                                   String description, String homepage, String mailingList, String tracker, String logo, Collection<String> creators,
-                                  Map<String, Collection<String>> annotations, URI fileLocation, ReasonerType reasonerType,
+                                  Map<String, List<String>> annotations, URI fileLocation, ReasonerType reasonerType,
                                   boolean oboSlims, URI labelProperty, Collection<URI> definitionProperties,
                                   Collection<URI> synonymProperties, Collection<URI> hierarchicalProperties,
                                   Collection<String> baseUris, Collection<URI> hiddenProperties, boolean isSkos,
@@ -110,15 +103,8 @@ public class OntologyResourceConfig  {
         this.license = license;
     }
 
-=======
     private  Collection<String> languages;
 
-    private boolean allowDownload;
-
-    // these are any metadata properties for the ontology, such as title or definition that are included in the ontology as OWL ontology annotation
-    private Collection<String> internalMetadataProperties;
-
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     public OntologyResourceConfig() {
     }
 
@@ -152,11 +138,8 @@ public class OntologyResourceConfig  {
         this.internalMetadataProperties = builder.internalMetadatProperties;
         this.preferredRootTerms = builder.preferredRootTerms;
         this.allowDownload = builder.allowDownload;
-<<<<<<< HEAD
         this.classifications = builder.classifications;
         this.license = builder.license;
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     }
 
     public void setId(String id) {
@@ -418,8 +401,7 @@ public class OntologyResourceConfig  {
     public void setAllowDownload(boolean allowDownload) {
         this.allowDownload = allowDownload;
     }
-<<<<<<< HEAD
-    
+
     public Collection<Map<String, Collection<String>>> getClassifications() {
 		return classifications;
 	}
@@ -433,8 +415,8 @@ public class OntologyResourceConfig  {
     }
 
     public void setLicense(License license) {
-        this.license= license;
-=======
+        this.license = license;
+    }
 
     public void setLanguages(Collection<String> languages) {
         this.languages = languages;
@@ -442,7 +424,6 @@ public class OntologyResourceConfig  {
 
     public Collection<String> getLanguages() {
         return this.languages;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     }
 
     public static class OntologyResourceConfigBuilder {
@@ -476,11 +457,8 @@ public class OntologyResourceConfig  {
         private Collection<String> internalMetadatProperties = Collections.emptySet();
         private Collection<URI> preferredRootTerms = Collections.emptySet();
         private boolean allowDownload = true;
-<<<<<<< HEAD
         private Collection<Map<String, Collection<String>>> classifications = new ArrayList<>();
         private License license;
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
         public OntologyResourceConfigBuilder(String id, String namespace, URI fileLocation) {
             this.id = id;
@@ -596,19 +574,6 @@ public class OntologyResourceConfig  {
 
         public OntologyResourceConfigBuilder setTracker(String tracker) {
             this.tracker = tracker;
-<<<<<<< HEAD
-            return this;
-        }
-
-        public OntologyResourceConfigBuilder setLogo(String logo) {
-            this.logo = logo;
-            return this;
-        }
-
-        public OntologyResourceConfigBuilder setCreators(Collection<String> creators) {
-            this.creators = creators;
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             return this;
         }
 
@@ -644,8 +609,7 @@ public class OntologyResourceConfig  {
         public void setAllowDownload(boolean allowDownload) {
             this.allowDownload = allowDownload;
         }
-<<<<<<< HEAD
-        
+
         public OntologyResourceConfigBuilder setClassifications(Collection<Map<String, Collection<String>>> classifications) {
             this.classifications = classifications;
             return this;
@@ -654,8 +618,6 @@ public class OntologyResourceConfig  {
         public void setLicense(License license) {
             this.license = license;
         }
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
         public OntologyResourceConfig build() {
             return new OntologyResourceConfig(this);
