@@ -44,10 +44,7 @@ import org.neo4j.graphdb.Node;
 import uk.ac.ebi.spot.ols.config.OntologyLoadingConfiguration;
 import uk.ac.ebi.spot.ols.config.OntologyResourceConfig;
 import uk.ac.ebi.spot.ols.exception.OntologyLoadingException;
-<<<<<<< HEAD
-=======
 import uk.ac.ebi.spot.ols.util.LocalizedStrings;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 @Tag("integrationTest")
 @TestMethodOrder(OrderAnnotation.class)
@@ -74,22 +71,14 @@ public class IndexClassesTest {
 	@Order(1)
 	@ParameterizedTest
 	@MethodSource("provideOntologies")
-<<<<<<< HEAD
-	void testIndexClasses(String ontologyIRI, String title, String namespace, String ontologyToIndex, 
-=======
 	void testIndexClasses(String ontologyIRI, String namespace, String ontologyToIndex, 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 			String baseUri, String neo4JDir) {
 		
 		BatchInserter batchInserter = OLSBatchIndexerCreatorTestHelper
 				.createBatchInserter(null, INDEX_CLASSES_TEST_NEO4J_DIR);
 		
         OntologyResourceConfig.OntologyResourceConfigBuilder builder =
-<<<<<<< HEAD
-                new OntologyResourceConfig.OntologyResourceConfigBuilder(ontologyIRI, title, 
-=======
                 new OntologyResourceConfig.OntologyResourceConfigBuilder(ontologyIRI, 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 		namespace, (new File(BASE_DIR_FOR_TEST_RESOURCES + ontologyToIndex).toURI()));
         
         builder.setBaseUris(Collections.singleton(baseUri));
@@ -127,22 +116,14 @@ public class IndexClassesTest {
 	@Order(2)
 	@ParameterizedTest
 	@MethodSource("provideOntologies")
-<<<<<<< HEAD
-	void testIndexClassesDeprecated(String ontologyIRI, String title, String namespace, String ontologyToIndex, 
-=======
 	void testIndexClassesDeprecated(String ontologyIRI, String namespace, String ontologyToIndex, 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 			String baseUri, String neo4JDir) {
 		
 		BatchInserter batchInserter = OLSBatchIndexerCreatorTestHelper
 				.createBatchInserter(null, INDEX_CLASSES_TEST_DEPRECATED_NEO4J_DIR);
 		
         OntologyResourceConfig.OntologyResourceConfigBuilder builder =
-<<<<<<< HEAD
-                new OntologyResourceConfig.OntologyResourceConfigBuilder(ontologyIRI, title, 
-=======
                 new OntologyResourceConfig.OntologyResourceConfigBuilder(ontologyIRI, 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 		namespace, (new File(BASE_DIR_FOR_TEST_RESOURCES + ontologyToIndex).toURI()));
         
         builder.setBaseUris(Collections.singleton(baseUri));
@@ -253,11 +234,7 @@ public class IndexClassesTest {
 	
 	private static Stream<Arguments> provideOntologies() {
 	    return Stream.of(
-<<<<<<< HEAD
-	      Arguments.of("http://purl.obolibrary.org/obo/duo", "Data Use Ontology", "DUO", 
-=======
 	      Arguments.of("http://purl.obolibrary.org/obo/duo", "DUO", 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 	    		  "duo-preferred-roots.owl", "http://purl.obolibrary.org/obo/DUO_", 
 	    		  INDEX_CLASSES_TEST_NEO4J_DIR)	
 	    );
