@@ -28,75 +28,6 @@ public class JsTreeBuilder {
 
     private String rootName = "Thing";
 
-<<<<<<< HEAD
-    // CLASS queries
-    String getJsTreeClassChildren = "MATCH path = (child)-[r:SUBCLASSOF|RelatedTree]->(n:Class)\n"+
-            "USING INDEX n:Class(iri)\n" +
-            "WHERE n.ontology_name = {0} AND n.iri = {1}\n"+
-            "UNWIND rels(path) as r1\n" +
-            "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri, " + 
-              "startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, r1.label as relation";
-
-    String parentTreeQuery = "MATCH path = (n:Class)-[r:SUBCLASSOF|RelatedTree*]->(parent)\n"+
-            "USING INDEX n:Class(iri)\n" +
-            "WHERE n.ontology_name = {0} AND n.iri = {1}\n"+
-            "UNWIND rels(path) as r1\n" +
-            "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri," + 
-              "startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, " + 
-              "r1.label as relation, collect( distinct id(endNode(r1)) ) as parents";
-
-    String parentSiblingTreeQuery = "MATCH path = (n:Class)-[r:SUBCLASSOF|RelatedTree*]" + 
-            "->(parent)<-[r2:SUBCLASSOF|RelatedTree]-(n1:Class)\n"+
-            "USING INDEX n:Class(iri)\n" +
-            "WHERE n.ontology_name = {0} AND n.iri = {1}\n"+
-            "UNWIND rels(path) as r1\n" +
-            "WITH r1\n" +
-            "WHERE startNode(r1).is_obsolete=false\n"+
-            "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri, " + 
-              "startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, " + 
-              "r1.label as relation, collect( distinct id(endNode(r1)) ) as parents";
-
-
-    // Property queries
-
-    String getJsTreePropertyChildren = "MATCH path = (child)-[r:SUBPROPERTYOF]->(n:Property)\n"+
-            "USING INDEX n:Property(iri)\n" +
-            "WHERE n.ontology_name = {0} AND n.iri = {1}\n"+
-            "UNWIND rels(path) as r1\n" +
-            "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri, startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, r1.label as relation";
-
-    String propertyParentTreeQuery = "MATCH path = (n:Property)-[r:SUBPROPERTYOF*]->(parent)\n"+
-            "USING INDEX n:Property(iri)\n" +
-            "WHERE n.ontology_name = {0} AND n.iri = {1}\n"+
-            "UNWIND rels(path) as r1\n" +
-            "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri, startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, r1.label as relation, collect( distinct id(endNode(r1)) ) as parents";
-
-    String propertyParentSiblingTreeQuery = "MATCH path = (n:Property)-[r:SUBPROPERTYOF*]->(parent)<-[r2:SUBPROPERTYOF]-(n1:Property)\n"+
-            "USING INDEX n:Property(iri)\n" +
-            "WHERE n.ontology_name = {0} AND n.iri = {1}\n"+
-            "UNWIND rels(path) as r1\n" +
-            "WITH r1\n" +
-            "WHERE startNode(r1).is_obsolete=false\n"+
-            "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri, startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, r1.label as relation, collect( distinct id(endNode(r1)) ) as parents";
-
-    // individual tree query
-    String individualParentTreeQuery = "MATCH path = (n:Individual)-[r:INSTANCEOF|SUBCLASSOF*]->(parent)\n"+
-            "USING INDEX n:Individual(iri)\n" +
-            "WHERE n.ontology_name = {0} AND n.iri = {1}\n"+
-            "UNWIND rels(path) as r1\n" +
-            "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri, startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, r1.label as relation,collect( distinct id(endNode(r1)) ) as parents";
-
-    String individualParentSiblingTreeQuery = "MATCH path = (n:Individual)-[r:INSTANCEOF|SUBCLASSOF*]->(parent)<-[r2:SUBCLASSOF]-(n1:Individual)\n"+
-            "USING INDEX n:Individual(iri)\n" +
-            "WHERE n.ontology_name = {0} AND n.iri = {1}\n"+
-            "UNWIND rels(path) as r1\n" +
-            "WITH r1\n" +
-            "WHERE startNode(r1).is_obsolete=false\n"+
-            "RETURN distinct id(startNode(r1)) as startId, startNode(r1).iri as startIri, startNode(r1).label as startLabel, startNode(r1).has_children as hasChildren, r1.label as relation, collect( distinct id(endNode(r1)) ) as parents";
-
-
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     public JsTreeBuilder() {
 
     }
@@ -105,11 +36,7 @@ public class JsTreeBuilder {
         this.rootName = rootName;
     }
 
-<<<<<<< HEAD
-    public Object getIndividualJsTree(String ontologyName, String iri) {
-=======
     public Object getIndividualJsTree(String lang, String ontologyName, String iri) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         Map<String, Object> paramt = new HashMap<>();
         paramt.put("0", ontologyName);
         paramt.put("1", iri);
@@ -119,11 +46,7 @@ public class JsTreeBuilder {
         return getJsTreeObject(lang, ontologyName, iri, res);
     }
 
-<<<<<<< HEAD
-    public Object getPropertyJsTree(String ontologyName, String iri, boolean siblings) {
-=======
     public Object getPropertyJsTree(String lang, String ontologyName, String iri, boolean siblings) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         Map<String, Object> paramt = new HashMap<>();
         paramt.put("0", ontologyName);
         paramt.put("1", iri);
@@ -135,11 +58,7 @@ public class JsTreeBuilder {
     }
 
 
-<<<<<<< HEAD
-    public Object getClassJsTree(String ontologyName, String iri, boolean siblings) {
-=======
     public Object getClassJsTree(String lang, String ontologyName, String iri, boolean siblings) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         Map<String, Object> paramt = new HashMap<>();
         paramt.put("0", ontologyName);
         paramt.put("1", iri);
@@ -158,11 +77,7 @@ public class JsTreeBuilder {
         return getJsTreeChildren(lang, "property", ontologyName, iri, parentNodeId);
     }
 
-<<<<<<< HEAD
-    private Object getJsTreeChildren(String type,String ontologyName, String iri, String parentNodeId) {
-=======
     private Object getJsTreeChildren(String lang, String type,String ontologyName, String iri, String parentNodeId) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         Map<String, Object> paramt = new HashMap<>();
         paramt.put("0", ontologyName);
         paramt.put("1", iri);
