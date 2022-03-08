@@ -122,7 +122,7 @@ public class OntologyController implements
     	
         try {
         	for (OntologyDocument document : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (schemas.contains(k)) temp.addAll(x.get(k));} ));
+				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (schemas.contains(k)) if (v != null) if (!v.isEmpty()) temp.addAll(v);} ));
 			}
         } catch (Exception e) {
         }
@@ -147,20 +147,24 @@ public class OntologyController implements
             PagedResourcesAssembler assembler
     ) throws ResourceNotFoundException { 	
     	
-    	List<OntologyDocument> temp = new ArrayList<OntologyDocument>();
+    	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
     	
     	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
     		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
     			for (String schema: schemas)
     			    if(classificationSchema.containsKey(schema))
-    				    for (String classification: classifications)
-    				      if (classificationSchema.get(schema).contains(classification)) {
-    					      temp.add(ontologyDocument);
-    					      break;
+    				    for (String classification: classifications) {
+    				    	if (classificationSchema.get(schema) != null)
+    				    		if (!classificationSchema.get(schema).isEmpty())
+    				    	        if (classificationSchema.get(schema).contains(classification)) {
+    					                tempSet.add(ontologyDocument);
     				  }
+    				    }
     			    
     			}
 		} 
+    	 
+    	 List<OntologyDocument> temp = new ArrayList<>(tempSet);
         
         final int start = (int)pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), temp.size());
