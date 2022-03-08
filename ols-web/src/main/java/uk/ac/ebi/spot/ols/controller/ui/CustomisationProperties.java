@@ -16,7 +16,6 @@ public class CustomisationProperties {
     @Value("${ols.customisation.ebiInfo:false}")
     private boolean ebiInfo;
     
-<<<<<<< HEAD
     @Value("${ols.customisation.logo:/img/TIB_Logo_en.png}")
     private String logo;
 
@@ -24,15 +23,6 @@ public class CustomisationProperties {
     private String title;
 
     @Value("${ols.customisation.short-title:TS}")
-=======
-    @Value("${ols.customisation.logo:/img/OLS_logo_2017.png}")
-    private String logo;
-
-    @Value("${ols.customisation.title:Ontology Lookup Service}")
-    private String title;
-
-    @Value("${ols.customisation.short-title:OLS}")
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     private String shortTitle;
 
     @Value("${ols.customisation.description:}")
@@ -41,23 +31,15 @@ public class CustomisationProperties {
     @Value("${ols.customisation.org:EMBL-EBI}")
     private String org;
     
-<<<<<<< HEAD
     @Value("${ols.customisation.web: https://www.tib.eu/}")
     private String web;
     
     @Value("${ols.customisation.twitter: https://twitter.com/tibhannover?lang=en}")
-=======
-    @Value("${ols.customisation.web: https://www.ebi.ac.uk/}")
-    private String web;
-    
-    @Value("${ols.customisation.twitter: https://twitter.com/EBIOLS}")
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     private String twitter;
     
     @Value("${ols.customisation.backgroundImage:/img/background_trial.jpg}")
     private String backgroundImage;
     
-<<<<<<< HEAD
     @Value("${ols.customisation.backgroundColor:0080FF}")
     private String backgroundColor;
     
@@ -65,15 +47,6 @@ public class CustomisationProperties {
     private String issuesPage;
 
     @Value("${ols.customisation.supportMail: information@tib.eu}")
-=======
-    @Value("${ols.customisation.backgroundColor:#0080FF}")
-    private String backgroundColor;
-    
-    @Value("${ols.customisation.issuesPage: https://github.com/EBISPOT/OLS/issues}")
-    private String issuesPage;
-
-    @Value("${ols.customisation.supportMail: ols-support@ebi.ac.uk}")
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     private String supportMail;
 
     @Value("${ols.customisation.hideGraphView:false}")
