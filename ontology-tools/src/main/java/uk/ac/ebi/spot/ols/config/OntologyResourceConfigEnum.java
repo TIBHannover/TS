@@ -22,13 +22,10 @@ public enum OntologyResourceConfigEnum {
     CREATOR("creator"),
     PREFERRED_ROOT_TERM("preferred_root_term"),
     ALLOW_DOWNLOAD("allow_download"),
-<<<<<<< HEAD
     CLASSIFICATION("classification"),
-    LICENSE("license");
-=======
+    LICENSE("license"),
     LOCALIZED_TITLES("localized_titles"),
     LOCALIZED_DESCRIPTIONS("localized_descriptions");
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     private final String propertyName;
 
