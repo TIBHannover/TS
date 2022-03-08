@@ -34,10 +34,7 @@ import org.springframework.stereotype.Component;
 import uk.ac.ebi.spot.ols.config.OlsNeo4jConfiguration;
 import uk.ac.ebi.spot.ols.exception.IndexingException;
 import uk.ac.ebi.spot.ols.model.OntologyIndexer;
-<<<<<<< HEAD
-=======
 import uk.ac.ebi.spot.ols.util.LocalizedStrings;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 /**
  * @author Simon Jupp
@@ -76,18 +73,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
     }
 
     protected BatchNeo4JIndexer(String ontologyName, BatchInserterIndex batchInserterIndex,
-<<<<<<< HEAD
-    		BatchInserterIndexProvider batchInserterIndexProvider, BatchInserter batchInserter) {
-    	
-    	nodeOntologyLabel = DynamicLabel.label(ontologyName.toUpperCase());
-    	index = batchInserterIndex;
-    	indexProvider = batchInserterIndexProvider;
-    	inserter = batchInserter;
-    }
-    
-    private Long getOrCreateMergedNode(BatchInserter inserter, Map<String, Long> mergedNodeMap,
-    		OntologyLoader loader, IRI classIri, Label ... nodeLabel) {
-=======
                                 BatchInserterIndexProvider batchInserterIndexProvider, BatchInserter batchInserter) {
 
         nodeOntologyLabel = DynamicLabel.label(ontologyName.toUpperCase());
@@ -98,7 +83,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
 
     private Long getOrCreateMergedNode(BatchInserter inserter, Map<String, Long> mergedNodeMap,
                                        OntologyLoader loader, IRI classIri, Label... nodeLabel) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
         if (!mergedNodeMap.containsKey(classIri.toString())) {
 
@@ -115,9 +99,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
             if (hits != null && hits.size() == 0) {
                 Map<String, Object> properties = new HashMap<>();
                 properties.put("iri", classIri.toString());
-<<<<<<< HEAD
-                properties.put("label", loader.getTermLabels().get(classIri));
-=======
 
                 LocalizedStrings labels = loader.getTermLabels().get(classIri);
 
@@ -130,17 +111,11 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
                 }
 
 		properties.put("label", labels.getFirstString("en"));
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
                 Long hit = inserter.createNode(properties, nodeLabel);
                 index.add(hit, properties);
                 mergedNodeMap.put(classIri.toString(), hit);
-<<<<<<< HEAD
-            }
-            else {
-=======
             } else {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 if (hits != null && hits.size() > 1) {
                     System.out.println("WARING: found more than one iri in merged terms for: " + classIri);
                 }
@@ -151,15 +126,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
         return mergedNodeMap.get(classIri.toString());
     }
 
-<<<<<<< HEAD
-    private void setOntologyLabel (String ontologyName) {
-        nodeOntologyLabel   = DynamicLabel.label(ontologyName.toUpperCase());
-    }
-
-    private BatchInserter getBatchIndexer (String ontologyName) {
-        inserter = OLSBatchIndexerCreator.createBatchInserter(inserter, 
-        		OlsNeo4jConfiguration.getNeo4JPath());
-=======
     private void setOntologyLabel(String ontologyName) {
         nodeOntologyLabel = DynamicLabel.label(ontologyName.toUpperCase());
     }
@@ -167,7 +133,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
     private BatchInserter getBatchIndexer(String ontologyName) {
         inserter = OLSBatchIndexerCreator.createBatchInserter(inserter,
                 OlsNeo4jConfiguration.getNeo4JPath());
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
         OLSBatchIndexerCreator.createSchemaIndexes(inserter);
 
@@ -186,22 +151,12 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
         rdfTypeProperties.put("ontology_name", ontologyName);
         rdfTypeProperties.put("__type__", "Type");
 
-<<<<<<< HEAD
-       	index = getBatchInserterIndex(getIndexProvider(inserter));
-=======
         index = getBatchInserterIndex(getIndexProvider(inserter));
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
-
         return inserter;
 
     }
 
-<<<<<<< HEAD
-    private BatchInserterIndexProvider getIndexProvider (BatchInserter inserter) {
-=======
     private BatchInserterIndexProvider getIndexProvider(BatchInserter inserter) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
-
         indexProvider =
             new LuceneBatchInserterIndexProvider(inserter);
         return indexProvider;
@@ -227,41 +182,17 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
         getLogger().debug("Creating Neo4j index for " + allRelations.size() + " properties");
 
         for (IRI objectPropertyIri : allRelations) {
-<<<<<<< HEAD
-            Long node = NodeCreator.getOrCreateNode(inserter, nodeMap,loader, objectPropertyIri, 
-            		new LinkedList<Label>(Arrays.asList(relationLabel, _relationLabel, 
-            				nodeOntologyLabel)));
-            Long mergedNode = getOrCreateMergedNode(inserter, mergedNodeMap, loader, 
-            		objectPropertyIri, mergedClassLabel);
-=======
             Long node = NodeCreator.getOrCreateNode(inserter, nodeMap, loader, objectPropertyIri,
                     new LinkedList<Label>(Arrays.asList(relationLabel, _relationLabel,
                             nodeOntologyLabel)));
             Long mergedNode = getOrCreateMergedNode(inserter, mergedNodeMap, loader,
                     objectPropertyIri, mergedClassLabel);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
-
             // add refers link
             inserter.createRelationship(node, mergedNode, refersTo, null);
 
             // add parent nodes
             if (!loader.getDirectParentTerms(objectPropertyIri).isEmpty()) {
                 for (IRI parent : loader.getDirectParentTerms().get(objectPropertyIri)) {
-<<<<<<< HEAD
-                    Long parentNode = NodeCreator.getOrCreateNode(inserter, nodeMap,loader, parent,
-                    		new LinkedList<Label>(Arrays.asList(relationLabel, _relationLabel, 
-                    				nodeOntologyLabel)));	
-                    
-                    // create local relationship
-                    inserter.createRelationship(node, parentNode, subpropertyof, subPropertyProperties);
-                }
-            }
-            else {
-                Long rootProperty = NodeCreator.getOrCreateNode(inserter, nodeMap, loader, 
-                		IRI.create("http://www.w3.org/2002/07/owl#TopObjectProperty"), 
-                		new LinkedList<Label>(Arrays.asList(relationLabel, _relationLabel, 
-                				nodeOntologyLabel, rootLabel)));	
-=======
                     Long parentNode = NodeCreator.getOrCreateNode(inserter, nodeMap, loader, parent,
                             new LinkedList<Label>(Arrays.asList(relationLabel, _relationLabel,
                                     nodeOntologyLabel)));
@@ -274,27 +205,11 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
                         IRI.create("http://www.w3.org/2002/07/owl#TopObjectProperty"),
                         new LinkedList<Label>(Arrays.asList(relationLabel, _relationLabel,
                                 nodeOntologyLabel, rootLabel)));
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 inserter.createRelationship(node, rootProperty, subpropertyof, subPropertyProperties);
             }
         }
     }
 
-<<<<<<< HEAD
-    private void indexIndividuals(BatchInserter inserter, OntologyLoader loader, 
-    		Map<String, Long> nodeMap, Map<String, Long> mergedNodeMap, Map<String, Long> classNodeMap) {
-        
-    	getLogger().debug("Creating Neo4j index for " + loader.getAllIndividualIRIs().size() + " individuals");
-
-        for (IRI individualIri : loader.getAllIndividualIRIs()) {
-
-            Long node = NodeCreator.getOrCreateNode(inserter, nodeMap,loader, individualIri, 
-            		new LinkedList<Label>(Arrays.asList(instanceLabel, _instanceLabel, 
-            				nodeOntologyLabel)));
-
-            Long mergedNode = getOrCreateMergedNode(inserter, mergedNodeMap, loader, individualIri, 
-            		mergedClassLabel);
-=======
     private void indexIndividuals(BatchInserter inserter, OntologyLoader loader,
                                   Map<String, Long> nodeMap, Map<String, Long> mergedNodeMap, Map<String, Long> classNodeMap) {
 
@@ -308,7 +223,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
 
             Long mergedNode = getOrCreateMergedNode(inserter, mergedNodeMap, loader, individualIri,
                     mergedClassLabel);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
             // add refers link
             inserter.createRelationship(node, mergedNode, refersTo, null);
@@ -316,23 +230,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
             // add parent nodes
             if (loader.getDirectTypes().containsKey(individualIri)) {
                 for (IRI parent : loader.getDirectTypes().get(individualIri)) {
-<<<<<<< HEAD
-                    Long parentNode =  NodeCreator.getOrCreateNode(inserter, classNodeMap,loader, parent,
-                    		new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, 
-                    				_nodeLabel)));
-                    		
-                    // create local relationship
-                    inserter.createRelationship(node, parentNode, typeOf, rdfTypeProperties);
-                }
-            }
-            else {
-                Long defaultType = NodeCreator.getOrCreateNode(inserter, nodeMap,loader, 
-                		IRI.create("http://www.w3.org/2002/07/owl#Thing"),  
-                		new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, 
-                				_nodeLabel, rootLabel)));
-                
-                inserter.createRelationship( node, defaultType, typeOf, rdfTypeProperties);
-=======
                     Long parentNode = NodeCreator.getOrCreateNode(inserter, classNodeMap, loader, parent,
                             new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel,
                                     _nodeLabel)));
@@ -347,26 +244,10 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
                                 _nodeLabel, rootLabel)));
 
                 inserter.createRelationship(node, defaultType, typeOf, rdfTypeProperties);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             }
 
             // add relations
             indexRelations(node, loader.getRelatedIndividuals(individualIri),
-<<<<<<< HEAD
-            		inserter,loader,nodeMap, 
-            		new LinkedList<Label>(Arrays.asList(instanceLabel, nodeOntologyLabel, _instanceLabel)));
-            
-            indexRelations(node, loader.getRelatedClassesToIndividual(individualIri),
-            		inserter,loader,classNodeMap, 
-            		new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, _nodeLabel)));
-        }
-    }
-
-    private void indexRelations(Long node, Map<IRI, Collection<IRI>> relatedIndividuals, 
-    		BatchInserter inserter, OntologyLoader loader, Map<String, Long> nodeMap, 
-    		Collection<Label> nodeLabels) {
-    	
-=======
                     inserter, loader, nodeMap,
                     new LinkedList<Label>(Arrays.asList(instanceLabel, nodeOntologyLabel, _instanceLabel)));
 
@@ -380,7 +261,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
                                 BatchInserter inserter, OntologyLoader loader, Map<String, Long> nodeMap,
                                 Collection<Label> nodeLabels) {
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         for (IRI relation : relatedIndividuals.keySet()) {
             Map<String, Object> relatedProperties = new HashMap<>();
             relatedProperties.put("uri", relation.toString());
@@ -390,15 +270,9 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
 
             for (IRI relatedTerm : relatedIndividuals.get(relation)) {
                 //TODO review right parameters
-<<<<<<< HEAD
-                Long relatedNode =  NodeCreator.getOrCreateNode(inserter, nodeMap,loader, 
-                		relatedTerm, nodeLabels);
-                inserter.createRelationship( node, relatedNode, related, relatedProperties);
-=======
                 Long relatedNode = NodeCreator.getOrCreateNode(inserter, nodeMap, loader,
                         relatedTerm, nodeLabels);
                 inserter.createRelationship(node, relatedNode, related, relatedProperties);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             }
 
         }
@@ -418,19 +292,11 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
      * @param nodeMap
      * @param nodeLabels
      */
-<<<<<<< HEAD
-    private void indexRelatedIndividuals(Long node, Map<IRI, Collection<IRI>> relatedIndividuals, 
-    		BatchInserter inserter, OntologyLoader loader, Map<String, Long> nodeMap, 
-    		Collection<Label> nodeLabels) {
-        
-    	for (IRI relation : relatedIndividuals.keySet()) {
-=======
     private void indexRelatedIndividuals(Long node, Map<IRI, Collection<IRI>> relatedIndividuals,
                                          BatchInserter inserter, OntologyLoader loader, Map<String, Long> nodeMap,
                                          Collection<Label> nodeLabels) {
 
         for (IRI relation : relatedIndividuals.keySet()) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             Map<String, Object> relatedProperties = new HashMap<>();
             relatedProperties.put("uri", relation.toString());
             relatedProperties.put("ontology_name", loader.getOntologyName());
@@ -439,44 +305,25 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
 
             for (IRI relatedTerm : relatedIndividuals.get(relation)) {
                 //TODO review right parameters
-<<<<<<< HEAD
-                Long relatedNode =  NodeCreator.getOrCreateNode(inserter, nodeMap,loader, 
-                		relatedTerm, nodeLabels);
-                inserter.createRelationship( node, relatedNode, relatedIndividual, relatedProperties);
-=======
                 Long relatedNode = NodeCreator.getOrCreateNode(inserter, nodeMap, loader,
                         relatedTerm, nodeLabels);
                 inserter.createRelationship(node, relatedNode, relatedIndividual, relatedProperties);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
             }
 
         }
     }
 
-<<<<<<< HEAD
-    void indexClasses(BatchInserter inserter, OntologyLoader loader, Map<String, Long> nodeMap, 
-    		Map<String, Long> mergedNodeMap) {
-=======
     void indexClasses(BatchInserter inserter, OntologyLoader loader, Map<String, Long> nodeMap,
                       Map<String, Long> mergedNodeMap) {
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
         getLogger().debug("Creating Neo4j index for " + loader.getAllClasses().size() + " classes");
 
         for (IRI classIri : loader.getAllClasses()) {
 
-<<<<<<< HEAD
-            Long node = NodeCreator.getOrCreateNode(inserter, nodeMap,loader, classIri, 
-            		new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, _nodeLabel)));
-
-            Long mergedNode = getOrCreateMergedNode(inserter, mergedNodeMap, loader, classIri, 
-            		mergedClassLabel);
-=======
             Long node = NodeCreator.getOrCreateNode(inserter, nodeMap, loader, classIri,
                     new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, _nodeLabel)));
 
             Long mergedNode = getOrCreateMergedNode(inserter, mergedNodeMap, loader, classIri,
                     mergedClassLabel);
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
             // add refers link
             inserter.createRelationship(node, mergedNode, refersTo, null);
@@ -491,61 +338,11 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
             indexRelatedNodes(inserter, loader, nodeMap, classIri, node);
 
             indexRelatedIndividuals(node, loader.getRelatedIndividualsToClass(classIri), inserter,
-<<<<<<< HEAD
-            		loader,nodeMap, new LinkedList<Label>(Arrays.asList(
-=======
                     loader, nodeMap, new LinkedList<Label>(Arrays.asList(
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                             instanceLabel, nodeOntologyLabel, _instanceLabel)));
         }
     }
 
-<<<<<<< HEAD
-	private void addParentAndRelatedParentNodesWithRelationships(BatchInserter inserter, OntologyLoader loader,
-			Map<String, Long> nodeMap, IRI classIri, Long node) {
-		// add parent nodes
-		if (!loader.getDirectParentTerms(classIri).isEmpty()) {
-		    for (IRI parent : loader.getDirectParentTerms().get(classIri)) {
-		        Long parentNode =  NodeCreator.getOrCreateNode(inserter, nodeMap, loader, parent, 
-		        		new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, _nodeLabel)));
-		        // create local relationship
-		        inserter.createRelationship(node, parentNode, isa, isaProperties);
-		    }
-		}
-		else if (loader.getRelatedParentTerms(classIri).isEmpty()) {
-		    Long thing = NodeCreator.getOrCreateNode(inserter, nodeMap, loader, 
-		    		IRI.create(THING), new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, 
-		    		    _nodeLabel, rootLabel)));
-		    inserter.createRelationship( node, thing, isa, isaProperties);
-		}
-	}
-    
-    void indexClassesDeprecated(BatchInserter inserter, OntologyLoader loader, Map<String, Long> nodeMap, 
-    		Map<String, Long> mergedNodeMap) {
-    	
-        getLogger().debug("Creating Neo4j index for " + loader.getAllClasses().size() + " classes");
-
-        for (IRI classIri : loader.getAllClasses()) {
-
-            Long node = NodeCreator.getOrCreateNode(inserter, nodeMap,loader, classIri, 
-            		new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, _nodeLabel)));
-
-            Long mergedNode = getOrCreateMergedNode(inserter, mergedNodeMap, loader, classIri, 
-            		mergedClassLabel);
-
-            // add refers link
-            inserter.createRelationship( node, mergedNode, refersTo, null);
-
-            addParentAndRelatedParentNodesWithRelationships(inserter, loader, nodeMap, classIri, node);
-            
-
-            indexRelatedNodes(inserter, loader, nodeMap, classIri, node);
-
-            indexRelatedIndividuals(node, loader.getRelatedIndividualsToClass(classIri), inserter,
-            		loader,nodeMap, new LinkedList<Label>(Arrays.asList(
-            				instanceLabel, nodeOntologyLabel, _instanceLabel)));
-        }
-=======
     private void addParentAndRelatedParentNodesWithRelationships(BatchInserter inserter, OntologyLoader loader,
                                                                  Map<String, Long> nodeMap, IRI classIri, Long node) {
         // add parent nodes
@@ -624,48 +421,10 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
                     }
                 }
             }
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
         }
     }
 
-<<<<<<< HEAD
-	private void indexRelatedNodes(BatchInserter inserter, OntologyLoader loader, 
-			Map<String, Long> nodeMap, IRI classIri, Long node) {
-		
-		Map<IRI, Collection<IRI>> relatedterms = loader.getRelatedTerms(classIri);
-
-
-		for (IRI relation : relatedterms.keySet()) {
-		    Map<String, Object> relatedProperties = new HashMap<>();
-		    relatedProperties.put("uri", relation.toString());
-		    relatedProperties.put("label", loader.getTermLabels().get(relation));
-		    relatedProperties.put("ontology_name", loader.getOntologyName());
-		    relatedProperties.put("__type__", "Related");
-
-		    Map<String, Object> relatedTreeProperties = new HashMap<>();
-		    relatedTreeProperties.put("uri", relation.toString());
-		    relatedTreeProperties.put("label", loader.getTermLabels().get(relation));
-		    relatedTreeProperties.put("ontology_name", loader.getOntologyName());
-		    relatedTreeProperties.put("__type__", "RelatedTree");
-
-		    for (IRI relatedTerm : relatedterms.get(relation)) {
-		        Long relatedNode =  NodeCreator.getOrCreateNode(inserter, nodeMap,loader, relatedTerm, 
-		        		new LinkedList<Label>(Arrays.asList(nodeLabel, nodeOntologyLabel, _nodeLabel)));
-		        // create local relationship
-		        inserter.createRelationship(node, relatedNode, related, relatedProperties);
-		        // add a hierarchical relation if it is a related parent term
-		        if (!loader.getRelatedParentTerms(classIri).isEmpty()) {
-		            if (loader.getRelatedParentTerms(classIri).containsKey(relation)) {
-		                inserter.createRelationship(node, relatedNode, treeRelation, 
-		                		relatedTreeProperties);
-		            }
-		        }
-		    }
-
-		}
-	}
-=======
     private static void addLocalizedProperties(
             Map<String, Object> properties, String propertyName, LocalizedStrings localizedStrings) {
 
@@ -675,7 +434,6 @@ public class BatchNeo4JIndexer implements OntologyIndexer {
             properties.put(propertyName + "_" + language, localizedStrings.getFirstString(language));
         }
     }
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 
     @Override
