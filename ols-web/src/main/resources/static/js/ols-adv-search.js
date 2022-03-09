@@ -451,7 +451,6 @@ function renderOntologyFacetField (facetArray, searchSummary) {
             $("#ontology-id").append($('<option/>', {
                 value: e.delegateTarget.id.toLowerCase(),
                 text : e.delegateTarget.id.toLowerCase(),
-<<<<<<< HEAD
                 selected : 'selected'
             }));
 
@@ -529,8 +528,6 @@ function renderClassificationFacetField (facetArray, searchSummary) {
             $("#classification-id").append($('<option/>', {
                 value: e.delegateTarget.id,
                 text : e.delegateTarget.id,
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
                 selected : 'selected'
             }));
 
