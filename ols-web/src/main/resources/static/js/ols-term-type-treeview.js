@@ -1728,11 +1728,8 @@ function _dataCB(node, cb, relativePath, url, ontology, termIRI, termType, showS
 
     url += '?viewMode=' + viewMode;
 
-<<<<<<< HEAD
-=======
     url += '&lang=' + getLang();
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     if (showSiblings) {
         url += '&siblings=true';
     } else {
@@ -1941,11 +1938,7 @@ function _renderRoots(url, cb, termType) {
 function _renderChildren (node, cb, url) {
     var requestIri = node.original.iri ? node.original.iri : node.original.a_attr.iri;
 
-<<<<<<< HEAD
-    var childrenUrl = url + encodeURIComponent(encodeURIComponent(requestIri)) + '/jstree/children/'+ node.id;
-=======
     var childrenUrl = url + encodeURIComponent(encodeURIComponent(requestIri)) + '/jstree/children/'+ node.id + '?lang=' + getLang();
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     $.getJSON(childrenUrl, function (data) {
         cb(data)
@@ -2024,11 +2017,7 @@ function _onClick(node, event, relativePath, currentTermIri, termType, selectedI
     }
 
     var newpath=relativePath + "ontologies/" + ontology_name + "/" + type + '?iri=' + encodeURIComponent(selectedIri) +
-<<<<<<< HEAD
-        '&viewMode=' + viewMode + '&siblings=' + showSiblings;
-=======
         '&lang=' + getLang() + '&viewMode=' + viewMode + '&siblings=' + showSiblings;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
     console.log("_onClick newpath=", newpath);
     _goTo(newpath)
@@ -2038,14 +2027,11 @@ function _goTo (url) {
     window.location.href =  url;
 }
 
-<<<<<<< HEAD
-=======
 function getLang() {
 	var urlParams = new URLSearchParams(window.location.search);
 	return urlParams.get('lang') || 'en';
 }
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 module.exports = OLSTermTypeTreeView;
 
 
