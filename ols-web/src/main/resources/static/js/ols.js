@@ -21,14 +21,10 @@ function goTo (url) {
 
 $(function() {
     $('p.annotation-value').each(function(i, el) {
-<<<<<<< HEAD
-        $(el).html($(el).html().replace(/((http|https|ftp):\/\/[^\s,]+)/g, "<a href=\"$1\">$1</a>"))
-=======
         $(el).html($(el).html().replace(/((http|https|ftp):\/\/[^\s,]+)/g, function(url) {
 		console.log("Replacing URL with link: " + url);
 		return "<a href=\"$1\">" + escapeHtml(url) + "</a>";
 	}))
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     })
 
     $('.panel-heading').each(function(i, heading) {
@@ -61,8 +57,6 @@ $(function() {
         })
     )
 })
-<<<<<<< HEAD
-=======
 
 
 
@@ -107,4 +101,3 @@ function escapeHtml(unsafe)
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
  }
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
