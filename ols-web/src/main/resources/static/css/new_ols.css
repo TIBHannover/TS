@@ -2,11 +2,6 @@
   --ols_orange: #ffac1b;
   --ols_green: #00827c; }
 
-<<<<<<< HEAD
-#mainpageSearchBox {
-  margin-top: 30px;
-  margin-bottom: 30px;
-=======
 #main-content-area {
   min-height: 75vh; }
   #main-content-area .row {
@@ -16,7 +11,6 @@
 
 #mainpageSearchBox {
   margin: 30px 15px 30px 15px;
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
   background: #F0F0F0;
   padding: 35px 35px 35px 35px;
   border-radius: 5px; }
@@ -66,15 +60,10 @@ a.pagingButton {
 #ontologiesTable_paginate .paginate_button .current {
   background: transparent; }
 
-<<<<<<< HEAD
-#ontologiesTable td {
-  vertical-align: top !important; }
-=======
 #ontologiesTable {
   width: 100%; }
   #ontologiesTable td {
     vertical-align: top !important; }
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 /* Search Page */
 #filterBox {
@@ -200,7 +189,6 @@ a.nounderline.ontology-link {
 #ontology_info_box .panel-body {
   padding: 10px 10px 10px 10px; }
 
-<<<<<<< HEAD
 #ontology_info_box2 .panel-heading {
   background: #00827c;
   text-align: center; }
@@ -211,8 +199,6 @@ a.nounderline.ontology-link {
 #ontology_info_box2 .panel-body {
   padding: 10px 10px 10px 10px; }
 
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 #onto-tab-content .tabs-content {
   min-height: 500px;
   margin-bottom: 40px; }
@@ -223,8 +209,6 @@ a.nounderline.ontology-link {
 input[type="search"].select2-search__field {
   margin-bottom: 0; }
 
-<<<<<<< HEAD
-=======
 #individual-tree-tab tbody {
   border: none; }
   #individual-tree-tab tbody tr {
@@ -235,7 +219,6 @@ input[type="search"].select2-search__field {
         font-size: xx-small;
         color: #3c3c3c; }
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 /* Term page */
 #right_info_box .panel-heading {
   background: #00827c;
@@ -360,13 +343,10 @@ input[type="search"].select2-search__field {
   padding-top: 12px;
   padding-left: 12px; }
 
-<<<<<<< HEAD
-=======
 .term-section#content,
 .property-section#content {
   padding: 0; }
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 /* Search Box stuff(?) */
 .checkbox-inline {
   margin-top: -20px; }
@@ -471,16 +451,6 @@ button.list-group-item:hover, button.list-group-item:focus {
   font-weight: normal;
   color: #0a0a0a; }
 
-<<<<<<< HEAD
-.part_of:before {
-  content: "";
-  display: block;
-  background: url("../img/part_of.gif") no-repeat;
-  width: 15px;
-  height: 15px;
-  float: left;
-  margin: 4px 6px 0 2px; }
-=======
 .jstree-anchor.part_of:before {
   background: url("../img/part_of.png") no-repeat;
   background-size: 16px;
@@ -500,7 +470,6 @@ button.list-group-item:hover, button.list-group-item:focus {
   height: 16px;
   float: left;
   margin: 3px 4px 0 1px; }
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 
 /* Modify classes from ebi-global.css */
 .breadcrumbs {
@@ -520,13 +489,10 @@ button.list-group-item:hover, button.list-group-item:focus {
   box-shadow: none;
   transition: none; }
 
-<<<<<<< HEAD
 div.row {
   padding-top: 13px;
   padding-left: 13px; }
 
-=======
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 [type="text"]:focus {
   border: 1px solid #00827c;
   box-shadow: 0 0 7px rgba(0, 130, 124, 0.7); }
@@ -737,8 +703,6 @@ a + a > .ontology-source-valign {
 #docs-content h1 {
   color: black !important; }
 
-<<<<<<< HEAD
-=======
 /* header */
 #masthead .row {
   max-width: 80rem; }
@@ -773,5 +737,4 @@ footer {
       font-size: small;
       font-family: monospace; }
 
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
 /*# sourceMappingURL=new_ols.css.map */
