@@ -131,15 +131,6 @@ public class SolrIndexer implements OntologyIndexer {
                 documents.addAll(builder.createTermDocuments());
             }
 
-            for (IRI classTerm : loader.getAllDataPropertyIRIs()) {
-                TermDocumentBuilder builder = extractFeatures(loader, classTerm);
-                builder.setType(TermType.PROPERTY.toString().toLowerCase());
-                builder.setId(generateId(loader.getOntologyName(), "property", classTerm.toString()));
-                builder.setUri_key(generateAnnotationId(loader.getOntologyName() + classTerm.toString() + "property").hashCode());
-
-                documents.add(builder.createTermDocument());
-            }
-
             for (IRI classTerm : loader.getAllAnnotationPropertyIRIs()) {
                 TermDocumentBuilder builder = extractTermFeatures(loader, classTerm);
                 builder.setType(TermType.PROPERTY.toString().toLowerCase());
