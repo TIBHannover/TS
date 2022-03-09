@@ -23,7 +23,6 @@
 
 <body>
 <th:block th:include="fragments/header :: header"></th:block>
-<<<<<<< HEAD
 
 <section id="main-content-area" role="main">
 <div class="row">
@@ -45,28 +44,6 @@
             th:if="${error}" th:text="'('+${error}+')'">error ...</span>
     </p>
 
-=======
-
-<section id="main-content-area" role="main">
-<div class="row">
-    <h2 class="strapline" th:text="${title}">Ontology Lookup Service</h2>
-    <p class="alert-info bootstrap-alert error" th:inline="text">
-        [[${errorMessage}]]
-    </p>
-    <p th:if="${timestamp}" id='created'>
-        <b>Occurred:</b> <span th:text="${timestamp}">Timestamp</span>
-    </p>
-    <p th:if="${status}">
-        <b>Response Status:</b> <span th:text="${status}">status-code</span> <span
-            th:if="${error}" th:text="'('+${error}+')'">error ...</span>
-    </p>
-    
-    <ul>
-        <li><a th:href="@{${issuesPage}}">Issue Tracker</a></li>
-        <li><a th:href="@{'mailto:' + ${supportMail}}" th:text="@{${supportMail}}"></a></li>
-    </ul>
-
->>>>>>> 6b26b5e43ada0ebc714898f7a81a1620b94f0802
     <div th:if="${ex} or ${exception} or (${message} and ${message.length() != 0})">
         <p>
             <b>Cause:</b>
