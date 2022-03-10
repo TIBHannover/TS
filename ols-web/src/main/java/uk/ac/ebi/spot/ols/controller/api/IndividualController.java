@@ -100,6 +100,7 @@ public class IndividualController implements
         return new ResponseEntity<>(assembler.toResource(localized, individualAssembler), HttpStatus.OK);
     }
     
+    @ApiOperation(value = "Retrieve a particular individual based on defining ontology")
     @RequestMapping(path = "/findByIdAndIsDefiningOntology/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<LocalizedIndividual>> getAllIndividualsByIdAndIsDefiningOntology(
             @PathVariable("id") String termId,
@@ -116,7 +117,7 @@ public class IndividualController implements
 
     }    
     
-    
+    @ApiOperation(value = "List individuals based on defining ontology")
     @RequestMapping(path = "/findByIdAndIsDefiningOntology", 
     		produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, 
     		method = RequestMethod.GET)
@@ -143,48 +144,6 @@ public class IndividualController implements
 	Page<LocalizedIndividual> localized = terms.map(term -> LocalizedIndividual.fromIndividual(lang, term));
 
         return new ResponseEntity<>(assembler.toResource(localized, individualAssembler), HttpStatus.OK);
-    }
-
-    @ApiOperation(value = "Find individual based on defining ontology")
-    @RequestMapping(path = "/findByIdAndIsDefiningOntology/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<PagedResources<Individual>> getAllIndividualsByIdAndIsDefiningOntology(
-            @PathVariable("id") String termId,
-            Pageable pageable,
-            PagedResourcesAssembler assembler) {
-        String decoded = null;
-        try {
-            decoded = UriUtils.decode(termId, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new ResourceNotFoundException("Can't decode IRI: " + termId);
-        }
-        return getAllIndividualsByIdAndIsDefiningOntology(decoded, null, null, pageable, assembler);
-
-    }    
-    
-    @ApiOperation(value = "List individuals based on defining ontology")
-    @RequestMapping(path = "/findByIdAndIsDefiningOntology", 
-    		produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, 
-    		method = RequestMethod.GET)
-    HttpEntity<PagedResources<Individual>> getAllIndividualsByIdAndIsDefiningOntology(
-            @RequestParam(value = "iri", required = false) String iri,
-            @RequestParam(value = "short_form", required = false) String shortForm,
-            @RequestParam(value = "obo_id", required = false) String oboId,
-            Pageable pageable,
-            PagedResourcesAssembler assembler) {
-
-        Page<Individual> terms = null;
-
-        if (iri != null) {
-            terms = ontologyIndividualRepository.findAllByIriAndIsDefiningOntology(iri, pageable);
-        } else if (shortForm != null) {
-            terms = ontologyIndividualRepository.findAllByShortFormAndIsDefiningOntology(shortForm, pageable);
-        } else if (oboId != null) {
-            terms = ontologyIndividualRepository.findAllByOboIdAndIsDefiningOntology(oboId, pageable);
-        } else {
-            terms = ontologyIndividualRepository.findAllByIsDefiningOntology(pageable);
-        }
-
-        return new ResponseEntity<>(assembler.toResource(terms, individualAssembler), HttpStatus.OK);
     }
     
 
