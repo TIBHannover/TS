@@ -128,7 +128,7 @@ public class OntologyControllerUI {
     String getTerm(
             @PathVariable("onto") String ontologyId,
             @RequestParam(value = "lang", required = false, defaultValue = "en") String lang,
-            @PageableDefault(size = Integer.MAX_VALUE, page = 0) Pageable pageable,
+            @PageableDefault(page = 0, size = 1000, sort="n.label") Pageable pageable,
             Model model) throws ResourceNotFoundException {
 
         ontologyId = ontologyId.toLowerCase();
@@ -146,16 +146,18 @@ public class OntologyControllerUI {
                 // only thrown if not valid e-mail, so contact must be URL of some sort
             }
             model.addAttribute("lang", lang);
-	    model.addAttribute("ontologyLanguages", document.getConfig().getLanguages());
+	        model.addAttribute("ontologyLanguages", document.getConfig().getLanguages());
             model.addAttribute("contact", contact);
-
-            if (pageable.getSort() == null) {
-                pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), new Sort(new Sort.Order(Sort.Direction.ASC, "n.label")));
-            }
+            
+            if (pageable.getSort() == null) 
+                pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), new Sort(new Sort.Order(Sort.Direction.DESC, "n.label")));
+ 
             Page<Individual> individuals = ontologyIndividualService.findAllByOntology(ontologyId, pageable);
 
             model.addAttribute("contact", contact);
             model.addAttribute("ontologyDocument", document);
+            model.addAttribute("ontologyIndividuals", individuals);
+            
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);

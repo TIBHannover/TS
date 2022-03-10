@@ -91,7 +91,7 @@
                     </td>
                     <td style="width: 11%;"><span class="ontology-source" th:text="${{onto.getConfig().getPreferredPrefix()}}"></span></td>
                     <td style="font-size: smaller;">
-                    <span th:text="${{onto.getConfig()getLocalizedDescription(lang)}}"></span>            
+                    <span th:text="${{onto.getConfig().getLocalizedDescription(lang)}}"></span>            
                     <div th:each="classification: ${onto.getConfig().getClassifications()}">
                        <div th:each="schema: ${classification.keySet().toArray()}">
                            <b th:text="${schema} + ': '"></b>

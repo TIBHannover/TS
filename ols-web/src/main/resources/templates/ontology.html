@@ -244,7 +244,7 @@
                             <b>Last loaded: </b> <span property="dateModified"
                                                        th:text="${ontologyDocument.getLoaded()}">NCBI_9606</span>
                         </div>
-	                    <div th:unless="${ontologyDocument.getConfig().getAnnotations().containsKey('creator') or ontologyDocument.getConfig().getAnnotations().containsKey('contributor') or ontologyDocument.getConfig().getCreators().size() < 1}">
+	                    <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('creator') or ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('contributor') or ontologyDocument.getConfig().getCreators().size() < 1}">
 	                           <b th:if="${ontologyDocument.getConfig().getCreators().size() > 1}">Creators:</b>
 	                           <div th:each="creator : ${ontologyDocument.getConfig().getCreators()}">
 	                               <b th:if="${ontologyDocument.getConfig().getCreators().size() == 1}">Creator: </b>
@@ -275,14 +275,14 @@
 	                        <a th:href="${ontologyDocument.getConfig().getLicense().getLogo()}" th:text="${ontologyDocument.getConfig().getLicense().getLogo()}">License Logo</a>
 	                    </div>
 	                                                     
-	                    <div th:unless="${ontologyDocument.getConfig().getAnnotations().containsKey('license') or ontologyDocument.getConfig().getAnnotations().containsKey('rights') or ontologyDocument.getConfig().getLicense().getUrl() == null}">
+	                    <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('license') or ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('rights') or ontologyDocument.getConfig().getLicense().getUrl() == null}">
 	                        <b>License URL: </b>
 	                        <a th:href="${ontologyDocument.getConfig().getLicense().getUrl()}" th:text="${ontologyDocument.getConfig().getLicense().getUrl()}">License URL</a>
 	                    </div>
 	                </div>
 	            </div>
             
-	            <div th:unless="${ontologyDocument.getConfig().getAnnotations().isEmpty()}" id="ontology_info_box2" class="panel">
+	            <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).isEmpty()}" id="ontology_info_box2" class="panel">
 	                <div class="panel-heading">
 	                    <h4 th:inline="text">Original [[${ontologyAlias}]] information</h4>
 	                </div>
