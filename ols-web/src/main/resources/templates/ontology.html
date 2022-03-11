@@ -284,7 +284,7 @@
             
 	            <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).isEmpty()}" id="ontology_info_box2" class="panel">
 	                <div class="panel-heading">
-	                    <h4 th:inline="text">Original [[${ontologyAlias}]] information</h4>
+	                    <h4 th:inline="text">Original [[${ontologyAlias}]] Info in [[${lang}]]</h4>
 	                </div>
 	                <div class="panel-body">
                         <div th:each="annotations: ${ontologyDocument.getConfig().getLocalizedAnnotations(lang)}">
@@ -306,6 +306,33 @@
                         </div>
                     </div>
                 </div>
+                
+                <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations('').isEmpty()}" id="ontology_info_box3" class="panel">
+	                <div class="panel-heading">
+	                    <h4 th:inline="text">Original [[${ontologyAlias}]] information</h4>
+	                </div>
+	                <div class="panel-body">
+                        <div th:each="annotations: ${ontologyDocument.getConfig().getLocalizedAnnotations('')}">
+                            <b>
+                                <a href="#"
+                                   th:href="@{../search(q=${annotations.key},exact='true', type=property, ontology=${ontologyDocument.getOntologyId()})}"
+                                   th:text="${annotations.key.replaceAll('_', ' ')}">property name</a>
+                            </b>
+	                        <div th:each="annovalue : ${annotations.value}">
+	                            <div th:unless="${annovalue.split(' ').length > 1}">
+	                                   <div th:unless="${annovalue.startsWith('http://') or annovalue.startsWith('https://')}">
+	                                       <a th:if="${annovalue.startsWith('www.')}" style="margin-left:9px;margin-bottom: 0rem;" th:href="'https://' + ${annovalue}" th:text="${annovalue}">NCBI_9606</a>
+	                                       <p th:unless="${annovalue.startsWith('www.')}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>  
+	                                   </div>
+	                                   <a th:if="${annovalue.startsWith('http://') or annovalue.startsWith('https://')}" style="margin-left:9px;margin-bottom: 0rem;" th:href="${annovalue}" th:text="${annovalue}">NCBI_9606</a>         
+	                            </div>
+	                            <p th:if="${annovalue.split(' ').length > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>
+	                        </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
             </div>
         </div>
     </div>
