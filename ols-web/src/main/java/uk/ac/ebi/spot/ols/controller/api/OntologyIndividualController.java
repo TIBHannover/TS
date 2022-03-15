@@ -93,7 +93,7 @@ public class OntologyIndividualController {
         return new ResponseEntity<>(assembler.toResource(terms, individualAssembler), HttpStatus.OK);
     }
     
-    @RequestMapping(path = "/{onto}/skosrootconcepts", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    @RequestMapping(path = "/{onto}/skosconcepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSRootConceptsByOntology(
             @PathVariable("onto") String ontologyId,
             @RequestParam(value = "iri", required = false) String iri,
@@ -131,14 +131,7 @@ public class OntologyIndividualController {
 					related.setIri(iriRelated);
 					tree.addRelated(related);
 				}
-				if (individual.getAnnotation().get("narrower") != null)
-				for (String iriChild : (String[]) individual.getAnnotation().get("narrower")) {
-					SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriChild));
-					child.setLabel(child.getData().getLabel());
-					child.setIri(iriChild);
-					tree.addChild(child);
-				}
-				
+                populateChildren(individual,tree,listOfTerms);								
 				rootIndividuals.add(tree);
 				count++;
 			}
@@ -156,6 +149,18 @@ public class OntologyIndividualController {
     		if(individual.getIri().equals(iri))
     			return individual;
     	return new Individual();
+    }
+    
+    public void populateChildren(Individual individual, SKOSConceptNode<Individual> tree, List<Individual> listOfTerms ) {
+		if (individual.getAnnotation().get("narrower") != null)
+		for (String iriChild : (String[]) individual.getAnnotation().get("narrower")) {
+			Individual childIndividual = findIndividual(listOfTerms,iriChild);
+			SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(childIndividual);
+			child.setLabel(child.getData().getLabel());
+			child.setIri(iriChild);
+			populateChildren(childIndividual,child,listOfTerms);
+			tree.addChild(child);
+		}
     }
 
     @RequestMapping(path = "/{onto}/individuals/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
