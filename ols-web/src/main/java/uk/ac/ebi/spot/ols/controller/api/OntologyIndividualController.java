@@ -3,9 +3,12 @@ package uk.ac.ebi.spot.ols.controller.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import org.semanticweb.elk.owl.implementation.ElkIndividualListObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -28,7 +31,11 @@ import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Simon Jupp
@@ -80,9 +87,75 @@ public class OntologyIndividualController {
             }
         } else {
             terms = ontologyIndividualRepository.findAllByOntology(ontologyId, pageable);
+            
         }
 
         return new ResponseEntity<>(assembler.toResource(terms, individualAssembler), HttpStatus.OK);
+    }
+    
+    @RequestMapping(path = "/{onto}/skosrootconcepts", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSRootConceptsByOntology(
+            @PathVariable("onto") String ontologyId,
+            @RequestParam(value = "iri", required = false) String iri,
+            @RequestParam(value = "short_form", required = false) String shortForm,
+            @RequestParam(value = "obo_id", required = false) String oboId,
+            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount,
+            PagedResourcesAssembler assembler) {
+
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
+        List<Individual> listOfTerms = terms.getContent();       
+
+        List<SKOSConceptNode<Individual>> rootIndividuals = new ArrayList<SKOSConceptNode<Individual>>();
+        
+        int count = 0;
+         for (Individual individual : listOfTerms) {
+        	 SKOSConceptNode<Individual> tree = new SKOSConceptNode<Individual>(individual);
+        	if (tree.isRoot() && individual.getAnnotation().get("topConceptOf") != null) {
+				tree.setIri(individual.getIri());
+				tree.setLabel(individual.getLabel());
+				tree.setIndex(String.valueOf(count + 1));
+				
+				if (individual.getAnnotation().get("broader") != null) {
+					for (String iriBroader : (String[]) individual.getAnnotation().get("broader")) {
+						SKOSConceptNode<Individual> parent = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriBroader));
+						parent.setLabel(parent.getData().getLabel());
+						parent.setIri(iriBroader);
+						tree.addParent(parent);
+					}
+				}
+			
+				if (individual.getAnnotation().get("related") != null)
+				for (String iriRelated : (String[]) individual.getAnnotation().get("related")) {
+					SKOSConceptNode<Individual> related = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriRelated));
+					related.setLabel(related.getData().getLabel());
+					related.setIri(iriRelated);
+					tree.addRelated(related);
+				}
+				if (individual.getAnnotation().get("narrower") != null)
+				for (String iriChild : (String[]) individual.getAnnotation().get("narrower")) {
+					SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriChild));
+					child.setLabel(child.getData().getLabel());
+					child.setIri(iriChild);
+					tree.addChild(child);
+				}
+				
+				rootIndividuals.add(tree);
+				count++;
+			}
+		} 
+         
+         for (SKOSConceptNode<Individual> root : rootIndividuals)
+        	 System.out.println(root.getLabel() + " - " + root.getIri());
+         System.out.println("Number of roots: "+rootIndividuals.size());
+
+        return new ResponseEntity<>(rootIndividuals, HttpStatus.OK);
+    }
+    
+    public Individual findIndividual(List<Individual> wholeList, String iri) {
+    	for (Individual individual : wholeList)
+    		if(individual.getIri().equals(iri))
+    			return individual;
+    	return new Individual();
     }
 
     @RequestMapping(path = "/{onto}/individuals/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
