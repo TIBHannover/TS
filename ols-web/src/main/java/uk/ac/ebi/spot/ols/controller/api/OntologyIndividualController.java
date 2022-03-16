@@ -96,12 +96,25 @@ public class OntologyIndividualController {
     @RequestMapping(path = "/{onto}/skosconcepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSConceptHierarchyByOntology(
             @PathVariable("onto") String ontologyId,
-            @RequestParam(value = "iri", required = false) String iri,
-            @RequestParam(value = "short_form", required = false) String shortForm,
-            @RequestParam(value = "obo_id", required = false) String oboId,
-            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount,
-            PagedResourcesAssembler assembler) {
-
+            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
+        return new ResponseEntity<>(conceptTree(ontologyId,individualCount), HttpStatus.OK);
+    } 
+    
+    @RequestMapping(path = "/{onto}/skosconcepts", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<String> getSKOSConceptsByOntology(
+            @PathVariable("onto") String ontologyId,
+            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
+    	 List<SKOSConceptNode<Individual>> rootIndividuals = conceptTree(ontologyId,individualCount);
+         StringBuilder sb = new StringBuilder();
+         for (SKOSConceptNode<Individual> root : rootIndividuals) {
+        	 sb.append(root.getIndex() + " , "+ root.getLabel() + " , " + root.getIri()).append("\n");
+        	 sb.append(getYAMLSKOSConceptHierarchyByOntology(root)); 
+         }
+         
+         return new ResponseEntity<>(sb.toString(), HttpStatus.OK);
+    }   
+    
+    public List<SKOSConceptNode<Individual>> conceptTree (String ontologyId, Integer individualCount){
         Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
         List<Individual> listOfTerms = terms.getContent();       
 
@@ -127,17 +140,8 @@ public class OntologyIndividualController {
                 populateChildrenandRelated(individual,tree,listOfTerms);								
 				rootIndividuals.add(tree);
 			}
-		} 
-         StringBuilder sb = new StringBuilder();
-         for (SKOSConceptNode<Individual> root : rootIndividuals) {
-        	 sb.append(root.getIndex() + " - "+ root.getLabel() + " - " + root.getIri()).append("\n");
-        	 sb.append(getYAMLSKOSConceptHierarchyByOntology(root))   ; 
-         } 	 
-          
-         System.out.println(sb.toString());   
-         System.out.println("Number of roots: "+rootIndividuals.size());
-
-        return new ResponseEntity<>(rootIndividuals, HttpStatus.OK);
+		}          
+         return rootIndividuals;
     }
     
     public Individual findIndividual(List<Individual> wholeList, String iri) {
@@ -173,7 +177,7 @@ public class OntologyIndividualController {
     public StringBuilder getYAMLSKOSConceptHierarchyByOntology(SKOSConceptNode<Individual> rootIndividual) {
     	StringBuilder sb = new StringBuilder();
         for (SKOSConceptNode<Individual> individual : rootIndividual.getChildren()) {
-       	     sb.append(individual.getIndex() + " - "+ individual.getLabel() + " - " + individual.getIri()).append("\n");
+       	     sb.append(individual.getIndex() + " , "+ individual.getLabel() + " , " + individual.getIri()).append("\n");
        	     sb.append(getYAMLSKOSConceptHierarchyByOntology(individual));
         }
         return sb;
