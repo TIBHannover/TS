@@ -113,7 +113,7 @@ public class OntologyIndividualController {
         	if (tree.isRoot() && individual.getAnnotation().get("topConceptOf") != null) {
 				tree.setIri(individual.getIri());
 				tree.setLabel(individual.getLabel());
-				tree.setIndex(String.valueOf(count + 1));
+				tree.setIndex(String.valueOf(++count));
 				
 				if (individual.getAnnotation().get("broader") != null) {
 					for (String iriBroader : (String[]) individual.getAnnotation().get("broader")) {
@@ -124,16 +124,8 @@ public class OntologyIndividualController {
 					}
 				}
 			
-				if (individual.getAnnotation().get("related") != null)
-				for (String iriRelated : (String[]) individual.getAnnotation().get("related")) {
-					SKOSConceptNode<Individual> related = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriRelated));
-					related.setLabel(related.getData().getLabel());
-					related.setIri(iriRelated);
-					tree.addRelated(related);
-				}
-                populateChildren(individual,tree,listOfTerms);								
+                populateChildrenandRelated(individual,tree,listOfTerms);								
 				rootIndividuals.add(tree);
-				count++;
 			}
 		} 
          
@@ -151,14 +143,25 @@ public class OntologyIndividualController {
     	return new Individual();
     }
     
-    public void populateChildren(Individual individual, SKOSConceptNode<Individual> tree, List<Individual> listOfTerms ) {
-		if (individual.getAnnotation().get("narrower") != null)
+    public void populateChildrenandRelated(Individual individual, SKOSConceptNode<Individual> tree, List<Individual> listOfTerms ) {
+		
+		if (individual.getAnnotation().get("related") != null)
+		for (String iriRelated : (String[]) individual.getAnnotation().get("related")) {
+			SKOSConceptNode<Individual> related = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriRelated));
+			related.setLabel(related.getData().getLabel());
+			related.setIri(iriRelated);
+			related.setIndex(tree.getIndex()+ ".related");
+			tree.addRelated(related);
+		}
+    	int count = 0;
+    	if (individual.getAnnotation().get("narrower") != null)
 		for (String iriChild : (String[]) individual.getAnnotation().get("narrower")) {
 			Individual childIndividual = findIndividual(listOfTerms,iriChild);
 			SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(childIndividual);
 			child.setLabel(child.getData().getLabel());
 			child.setIri(iriChild);
-			populateChildren(childIndividual,child,listOfTerms);
+			child.setIndex(tree.getIndex()+"."+ ++count);			
+			populateChildrenandRelated(childIndividual,child,listOfTerms);
 			tree.addChild(child);
 		}
     }
