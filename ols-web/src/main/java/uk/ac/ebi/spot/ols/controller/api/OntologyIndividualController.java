@@ -94,7 +94,7 @@ public class OntologyIndividualController {
     }
     
     @RequestMapping(path = "/{onto}/skosconcepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSRootConceptsByOntology(
+    HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSConceptHierarchyByOntology(
             @PathVariable("onto") String ontologyId,
             @RequestParam(value = "iri", required = false) String iri,
             @RequestParam(value = "short_form", required = false) String shortForm,
@@ -128,9 +128,13 @@ public class OntologyIndividualController {
 				rootIndividuals.add(tree);
 			}
 		} 
-         
-         for (SKOSConceptNode<Individual> root : rootIndividuals)
-        	 System.out.println(root.getLabel() + " - " + root.getIri());
+         StringBuilder sb = new StringBuilder();
+         for (SKOSConceptNode<Individual> root : rootIndividuals) {
+        	 sb.append(root.getIndex() + " - "+ root.getLabel() + " - " + root.getIri()).append("\n");
+        	 sb.append(getYAMLSKOSConceptHierarchyByOntology(root))   ; 
+         } 	 
+          
+         System.out.println(sb.toString());   
          System.out.println("Number of roots: "+rootIndividuals.size());
 
         return new ResponseEntity<>(rootIndividuals, HttpStatus.OK);
@@ -164,6 +168,15 @@ public class OntologyIndividualController {
 			populateChildrenandRelated(childIndividual,child,listOfTerms);
 			tree.addChild(child);
 		}
+    }
+    
+    public StringBuilder getYAMLSKOSConceptHierarchyByOntology(SKOSConceptNode<Individual> rootIndividual) {
+    	StringBuilder sb = new StringBuilder();
+        for (SKOSConceptNode<Individual> individual : rootIndividual.getChildren()) {
+       	     sb.append(individual.getIndex() + " - "+ individual.getLabel() + " - " + individual.getIri()).append("\n");
+       	     sb.append(getYAMLSKOSConceptHierarchyByOntology(individual));
+        }
+        return sb;
     }
 
     @RequestMapping(path = "/{onto}/individuals/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
