@@ -34,8 +34,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Simon Jupp
@@ -92,97 +94,7 @@ public class OntologyIndividualController {
 
         return new ResponseEntity<>(assembler.toResource(terms, individualAssembler), HttpStatus.OK);
     }
-    
-    @RequestMapping(path = "/{onto}/skosconcepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSConceptHierarchyByOntology(
-            @PathVariable("onto") String ontologyId,
-            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
-        return new ResponseEntity<>(conceptTree(ontologyId,individualCount), HttpStatus.OK);
-    } 
-    
-    @RequestMapping(path = "/{onto}/skosconcepts", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<String> getSKOSConceptsByOntology(
-            @PathVariable("onto") String ontologyId,
-            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
-    	 List<SKOSConceptNode<Individual>> rootIndividuals = conceptTree(ontologyId,individualCount);
-         StringBuilder sb = new StringBuilder();
-         for (SKOSConceptNode<Individual> root : rootIndividuals) {
-        	 sb.append(root.getIndex() + " , "+ root.getLabel() + " , " + root.getIri()).append("\n");
-        	 sb.append(getYAMLSKOSConceptHierarchyByOntology(root)); 
-         }
-         
-         return new ResponseEntity<>(sb.toString(), HttpStatus.OK);
-    }   
-    
-    public List<SKOSConceptNode<Individual>> conceptTree (String ontologyId, Integer individualCount){
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
-        List<Individual> listOfTerms = terms.getContent();       
-
-        List<SKOSConceptNode<Individual>> rootIndividuals = new ArrayList<SKOSConceptNode<Individual>>();
-        
-        int count = 0;
-         for (Individual individual : listOfTerms) {
-        	 SKOSConceptNode<Individual> tree = new SKOSConceptNode<Individual>(individual);
-        	if (tree.isRoot() && individual.getAnnotation().get("topConceptOf") != null) {
-				tree.setIri(individual.getIri());
-				tree.setLabel(individual.getLabel());
-				tree.setIndex(String.valueOf(++count));
-				
-				if (individual.getAnnotation().get("broader") != null) {
-					for (String iriBroader : (String[]) individual.getAnnotation().get("broader")) {
-						SKOSConceptNode<Individual> parent = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriBroader));
-						parent.setLabel(parent.getData().getLabel());
-						parent.setIri(iriBroader);
-						tree.addParent(parent);
-					}
-				}
-			
-                populateChildrenandRelated(individual,tree,listOfTerms);								
-				rootIndividuals.add(tree);
-			}
-		}          
-         return rootIndividuals;
-    }
-    
-    public Individual findIndividual(List<Individual> wholeList, String iri) {
-    	for (Individual individual : wholeList)
-    		if(individual.getIri().equals(iri))
-    			return individual;
-    	return new Individual();
-    }
-    
-    public void populateChildrenandRelated(Individual individual, SKOSConceptNode<Individual> tree, List<Individual> listOfTerms ) {
-		
-		if (individual.getAnnotation().get("related") != null)
-		for (String iriRelated : (String[]) individual.getAnnotation().get("related")) {
-			SKOSConceptNode<Individual> related = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriRelated));
-			related.setLabel(related.getData().getLabel());
-			related.setIri(iriRelated);
-			related.setIndex(tree.getIndex()+ ".related");
-			tree.addRelated(related);
-		}
-    	int count = 0;
-    	if (individual.getAnnotation().get("narrower") != null)
-		for (String iriChild : (String[]) individual.getAnnotation().get("narrower")) {
-			Individual childIndividual = findIndividual(listOfTerms,iriChild);
-			SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(childIndividual);
-			child.setLabel(child.getData().getLabel());
-			child.setIri(iriChild);
-			child.setIndex(tree.getIndex()+"."+ ++count);			
-			populateChildrenandRelated(childIndividual,child,listOfTerms);
-			tree.addChild(child);
-		}
-    }
-    
-    public StringBuilder getYAMLSKOSConceptHierarchyByOntology(SKOSConceptNode<Individual> rootIndividual) {
-    	StringBuilder sb = new StringBuilder();
-        for (SKOSConceptNode<Individual> individual : rootIndividual.getChildren()) {
-       	     sb.append(individual.getIndex() + " , "+ individual.getLabel() + " , " + individual.getIri()).append("\n");
-       	     sb.append(getYAMLSKOSConceptHierarchyByOntology(individual));
-        }
-        return sb;
-    }
-
+ 
     @RequestMapping(path = "/{onto}/individuals/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<Resource<Individual>> getIndividual(@PathVariable("onto") String ontologyId, @PathVariable("id") String termId) throws ResourceNotFoundException {
         ontologyId = ontologyId.toLowerCase();
