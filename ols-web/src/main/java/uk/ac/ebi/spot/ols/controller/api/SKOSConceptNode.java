@@ -14,8 +14,6 @@ public class SKOSConceptNode<T> {
 //	@JsonIgnore
     private Collection<SKOSConceptNode<T>> parent = new ArrayList<SKOSConceptNode<T>>();
     private String index;
-    private String iri;
-    private String label;
     private T data = null;
     
     public SKOSConceptNode(T data) {
@@ -82,18 +80,6 @@ public class SKOSConceptNode<T> {
 	}
 	public void setIndex(String index) {
 		this.index = index;
-	}
-	public String getIri() {
-		return iri;
-	}
-	public void setIri(String iri) {
-		this.iri = iri;
-	}
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
 	}
 	
     public T getData() {
