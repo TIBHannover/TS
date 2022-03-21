@@ -7,11 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class SKOSConceptNode<T> {
 	
-//	@JsonIgnore
 	private Collection<SKOSConceptNode<T>> children = new ArrayList<SKOSConceptNode<T>>();
-//	@JsonIgnore
 	private Collection<SKOSConceptNode<T>> related = new ArrayList<SKOSConceptNode<T>>();
-//	@JsonIgnore
     private Collection<SKOSConceptNode<T>> parent = new ArrayList<SKOSConceptNode<T>>();
     private String index;
     private T data = null;

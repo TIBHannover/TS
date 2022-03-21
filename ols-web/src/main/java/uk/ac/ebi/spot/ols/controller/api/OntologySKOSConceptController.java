@@ -198,7 +198,6 @@ public class OntologySKOSConceptController {
                 for (Individual indiv : listOfTerms)
                	    if (indiv.getAnnotation().get("hasTopConcept") != null) {
             		 for (String iriTopConcept : (String[]) indiv.getAnnotation().get("hasTopConcept")) {
-            			 System.out.println(iriTopConcept);
             			 Individual topConceptIndividual = findIndividual(listOfTerms,iriTopConcept);
             			 SKOSConceptNode<Individual> topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
             		     topConcept.setIndex(String.valueOf(++count));
