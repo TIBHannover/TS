@@ -2,9 +2,13 @@ package uk.ac.ebi.spot.ols.controller.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
+import io.swagger.annotations.ApiParam;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 
@@ -131,6 +136,38 @@ public class OntologySKOSConceptController {
          	     
         return new ResponseEntity<>(sb.toString(), HttpStatus.OK);
     } 
+    
+    @RequestMapping(path = "/{onto}/conceptrelations/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    public HttpEntity<PagedResources<Individual>> findRelatedConcepts(
+            @PathVariable("onto") String ontologyId,
+            @PathVariable("iri") String iri,
+            @ApiParam(value = "skos based concept relation type", required = true, allowableValues = "broader, narrower, related")
+            @RequestParam(value = "relation_type", required = true, defaultValue = "broader") String relationType,
+            Pageable pageable,
+            PagedResourcesAssembler assembler) {
+    	
+    	ontologyId = ontologyId.toLowerCase();
+    	List<Individual> related = new ArrayList<Individual>();
+    	
+    	try {
+			String decoded = UriUtils.decode(iri, "UTF-8");
+			Individual individual = ontologyIndividualRepository.findByOntologyAndIri(ontologyId, decoded);			
+			if (individual.getAnnotation().get(relationType) != null)
+			for (String iriBroader : (String[]) individual.getAnnotation().get(relationType)) {
+				related.add(ontologyIndividualRepository.findByOntologyAndIri(ontologyId, iriBroader));
+				}
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), related.size());
+        Page<Individual> conceptPage = new PageImpl<>(related.subList(start, end), pageable, related.size());
+       
+       return new ResponseEntity<>( assembler.toResource(conceptPage), HttpStatus.OK);    	
+
+    }
     
     public List<SKOSConceptNode<Individual>> conceptTree (String ontologyId, Integer individualCount, boolean schema, boolean narrower, boolean withoutTop){
         Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
@@ -281,15 +318,6 @@ public class OntologySKOSConceptController {
         }
         return sb;
     }
-    // Ya da yalnizca bir üst seviye bulunur, programci oradan kendi ilerler. 
-    public Collection<Individual> findBroader(String iri) {
-    	return null;
-    }
-    
-    public Collection<Individual> findNarrower(String iri) {
-    	return null;
-    }
-
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
     @ExceptionHandler(ResourceNotFoundException.class)
