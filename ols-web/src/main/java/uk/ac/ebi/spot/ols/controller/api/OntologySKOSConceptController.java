@@ -24,6 +24,7 @@ import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,6 +50,7 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @RequestParam(value = "without_top", required = true, defaultValue = "false") boolean withoutTop,
             @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
+    	ontologyId = ontologyId.toLowerCase();
         return new ResponseEntity<>(conceptTree(ontologyId,individualCount,schema,narrower,withoutTop), HttpStatus.OK);
     } 
     
@@ -59,6 +61,7 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @RequestParam(value = "without_top", required = true, defaultValue = "false") boolean withoutTop,
             @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
+    	 ontologyId = ontologyId.toLowerCase();
     	 List<SKOSConceptNode<Individual>> rootIndividuals = conceptTree(ontologyId,individualCount,schema,narrower,withoutTop);
          StringBuilder sb = new StringBuilder();
          for (SKOSConceptNode<Individual> root : rootIndividuals) {
@@ -76,29 +79,23 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
             @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
-    	
+    	ontologyId = ontologyId.toLowerCase();
         Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
         List<Individual> listOfTerms = terms.getContent(); 
-        String decodedIri = null;
+        SKOSConceptNode<Individual> topConcept = new SKOSConceptNode<Individual>(new Individual());
         try {
-			decodedIri = UriUtils.decode(iri, "UTF-8");
+			String decodedIri = UriUtils.decode(iri, "UTF-8");	        
+	        Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);
+	        topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
+		     topConcept.setIndex(index);
+		     if(narrower)
+		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
+		     else
+		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        
-        System.out.println(decodedIri);
-        
-        Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);
-        
-        System.out.println(decodedIri + " - " + topConceptIndividual.getIri());
-        
-        SKOSConceptNode<Individual> topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
-	     topConcept.setIndex(index);
-	     if(narrower)
-	         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
-	     else
-	    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
         return new ResponseEntity<>(topConcept, HttpStatus.OK);
     } 
     
@@ -109,30 +106,27 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
             @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
-    	
+    	ontologyId = ontologyId.toLowerCase();
         Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
         List<Individual> listOfTerms = terms.getContent();
-        String decodedIri = null;
+        StringBuilder sb = new StringBuilder();
         try {
-			decodedIri = UriUtils.decode(iri, "UTF-8");
+        	String decodedIri = UriUtils.decode(iri, "UTF-8");
+			Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);	        
+	        SKOSConceptNode<Individual> topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
+		     topConcept.setIndex(index);
+		     if(narrower)
+		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
+		     else
+		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);      
+	         sb.append(topConcept.getIndex() + " , "+ topConcept.getData().getLabel() + " , " + topConcept.getData().getIri()).append("\n");
+	         sb.append(generateConceptHierarchyTextByOntology(topConcept)); 
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-        Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);
-        
-        System.out.println(decodedIri + " - " + topConceptIndividual.getIri());
-        
-        SKOSConceptNode<Individual> topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
-	     topConcept.setIndex(index);
-	     if(narrower)
-	         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
-	     else
-	    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
-	     
-         StringBuilder sb = new StringBuilder();
-         sb.append(topConcept.getIndex() + " , "+ topConcept.getData().getLabel() + " , " + topConcept.getData().getIri()).append("\n");
-         sb.append(generateConceptHierarchyTextByOntology(topConcept)); 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}   
          	     
         return new ResponseEntity<>(sb.toString(), HttpStatus.OK);
     } 
@@ -148,15 +142,13 @@ public class OntologySKOSConceptController {
     	
     	ontologyId = ontologyId.toLowerCase();
     	List<Individual> related = new ArrayList<Individual>();
-    	
-    	try {
-			String decoded = UriUtils.decode(iri, "UTF-8");
-			Individual individual = ontologyIndividualRepository.findByOntologyAndIri(ontologyId, decoded);			
+    	try {	
+    		String decodedIri = UriUtils.decode(iri, "UTF-8");
+			Individual individual = ontologyIndividualRepository.findByOntologyAndIri(ontologyId, decodedIri);			
 			if (individual.getAnnotation().get(relationType) != null)
-			for (String iriBroader : (String[]) individual.getAnnotation().get(relationType)) {
+			for (String iriBroader : (String[]) individual.getAnnotation().get(relationType)) 
 				related.add(ontologyIndividualRepository.findByOntologyAndIri(ontologyId, iriBroader));
-				}
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
