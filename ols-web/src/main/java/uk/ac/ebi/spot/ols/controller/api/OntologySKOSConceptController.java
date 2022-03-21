@@ -24,9 +24,7 @@ import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,32 +45,35 @@ public class OntologySKOSConceptController {
     HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSConceptHierarchyByOntology(
     	    @ApiParam(value = "ontology ID")
     	    @PathVariable("onto") String ontologyId,
-    	    @ApiParam(value = "infer top concepts from schema or their own properties")
-            @RequestParam(value = "schema", required = true, defaultValue = "false") boolean schema,
+    	    @ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships")
+            @RequestParam(value = "find_roots", required = true, defaultValue = "false") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships")
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "infer only by relationships")
-            @RequestParam(value = "without_top", required = true, defaultValue = "false") boolean withoutTop,
             @ApiParam(value = "Maximum number of concepts")
             @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
     	ontologyId = ontologyId.toLowerCase();
-        return new ResponseEntity<>(conceptTree(ontologyId,individualCount,schema,narrower,withoutTop), HttpStatus.OK);
+    	if (TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
+    		return new ResponseEntity<>(conceptTreeWithoutTop(ontologyId,individualCount, narrower), HttpStatus.OK);
+    	else
+    		return new ResponseEntity<>(conceptTree(ontologyId,individualCount,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
     } 
     
     @RequestMapping(path = "/{onto}/displayconcepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<String> displaySKOSConceptHierarchyByOntology(
     	    @ApiParam(value = "ontology ID")
     	    @PathVariable("onto") String ontologyId,
-    		@ApiParam(value = "infer top concepts from schema or their own properties")
-            @RequestParam(value = "schema", required = true, defaultValue = "false") boolean schema,
+    		@ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships")
+    	    @RequestParam(value = "find_roots", required = true, defaultValue = "false") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships")
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "infer top concepts only by relationships")
-            @RequestParam(value = "without_top", required = true, defaultValue = "false") boolean withoutTop,
             @ApiParam(value = "Maximum number of concepts")
             @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
     	 ontologyId = ontologyId.toLowerCase();
-    	 List<SKOSConceptNode<Individual>> rootIndividuals = conceptTree(ontologyId,individualCount,schema,narrower,withoutTop);
+     	 List<SKOSConceptNode<Individual>> rootIndividuals = null;
+    	 if(TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
+    		 rootIndividuals = conceptTreeWithoutTop(ontologyId,individualCount, narrower);
+    	 else
+    		 rootIndividuals = conceptTree(ontologyId,individualCount,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
          StringBuilder sb = new StringBuilder();
          for (SKOSConceptNode<Individual> root : rootIndividuals) {
         	 sb.append(root.getIndex() + " , "+ root.getData().getLabel() + " , " + root.getData().getIri()).append("\n");
@@ -183,44 +184,39 @@ public class OntologySKOSConceptController {
 
     }
     
-    public List<SKOSConceptNode<Individual>> conceptTree (String ontologyId, Integer individualCount, boolean schema, boolean narrower, boolean withoutTop){
+    public List<SKOSConceptNode<Individual>> conceptTree (String ontologyId, Integer individualCount, boolean schema, boolean narrower){
         Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
         List<Individual> listOfTerms = terms.getContent(); 
-        List<SKOSConceptNode<Individual>> rootIndividuals = null;
-        if(withoutTop) {
-        	rootIndividuals = conceptTreeWithoutTop(ontologyId,individualCount, narrower);
-        } else {
-        	rootIndividuals = new ArrayList<SKOSConceptNode<Individual>>();
-            
-            int count = 0;
-            
-            if(schema) {
-                for (Individual indiv : listOfTerms)
-               	    if (indiv.getAnnotation().get("hasTopConcept") != null) {
-            		 for (String iriTopConcept : (String[]) indiv.getAnnotation().get("hasTopConcept")) {
-            			 Individual topConceptIndividual = findIndividual(listOfTerms,iriTopConcept);
-            			 SKOSConceptNode<Individual> topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
-            		     topConcept.setIndex(String.valueOf(++count));
-            		     if(narrower)
-            		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
-            		     else
-            		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
-            			 rootIndividuals.add(topConcept);
-            		 }
-               	    }  
-            } else for (Individual individual : listOfTerms) {
-            	 SKOSConceptNode<Individual> tree = new SKOSConceptNode<Individual>(individual);
-            	 
-            	 if (tree.isRoot() && individual.getAnnotation().get("topConceptOf") != null) {
-    				tree.setIndex(String.valueOf(++count));
-    				if(narrower)
-                        populateChildrenandRelatedByNarrower(individual,tree,listOfTerms);
-    				else
-    					populateChildrenandRelatedByBroader(individual,tree,listOfTerms);
-    				rootIndividuals.add(tree);
-    			}
-    		}    
-        }
+        List<SKOSConceptNode<Individual>> rootIndividuals = new ArrayList<SKOSConceptNode<Individual>>();      
+        int count = 0;
+        
+        if(schema) {
+            for (Individual indiv : listOfTerms)
+           	    if (indiv.getAnnotation().get("hasTopConcept") != null) {
+        		 for (String iriTopConcept : (String[]) indiv.getAnnotation().get("hasTopConcept")) {
+        			 Individual topConceptIndividual = findIndividual(listOfTerms,iriTopConcept);
+        			 SKOSConceptNode<Individual> topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
+        		     topConcept.setIndex(String.valueOf(++count));
+        		     if(narrower)
+        		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
+        		     else
+        		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
+        			 rootIndividuals.add(topConcept);
+        		 }
+           	    }  
+        } else for (Individual individual : listOfTerms) {
+        	 SKOSConceptNode<Individual> tree = new SKOSConceptNode<Individual>(individual);
+        	 
+        	 if (tree.isRoot() && individual.getAnnotation().get("topConceptOf") != null) {
+				tree.setIndex(String.valueOf(++count));
+				if(narrower)
+                    populateChildrenandRelatedByNarrower(individual,tree,listOfTerms);
+				else
+					populateChildrenandRelatedByBroader(individual,tree,listOfTerms);
+				rootIndividuals.add(tree);
+			}
+		}    
+        
             
          return rootIndividuals;
     }
