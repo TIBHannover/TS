@@ -3,8 +3,6 @@ package uk.ac.ebi.spot.ols.controller.api;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class SKOSConceptNode<T> {
 	
 	private Collection<SKOSConceptNode<T>> children = new ArrayList<SKOSConceptNode<T>>();
@@ -31,12 +29,10 @@ public class SKOSConceptNode<T> {
 	
     public void addChild(T data) {
         SKOSConceptNode<T> child = new SKOSConceptNode<T>(data);
-//        child.addParent(this);
         this.children.add(child);
     }
 
     public void addChild(SKOSConceptNode<T> child) {
-//        child.addParent(this);
         this.children.add(child);
     }
     
@@ -51,12 +47,10 @@ public class SKOSConceptNode<T> {
     
     public void addParent(T data) {
         SKOSConceptNode<T> parent = new SKOSConceptNode<T>(data);
-//        parent.addChild(this);
         this.parent.add(parent);
     }
 
     public void addParent(SKOSConceptNode<T> parent) {
-//    	parent.addChild(this);
         this.parent.add(parent);
     }
 	
