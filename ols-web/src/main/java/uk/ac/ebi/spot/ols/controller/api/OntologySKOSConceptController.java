@@ -67,6 +67,8 @@ public class OntologySKOSConceptController {
     	    @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
+            @ApiParam(value = "display related concepts", required = true)
+            @RequestParam(value = "display_related", required = true, defaultValue = "false") boolean displayRelated,
             @ApiParam(value = "Maximum number of concepts", required = true)
             @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
     	 ontologyId = ontologyId.toLowerCase();
@@ -78,7 +80,7 @@ public class OntologySKOSConceptController {
          StringBuilder sb = new StringBuilder();
          for (SKOSConceptNode<Individual> root : rootIndividuals) {
         	 sb.append(root.getIndex() + " , "+ root.getData().getLabel() + " , " + root.getData().getIri()).append("\n");
-        	 sb.append(generateConceptHierarchyTextByOntology(root)); 
+        	 sb.append(generateConceptHierarchyTextByOntology(root, displayRelated)); 
          }
          
          return sb.toString();
@@ -125,6 +127,8 @@ public class OntologySKOSConceptController {
             @PathVariable("iri") String iri,
             @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
+            @ApiParam(value = "display related concepts", required = true)
+            @RequestParam(value = "display_related", required = true, defaultValue = "false") boolean displayRelated,
             @ApiParam(value = "index value for the root term", required = true)
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
             @ApiParam(value = "Maximum number of concepts", required = true)
@@ -143,7 +147,7 @@ public class OntologySKOSConceptController {
 		     else
 		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);      
 	         sb.append(topConcept.getIndex() + " , "+ topConcept.getData().getLabel() + " , " + topConcept.getData().getIri()).append("\n");
-	         sb.append(generateConceptHierarchyTextByOntology(topConcept)); 
+	         sb.append(generateConceptHierarchyTextByOntology(topConcept, displayRelated)); 
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -169,10 +173,11 @@ public class OntologySKOSConceptController {
     	List<Individual> related = new ArrayList<Individual>();
     	try {	
     		String decodedIri = UriUtils.decode(iri, "UTF-8");
-			Individual individual = ontologyIndividualRepository.findByOntologyAndIri(ontologyId, decodedIri);			
-			if (individual.getAnnotation().get(relationType) != null)
-			for (String iriBroader : (String[]) individual.getAnnotation().get(relationType)) 
-				related.add(ontologyIndividualRepository.findByOntologyAndIri(ontologyId, iriBroader));
+			Individual individual = ontologyIndividualRepository.findByOntologyAndIri(ontologyId, decodedIri);
+			if (individual != null)
+				if (individual.getAnnotation().get(relationType) != null)
+					for (String iriBroader : (String[]) individual.getAnnotation().get(relationType)) 
+						related.add(ontologyIndividualRepository.findByOntologyAndIri(ontologyId, iriBroader));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -311,26 +316,28 @@ public class OntologySKOSConceptController {
 		int count = 0;
 		for ( Individual indiv : listOfTerms) {
 			if (indiv.getAnnotation().get("broader") != null)
-				for (String iriBroader : (String[]) indiv.getAnnotation().get("broader")) 
-					if (individual.getIri().equals(iriBroader)) {
-						SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(indiv);
-						child.setIndex(tree.getIndex()+"."+ ++count);	
-						populateChildrenandRelatedByBroader(indiv,child,listOfTerms);
-						tree.addChild(child);
-					}	
+				for (String iriBroader : (String[]) indiv.getAnnotation().get("broader"))
+					if(individual.getIri() != null)
+						if (individual.getIri().equals(iriBroader)) {
+							SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(indiv);
+							child.setIndex(tree.getIndex()+"."+ ++count);	
+							populateChildrenandRelatedByBroader(indiv,child,listOfTerms);
+							tree.addChild(child);
+						}	
 		}
     }
     
-    public StringBuilder generateConceptHierarchyTextByOntology(SKOSConceptNode<Individual> rootIndividual) {
+    public StringBuilder generateConceptHierarchyTextByOntology(SKOSConceptNode<Individual> rootConcept, boolean displayRelated) {
     	StringBuilder sb = new StringBuilder();
-        for (SKOSConceptNode<Individual> individual : rootIndividual.getChildren()) {
-       	     sb.append(individual.getIndex() + " , "+ individual.getData().getLabel() + " , " + individual.getData().getIri()).append("\n");
-       	     sb.append(generateConceptHierarchyTextByOntology(individual));
+        for (SKOSConceptNode<Individual> childConcept : rootConcept.getChildren()) {
+       	     sb.append(childConcept.getIndex() + " , "+ childConcept.getData().getLabel() + " , " + childConcept.getData().getIri()).append("\n");
+       	     sb.append(generateConceptHierarchyTextByOntology(childConcept,displayRelated));
         }
-        for (SKOSConceptNode<Individual> individual : rootIndividual.getRelated()) {
-      	     sb.append(individual.getIndex() + " , "+ individual.getData().getLabel() + " , " + individual.getData().getIri()).append("\n");
-      	     sb.append(generateConceptHierarchyTextByOntology(individual));
-       }
+        if(displayRelated)
+	        for (SKOSConceptNode<Individual> relatedConcept : rootConcept.getRelated()) {
+	      	     sb.append(relatedConcept.getIndex() + " , "+ relatedConcept.getData().getLabel() + " , " + relatedConcept.getData().getIri()).append("\n");
+	      	     sb.append(generateConceptHierarchyTextByOntology(relatedConcept,displayRelated));
+	       }
         return sb;
     }
 
