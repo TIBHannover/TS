@@ -46,7 +46,7 @@ public class OntologySKOSConceptController {
     	    @ApiParam(value = "ontology ID")
     	    @PathVariable("onto") String ontologyId,
     	    @ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships")
-            @RequestParam(value = "find_roots", required = true, defaultValue = "false") TopConceptEnum topConceptIdentification,
+            @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships")
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @ApiParam(value = "Maximum number of concepts")
@@ -58,12 +58,13 @@ public class OntologySKOSConceptController {
     		return new ResponseEntity<>(conceptTree(ontologyId,individualCount,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
     } 
     
-    @RequestMapping(path = "/{onto}/displayconcepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<String> displaySKOSConceptHierarchyByOntology(
+    @RequestMapping(path = "/{onto}/displayconcepthierarchy", method = RequestMethod.GET)
+    @ResponseBody
+    String displaySKOSConceptHierarchyByOntology(
     	    @ApiParam(value = "ontology ID")
     	    @PathVariable("onto") String ontologyId,
     		@ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships")
-    	    @RequestParam(value = "find_roots", required = true, defaultValue = "false") TopConceptEnum topConceptIdentification,
+    	    @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships")
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @ApiParam(value = "Maximum number of concepts")
@@ -80,7 +81,7 @@ public class OntologySKOSConceptController {
         	 sb.append(generateConceptHierarchyTextByOntology(root)); 
          }
          
-         return new ResponseEntity<>(sb.toString(), HttpStatus.OK);
+         return sb.toString();
     }  
     
     @RequestMapping(path = "/{onto}/concepthierarchy/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
@@ -115,8 +116,9 @@ public class OntologySKOSConceptController {
         return new ResponseEntity<>(topConcept, HttpStatus.OK);
     } 
     
-    @RequestMapping(path = "/{onto}/displayconcepthierarchy/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<String> displaySKOSConceptHierarchyByOntologyAndIri(
+    @RequestMapping(path = "/{onto}/displayconcepthierarchy/{iri}", method = RequestMethod.GET)
+    @ResponseBody
+    String displaySKOSConceptHierarchyByOntologyAndIri(
     	    @ApiParam(value = "ontology ID")
     	    @PathVariable("onto") String ontologyId,
             @ApiParam(value = "encoded concept IRI")
@@ -149,7 +151,7 @@ public class OntologySKOSConceptController {
 			e.printStackTrace();
 		}   
          	     
-        return new ResponseEntity<>(sb.toString(), HttpStatus.OK);
+        return sb.toString();
     } 
     
     @RequestMapping(path = "/{onto}/conceptrelations/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
