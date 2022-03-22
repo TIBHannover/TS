@@ -73,30 +73,27 @@ Then, start solr and mongodb only:
 
     docker-compose up -d solr mongo
 
+
+Then build Docker images of config importer and indexer tools using the Dockerfiles in this repository. (Although there exists prebuilt config importer and indexer images of ebispot in Docker Hub, they cannot be used for this particular version due to their missing features.) 
+
+    docker build -f ols-apps/ols-config-importer/Dockerfile -t ols-config-importer .
+    docker build -f ols-apps/ols-indexer/Dockerfile -t ols-indexer .
+
+
 Then, adjust the configuration YAML files in the `config` directory as required,
 and load the configuration into the Mongo database using the config loader:
 
-    docker run --net=host -v $(pwd)/config:/config ebispot/ols-config-importer:stable
+    docker run --net=host -v $(pwd)/config:/config ols-config-importer
 
 Then, run the indexer:
 
-    docker run --net=host -v ols-neo4j-data:/mnt/neo4j -v ols-downloads:/mnt/downloads ebispot/ols-indexer:stable
+    docker run --net=host -v ols-neo4j-data:/mnt/neo4j -v ols-downloads:/mnt/downloads ols-indexer
 
 Finally, start the OLS webserver:
 
     docker-compose up -d ols-web
 
-You should now be able to access a populated OLS instance at `http://localhost:8080`.
-
-
-### Building the Docker images manually
-
-Rather than using the images from Docker Hub, the Docker images can also be
-built using the Dockerfiles in this repository.
-
-    docker build -f ols-apps/ols-config-importer/Dockerfile -t ols-config-importer .
-    docker build -f ols-apps/ols-indexer/Dockerfile -t ols-indexer .
-  
+You should now be able to access a populated OLS instance at `http://localhost:8080`. 
 
 
 ## Building OLS manually
@@ -135,12 +132,18 @@ It is possible to customise several branding options in `ols-web/src/main/resour
 
 * `ols.customisation.debrand` — If set to true, removes header and footer, documentation, and about page
 * `ols.customisation.ebiInfo` — If set to true, EBI specific banners are enabled
+* `ols.customisation.logo` — The relative location of the logo file to the static directory
 * `ols.customisation.title` — A custom title for your instance, e.g. "My OLS Instance"
 * `ols.customisation.short-title` — A shorter version of the custom title, e.g. "MYOLS"
 * `ols.customisation.description` — A description of the instance
 * `ols.customisation.org` — The organisation hosting your instance
+* `ols.customisation.web` — Web address of your organization
+* `ols.customisation.twitter` — Twitter address of your organization
+* `ols.customisation.backgroundImage` — The background image of page header
+* `ols.customisation.backgroundColor` — The background color of page header
+* `ols.customisation.issuesPage` — The issues page address for notifying problems
+* `ols.customisation.supportMail` — The support mail address for notifying feedback
 * `ols.customisation.hideGraphView` — Set to true to hide the graph view 
-* `ols.customisation.errorMessage` — Message to show on error pages
 * `ols.customisation.ontologyAlias` — A custom word or phrase to use instead of "Ontology", e.g. "Data Dictionary"
 * `ols.customisation.ontologyAliasPlural` — As `ontologyAlias` but plural, e.g. "Data Dictionaries"
 * `ols.customisation.oxoUrl` — The URL of an OxO instance to link to with a trailing slash e.g. `https://www.ebi.ac.uk/spot/oxo/`
