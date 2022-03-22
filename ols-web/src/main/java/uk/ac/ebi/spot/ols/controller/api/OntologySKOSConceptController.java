@@ -43,14 +43,14 @@ public class OntologySKOSConceptController {
     
     @RequestMapping(path = "/{onto}/concepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSConceptHierarchyByOntology(
-    	    @ApiParam(value = "ontology ID")
+    	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
-    	    @ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships")
+    	    @ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships", required = true)
             @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
-            @ApiParam(value = "infer from narrower or broader relationships")
+            @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "Maximum number of concepts")
-            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Maximum number of concepts", required = true)
+            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
     	ontologyId = ontologyId.toLowerCase();
     	if (TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
     		return new ResponseEntity<>(conceptTreeWithoutTop(ontologyId,individualCount, narrower), HttpStatus.OK);
@@ -61,14 +61,14 @@ public class OntologySKOSConceptController {
     @RequestMapping(path = "/{onto}/displayconcepthierarchy", method = RequestMethod.GET)
     @ResponseBody
     String displaySKOSConceptHierarchyByOntology(
-    	    @ApiParam(value = "ontology ID")
+    	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
-    		@ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships")
+    		@ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships", required = true)
     	    @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
-            @ApiParam(value = "infer from narrower or broader relationships")
+            @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "Maximum number of concepts")
-            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Maximum number of concepts", required = true)
+            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
     	 ontologyId = ontologyId.toLowerCase();
      	 List<SKOSConceptNode<Individual>> rootIndividuals = null;
     	 if(TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
@@ -86,16 +86,16 @@ public class OntologySKOSConceptController {
     
     @RequestMapping(path = "/{onto}/concepthierarchy/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<SKOSConceptNode<Individual>> getSKOSConceptHierarchyByOntologyAndIri(
-    	    @ApiParam(value = "ontology ID")
+    	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
-            @ApiParam(value = "encoded concept IRI")
+            @ApiParam(value = "encoded concept IRI", required = true)
             @PathVariable("iri") String iri,
-            @ApiParam(value = "infer from narrower or broader relationships")
+            @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "index value for the root term")
+            @ApiParam(value = "index value for the root term", required = true)
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
-            @ApiParam(value = "Maximum number of concepts")
-            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Maximum number of concepts", required = true)
+            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
     	ontologyId = ontologyId.toLowerCase();
         Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
         List<Individual> listOfTerms = terms.getContent(); 
@@ -104,11 +104,11 @@ public class OntologySKOSConceptController {
 			String decodedIri = UriUtils.decode(iri, "UTF-8");	        
 	        Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);
 	        topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
-		     topConcept.setIndex(index);
-		     if(narrower)
-		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
-		     else
-		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
+		    topConcept.setIndex(index);
+		    if(narrower)
+		        populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
+		    else
+		        populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -119,16 +119,16 @@ public class OntologySKOSConceptController {
     @RequestMapping(path = "/{onto}/displayconcepthierarchy/{iri}", method = RequestMethod.GET)
     @ResponseBody
     String displaySKOSConceptHierarchyByOntologyAndIri(
-    	    @ApiParam(value = "ontology ID")
+    	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
-            @ApiParam(value = "encoded concept IRI")
+            @ApiParam(value = "encoded concept IRI", required = true)
             @PathVariable("iri") String iri,
-            @ApiParam(value = "infer from narrower or broader relationships")
+            @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "index value for the root term")
+            @ApiParam(value = "index value for the root term", required = true)
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
-            @ApiParam(value = "Maximum number of concepts")
-            @RequestParam(value = "individual_count", defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Maximum number of concepts", required = true)
+            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
     	ontologyId = ontologyId.toLowerCase();
         Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
         List<Individual> listOfTerms = terms.getContent();
@@ -156,9 +156,9 @@ public class OntologySKOSConceptController {
     
     @RequestMapping(path = "/{onto}/conceptrelations/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     public HttpEntity<PagedResources<Individual>> findRelatedConcepts(
-    		@ApiParam(value = "ontology ID")
+    		@ApiParam(value = "ontology ID", required = true)
     		@PathVariable("onto") String ontologyId,
-            @ApiParam(value = "encoded concept IRI")
+            @ApiParam(value = "encoded concept IRI", required = true)
             @PathVariable("iri") String iri,
             @ApiParam(value = "skos based concept relation type", required = true, allowableValues = "broader, narrower, related")
             @RequestParam(value = "relation_type", required = true, defaultValue = "broader") String relationType,
@@ -327,6 +327,10 @@ public class OntologySKOSConceptController {
        	     sb.append(individual.getIndex() + " , "+ individual.getData().getLabel() + " , " + individual.getData().getIri()).append("\n");
        	     sb.append(generateConceptHierarchyTextByOntology(individual));
         }
+        for (SKOSConceptNode<Individual> individual : rootIndividual.getRelated()) {
+      	     sb.append(individual.getIndex() + " , "+ individual.getData().getLabel() + " , " + individual.getData().getIri()).append("\n");
+      	     sb.append(generateConceptHierarchyTextByOntology(individual));
+       }
         return sb;
     }
 
