@@ -1,36 +1,22 @@
 package uk.ac.ebi.spot.ols.entities;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-@Entity
-@Table(name = "rest_call")
+@Document(collection = "rest_call")
 public class RestCall {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private String id;
 
-    @Column(name = "url", nullable = false)
     private String url;
 
-    @OneToMany(mappedBy = "restCall", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<RestCallParameter> parameters = new HashSet<>();
 
-    @Column(name = "created_at")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdAt;
 
     public RestCall() {
@@ -50,14 +36,13 @@ public class RestCall {
 
     public void addParameters(Set<RestCallParameter> set) {
         parameters.addAll(set);
-        set.forEach(parameter -> parameter.setRestCall(this));
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

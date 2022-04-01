@@ -15,7 +15,7 @@ import org.springframework.data.neo4j.config.EnableNeo4jRepositories;
 @SpringBootApplication
 @EnableAutoConfiguration
 @EnableNeo4jRepositories(basePackages = "uk.ac.ebi.spot.ols.neo4j.repository")
-@EnableMongoRepositories(basePackages = "uk.ac.ebi.spot.ols.repository.mongo")
+@EnableMongoRepositories(basePackages = {"uk.ac.ebi.spot.ols.repository.mongo", "uk.ac.ebi.spot.ols.repositories"})
 //@EnableSolrRepositories(basePackages = "uk.ac.ebi.spot.ols.indexer")
 public class OlsWebApp extends SpringBootServletInitializer {
 

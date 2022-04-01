@@ -1,6 +1,5 @@
 package uk.ac.ebi.spot.ols.controller.dto;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import uk.ac.ebi.spot.ols.entities.RestCall;
 import uk.ac.ebi.spot.ols.entities.RestCallParameter;
 
@@ -8,16 +7,15 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 public class RestCallDto {
-    private Long id;
+    private String id;
     private String url;
     private Set<RestCallParameter> parameters;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdAt;
 
     public RestCallDto() {
     }
 
-    public RestCallDto(Long id,
+    public RestCallDto(String id,
                        String url,
                        Set<RestCallParameter> parameters,
                        LocalDateTime createdAt) {
@@ -27,11 +25,11 @@ public class RestCallDto {
         this.createdAt = createdAt;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

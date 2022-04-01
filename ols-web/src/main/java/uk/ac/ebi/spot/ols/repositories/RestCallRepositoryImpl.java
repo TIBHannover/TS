@@ -3,95 +3,83 @@ package uk.ac.ebi.spot.ols.repositories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.query.QueryUtils;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.util.UriUtils;
-import uk.ac.ebi.spot.ols.controller.dto.RestCallDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
 import uk.ac.ebi.spot.ols.entities.RestCall;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Repository
 public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public static final String CREATED_AT_COLUMN = "createdAt";
-
-    private final EntityManager em;
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public RestCallRepositoryImpl(EntityManager em) {
-        this.em = em;
+    public RestCallRepositoryImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Override
-    public Page<RestCallDto> query(RestCallRequest request, Pageable pageable) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<RestCall> query = builder.createQuery(RestCall.class);
+    public List<RestCall> query(RestCallRequest request, Pageable pageable) {
+        Query query = new Query();
+        List<Criteria> criteria = new ArrayList<>();
 
-        Root<RestCall> root = query.from(RestCall.class);
-        List<Predicate> predicates = getPredicates(request, builder, root);
+        addCriteriaByDates(request, criteria);
+        addCriteriaByUrl(request, criteria);
 
-        query.where(builder.and(predicates.toArray(new Predicate[0])));
-        query.orderBy(QueryUtils.toOrders(pageable.getSort(), root, builder));
 
-        List<RestCall> list = em.createQuery(query)
-            .setFirstResult(pageable.getOffset())
-            .setMaxResults(pageable.getPageSize())
-            .getResultList();
+        if (!criteria.isEmpty()) {
+            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
+        }
 
-        Long count = getCount(builder, predicates);
+        if (Objects.nonNull(pageable)) {
+            query.with(pageable);
+        }
 
-        List<RestCallDto> dtos = list.stream()
-            .map(RestCallDto::of)
-            .collect(Collectors.toList());
-
-        return new PageImpl<>(dtos, pageable, count);
+        return mongoTemplate.find(query, RestCall.class);
     }
 
     @Override
     public Long count(RestCallRequest request) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<RestCall> query = builder.createQuery(RestCall.class);
+        Query query = new Query();
 
-        Root<RestCall> root = query.from(RestCall.class);
-        List<Predicate> predicates = getPredicates(request, builder, root);
+        List<Criteria> criteria = new ArrayList<>();
 
-        query.where(builder.and(predicates.toArray(new Predicate[0])));
+        addCriteriaByDates(request, criteria);
+        addCriteriaByUrl(request, criteria);
 
-        return getCount(builder, predicates);
-    }
-
-    private List<Predicate> getPredicates(RestCallRequest request, CriteriaBuilder builder, Root<RestCall> root) {
-        List<Predicate> predicates = new ArrayList<>();
-
-        String url = getDecodedUrl(request);
-
-        if (url != null) {
-            predicates.add(builder.equal(root.get("url"), request.getUrl()));
+        if (!criteria.isEmpty()) {
+            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
         }
 
+        return mongoTemplate.count(query, RestCall.class);
+    }
+
+    private void addCriteriaByUrl(RestCallRequest request, List<Criteria> criteria) {
+        if (request.getUrl() != null) {
+            String url = getDecodedUrl(request);
+            criteria.add(Criteria.where("url").is(url));
+        }
+    }
+
+    private void addCriteriaByDates(RestCallRequest request, List<Criteria> criteria) {
         if (request.getDateTimeFrom() != null) {
-            predicates.add(builder.greaterThanOrEqualTo(root.get(CREATED_AT_COLUMN), request.getDateTimeFrom()));
+            criteria.add(Criteria.where("createdAt").gte(request.getDateTimeFrom()));
         }
 
         if (request.getDateTimeTo() != null) {
-            predicates.add(builder.lessThanOrEqualTo(root.get(CREATED_AT_COLUMN), request.getDateTimeTo()));
+            criteria.add(Criteria.where("createdAt").lte(request.getDateTimeTo()));
         }
-        return predicates;
     }
 
     private String getDecodedUrl(RestCallRequest request) {
@@ -107,15 +95,5 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
         }
 
         return decodedUrl;
-    }
-
-    private Long getCount(CriteriaBuilder builder, List<Predicate> predicates) {
-        CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-        Root<RestCall> booksRootCount = countQuery.from(RestCall.class);
-        countQuery
-            .select(builder.count(booksRootCount))
-            .where(builder.and(predicates.toArray(new Predicate[0])));
-
-        return em.createQuery(countQuery).getSingleResult();
     }
 }

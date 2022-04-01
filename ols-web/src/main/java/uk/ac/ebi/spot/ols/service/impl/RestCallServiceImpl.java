@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.ols.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallDto;
@@ -11,6 +12,7 @@ import uk.ac.ebi.spot.ols.repositories.RestCallRepository;
 import uk.ac.ebi.spot.ols.service.RestCallService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RestCallServiceImpl implements RestCallService {
@@ -29,8 +31,15 @@ public class RestCallServiceImpl implements RestCallService {
 
     @Override
     public Page<RestCallDto> getList(RestCallRequest request, Pageable pageable) {
+        List<RestCall> list = restCallRepository.query(request, pageable);
 
-        return restCallRepository.query(request, pageable);
+        List<RestCallDto> dtos = list.stream()
+            .map(RestCallDto::of)
+            .collect(Collectors.toList());
+
+        Long count = restCallRepository.count(request);
+
+        return new PageImpl<>(dtos, pageable, count);
     }
 
     @Override
