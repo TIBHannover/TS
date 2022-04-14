@@ -1,8 +1,8 @@
 package uk.ac.ebi.spot.ols.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import uk.ac.ebi.spot.ols.entities.RestCall;
 
-public interface RestCallRepository extends JpaRepository<RestCall, Long>, RestCallRepositoryCustom {
+public interface RestCallRepository extends MongoRepository<RestCall, String>, RestCallRepositoryCustom {
 
 }

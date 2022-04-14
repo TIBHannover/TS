@@ -174,7 +174,7 @@ public class OntologySuggestionController {
 		userOntologyRepository.findAll().forEach(x ->  {if (x.getName().equals(name)) error.put("Existing name",x.getName());if (x.getPreferredPrefix().equals(preferredPrefix)) error.put("Existing preferredPrefix",x.getPreferredPrefix());} );
 			
 		if(error.isEmpty() && validator.validate(userOntology).isEmpty()) {
-		    userOntologyRepository.saveAndFlush(userOntology);
+		    userOntologyRepository.save(userOntology);
 			return YamlBasedPersistence.singleSuggestionDumpWriter(userOntology, false);
 		} 	
 		
@@ -251,7 +251,7 @@ public class OntologySuggestionController {
 
   	  for (UserOntology uo : temp) {
   		  if (!recordExists(uo.getName(), uo.getPreferredPrefix(), userOntologyRepository)) {
-  			  userOntologyRepository.saveAndFlush(uo);
+  			  userOntologyRepository.save(uo);
   		  } else {
   			  System.out.println(uo.getName()+" is not added due to an existing record with the same id or same preferred prefix.");
   			  System.out.println("A record exists with either id: "+uo.getName()+" or preferredPrefix: "+uo.getPreferredPrefix());

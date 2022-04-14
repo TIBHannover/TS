@@ -1,24 +1,27 @@
 package uk.ac.ebi.spot.ols.entities;
 
 import java.util.List;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import org.hibernate.validator.constraints.Length;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 @UniqueField(message = "The id or preferredPrefix exists in previous records")
-@Entity
+@Document(collection = "user_ontology")
 @ApiModel
 public class UserOntology {
+	
+    @Transient
+    public static final String SEQUENCE_NAME = "users_sequence";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,11 +48,9 @@ public class UserOntology {
     private String licenseLabel;
     
     private String title;
-    @Length(max = 2500)
+    
     private String description;
 
-    @ElementCollection
-    @Column(length=3000)
     private List<String> creator;
     
     private String homePage;
@@ -61,7 +62,7 @@ public class UserOntology {
     @NotNull(message = "Preferred Prefix is mandatory")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters")
     @Column(unique=true)
-    @ApiModelProperty(value = "Preferred Prefiy of the Ontology Suggestion", name = "preferredPrefix", dataType = "String", example = "iao")
+    @ApiModelProperty(value = "Preferred Prefix of the Ontology Suggestion", name = "preferredPrefix", dataType = "String", example = "iao")
     private String preferredPrefix;
     
     private String baseURI;
@@ -69,18 +70,18 @@ public class UserOntology {
     private ReasonerEnum reasoner;
     
     private String labelProperty;
-    @ElementCollection
+    
     private List<String> definitionProperty;
-    @ElementCollection
+    
     private List<String> synonymProperty;
-    @ElementCollection
+    
     private List<String> hierarchicalProperty;
-    @ElementCollection
+    
     private List<String> hiddenProperty;
     
     @NotNull(message = "oboSlims is mandatory")
     private boolean oboSlims;
-    @ElementCollection
+    
     private List<String> preferredRootTerm;
     
     private String logo;

@@ -11,7 +11,7 @@ services:
           - ./ols-solr/src/main/solr-5-config:/mnt/solr-config
         command: ["-Dsolr.solr.home=/mnt/solr-config", "-Dsolr.data.dir=/var/solr", "-f"]
     mongo:
-      image: mongo:3.2.9
+      image: mongo:3.4.24
       ports:
           - 27017:27017
       volumes:
