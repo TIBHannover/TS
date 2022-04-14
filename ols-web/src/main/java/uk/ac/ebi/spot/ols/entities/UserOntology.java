@@ -22,7 +22,7 @@ import org.springframework.data.annotation.Transient;
 @ApiModel
 public class UserOntology {
 	
-	@Transient
+    @Transient
     public static final String SEQUENCE_NAME = "users_sequence";
     
     @Id
@@ -50,11 +50,9 @@ public class UserOntology {
     private String licenseLabel;
     
     private String title;
-    @Length(max = 2500)
+    
     private String description;
 
-    @ElementCollection
-    @Column(length=3000)
     private List<String> creator;
     
     private String homePage;
@@ -66,7 +64,7 @@ public class UserOntology {
     @NotNull(message = "Preferred Prefix is mandatory")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters")
     @Column(unique=true)
-    @ApiModelProperty(value = "Preferred Prefiy of the Ontology Suggestion", name = "preferredPrefix", dataType = "String", example = "iao")
+    @ApiModelProperty(value = "Preferred Prefix of the Ontology Suggestion", name = "preferredPrefix", dataType = "String", example = "iao")
     private String preferredPrefix;
     
     private String baseURI;
@@ -74,18 +72,18 @@ public class UserOntology {
     private ReasonerEnum reasoner;
     
     private String labelProperty;
-    @ElementCollection
+    
     private List<String> definitionProperty;
-    @ElementCollection
+    
     private List<String> synonymProperty;
-    @ElementCollection
+    
     private List<String> hierarchicalProperty;
-    @ElementCollection
+    
     private List<String> hiddenProperty;
     
     @NotNull(message = "oboSlims is mandatory")
     private boolean oboSlims;
-    @ElementCollection
+    
     private List<String> preferredRootTerm;
     
     private String logo;
