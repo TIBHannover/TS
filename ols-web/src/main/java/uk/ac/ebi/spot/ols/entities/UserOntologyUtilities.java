@@ -22,14 +22,17 @@ public class UserOntologyUtilities {
 	    	FileManager.get().addLocatorClassLoader(OntologySuggestionController.class.getClassLoader());
 	    	org.apache.jena.rdf.model.Model modelQuery = null;
 	    	Query query;
+
 	    	try {
-				modelQuery = FileManager.get().loadModel(userOntology.getPermanenturl());
-			} catch (org.apache.jena.riot.RiotException e) {
-				System.out.println(e.getMessage());
+	    		modelQuery = FileManager.get().loadModel(userOntology.getPermanenturl());
+				if(modelQuery.isEmpty()) {
+					System.out.println("No valid statements");
+					return userOntology;
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				return userOntology;
 			}
-	    	if(modelQuery.isEmpty()) {
-	    		System.out.println("No valid statements");
-	    	}
 	    	
 	        String queryString = 
 	            "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + "\n" +
@@ -41,14 +44,14 @@ public class UserOntologyUtilities {
 	        	"PREFIX dc: <http://purl.org/dc/elements/1.1/>" +  "\n" +
 	        	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" +  "\n" +
 
-	        	"SELECT ?title ?description ?license_url ?homepage ?contact_email ?creator" +  "\n" + 
-	        	"# ?versionInfo ?IRI" +  "\n" +
+	        	"SELECT ?title ?description ?license_url ?homepage ?contact_email ?creator ?versionInfo" +  "\n" + 
+	        	"# ?IRI" +  "\n" +
 	        	"WHERE {" +  "\n" +
 	        	        "?ontology a owl:Ontology . # Does not exclude imported ontologies." + "\n" +
 	        	        "OPTIONAL{?ontology terms:license|terms:rights|dc:rights ?license_url .}" + "\n" +
 	        	        "OPTIONAL{?ontology terms:title|dc:title|rdfs:label ?title .}" + "\n" +
 	        	        "OPTIONAL{?ontology terms:description|dc:description ?description .}" + "\n" +
-	        	        "# OPTIONAL{?ontology owl:versionInfo ?versionInfo .}" + "\n" +
+	        	        "OPTIONAL{?ontology owl:versionInfo ?versionInfo .}" + "\n" +
 	        	        "# OPTIONAL{?ontology owl:versionIRI  ?IRI .}" + "\n" +
 	        	        "OPTIONAL{?ontology foaf:homepage ?homepage .}" + "\n" +
 	        	        "OPTIONAL{" + "\n" +
@@ -88,8 +91,7 @@ public class UserOntologyUtilities {
 	                Literal contact_email = soln.getLiteral("contact_email");
 	                Literal creator = soln.getLiteral("creator");
 	                Literal versionInfo = soln.getLiteral("versionInfo");
-	                Literal IRI = soln.getLiteral("IRI");
-	                
+	                Literal IRI = soln.getLiteral("IRI");             
 	                if(title != null) {
 	                	System.out.println("title: "+title);
 	                	userOntology.setTitle(title.toString());
@@ -137,8 +139,11 @@ public class UserOntologyUtilities {
 	                	userOntology.setURI(IRI.toString());
 	                }
 	                
-	                System.out.println("versionInfo: "+versionInfo);
-	                
+	                if (versionInfo != null) {
+	                	System.out.println("versionInfo: "+versionInfo);
+	                	userOntology.setVersionInfo(versionInfo.toString());
+	                }
+	                     
 	            }
 	        } finally {
 	            qexec.close();

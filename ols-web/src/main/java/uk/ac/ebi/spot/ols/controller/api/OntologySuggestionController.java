@@ -132,6 +132,7 @@ public class OntologySuggestionController {
     		@RequestParam(value = "preferredRootTerm", required = false) List<String> preferredRootTerm,
     		@RequestParam(value = "logo", required = false) String logo,
     		@RequestParam(value = "foundary", required = false) boolean foundary,
+    		@RequestParam(value = "versionInfo", required = false) String versionInfo,
 //    		@RequestParam(value = "approval", required = false) ApprovalEnum approval,
 //    		@RequestParam(value = "addedBy", required = false, defaultValue = "") String addedBy
     		@RequestParam(value = "extractMetaData", required = false) boolean extractMetaData
@@ -161,6 +162,7 @@ public class OntologySuggestionController {
     	userOntology.setPreferredRootTerm(preferredRootTerm);
     	userOntology.setLogo(logo);
     	userOntology.setFoundary(foundary);
+    	userOntology.setVersionInfo(versionInfo);
 //    	userOntology.setApproval(approval);
 //    	userOntology.setAddedBy(addedBy);    
     	

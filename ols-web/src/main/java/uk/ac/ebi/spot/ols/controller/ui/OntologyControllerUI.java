@@ -9,6 +9,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Sort;
+
+import uk.ac.ebi.spot.ols.entities.UserOntology;
+import uk.ac.ebi.spot.ols.entities.UserOntologyUtilities;
+import uk.ac.ebi.spot.ols.entities.YamlBasedPersistence;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
@@ -128,6 +132,11 @@ public class OntologyControllerUI {
             model.addAttribute("contact", contact);
 
             model.addAttribute("ontologyDocument", document);
+            
+            UserOntology userOntology = new UserOntology(ontologyId,document.getConfig().getId(),ontologyId);
+            userOntology = UserOntologyUtilities.extractMetaData(userOntology);
+            
+            model.addAttribute("extractedOntology",userOntology);
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);

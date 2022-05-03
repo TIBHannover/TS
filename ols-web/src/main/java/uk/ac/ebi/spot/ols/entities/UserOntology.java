@@ -89,12 +89,20 @@ public class UserOntology {
     @NotNull(message = "isFoundary is mandatory")
     private boolean foundary;
     
-    private ApprovalEnum approval;
+    private String versionInfo;
+
+	private ApprovalEnum approval;
     
     private String addedBy;
     
 
     public UserOntology() {}
+    
+    public UserOntology(String name, String permanenturl, String preferredPrefix) {
+    	this.name = name;
+    	this.permanenturl = permanenturl;
+    	this.preferredPrefix = preferredPrefix;
+    	}
 
 	public UserOntology(long id, @NotNull(message = "Name is mandatory") String name,
 			@NotNull(message = "PURL is mandatory") String permanenturl, String URI, String licenseURL, String licenseLogo,
@@ -103,7 +111,7 @@ public class UserOntology {
 			String baseURI, ReasonerEnum reasoner, String labelProperty, List<String> definitionProperty, List<String> synonymProperty,
 			List<String> hierarchicalProperty, List<String> hiddenProperty,
 			@NotNull(message = "oboSlims is mandatory") boolean oboSlims, List<String> preferredRootTerm, String logo,
-			@NotNull(message = "isFoundary is mandatory") boolean foundary, ApprovalEnum approval, String addedBy) {
+			@NotNull(message = "isFoundary is mandatory") boolean foundary, String versionInfo, ApprovalEnum approval, String addedBy) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -130,6 +138,7 @@ public class UserOntology {
 		this.preferredRootTerm = preferredRootTerm;
 		this.logo = logo;
 		this.foundary = foundary;
+		this.versionInfo = versionInfo;
 		this.approval = approval;
 		this.addedBy = addedBy;
 	}
@@ -332,6 +341,14 @@ public class UserOntology {
 
 	public void setFoundary(boolean foundary) {
 		this.foundary = foundary;
+	}
+	
+    public String getVersionInfo() {
+		return versionInfo;
+	}
+
+	public void setVersionInfo(String versionInfo) {
+		this.versionInfo = versionInfo;
 	}
 
 	public ApprovalEnum getApproval() {
