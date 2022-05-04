@@ -31,6 +31,7 @@ public class UserOntologyUtilities {
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
+				System.out.println("query::: "+e.getMessage());
 				return userOntology;
 			}
 	    	
@@ -69,7 +70,9 @@ public class UserOntologyUtilities {
 	        QueryExecution qexec = QueryExecutionFactory.create(query, modelQuery);
 	        try {
 	            ResultSet results = qexec.execSelect();
-	            while ( results.hasNext() ) {
+	            List<String> creatorList = new ArrayList<String>();
+	            String firstCreator = "";
+	            if ( results.hasNext() ) {
 	                QuerySolution soln = results.nextSolution();
 	                Literal title = soln.getLiteral("title");
 	                Literal description = soln.getLiteral("description");
@@ -125,13 +128,9 @@ public class UserOntologyUtilities {
 	                if(creator != null) 
 	                {
 	                	System.out.println("creator: "+creator.toString());
-	                	List<String> temp;
-	                	if (userOntology.getCreator() != null)
-	                	   temp = userOntology.getCreator();
-	                	else
-	                		temp = new ArrayList<String>();
-	                	temp.add(creator.toString());
-	                	userOntology.setCreator(temp);
+	                	firstCreator = creator.toString();
+	                	creatorList.add(creator.toString());
+	                	userOntology.setCreator(creatorList);
 	                }
 	                
 	                if (IRI != null) {
@@ -145,6 +144,23 @@ public class UserOntologyUtilities {
 	                }
 	                     
 	            }
+	            
+	            while ( results.hasNext() ) {
+	                QuerySolution soln = results.nextSolution();
+
+	                Literal creator = soln.getLiteral("creator");
+	                            
+	                if(firstCreator.equals(creator.toString()))
+	                	break;
+	                
+	                if(creator != null) 
+	                {
+	                	System.out.println("creator: "+creator.toString());
+	                	creatorList.add(creator.toString());
+	                	userOntology.setCreator(creatorList);
+	                }        
+	            }    
+	            
 	        } finally {
 	            qexec.close();
 	        }
