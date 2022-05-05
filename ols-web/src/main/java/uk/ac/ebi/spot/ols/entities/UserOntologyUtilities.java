@@ -13,13 +13,10 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
 
-import uk.ac.ebi.spot.ols.controller.api.OntologySuggestionController;
-
 public class UserOntologyUtilities {
 
 	   public static UserOntology extractMetaData(UserOntology userOntology) {
 	    	
-	    	FileManager.get().addLocatorClassLoader(OntologySuggestionController.class.getClassLoader());
 	    	org.apache.jena.rdf.model.Model modelQuery = null;
 	    	Query query;
 

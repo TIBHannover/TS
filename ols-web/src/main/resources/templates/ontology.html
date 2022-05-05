@@ -171,10 +171,7 @@
                     <div>
                         <b th:inline="text">[[${ontologyAlias}]] ID: </b> <span th:text="${ontologyDocument.getOntologyId()}" >ontology id</span>
                     </div>
-                    <div th:if="${extractedOntology.getVersionInfo() != null}">
-                        <b>Version: </b> <span th:text="${extractedOntology.getVersionInfo()}">NCBI:9606</span>
-                    </div>
-                    <div th:if="${extractedOntology.getVersionInfo() == null and ontologyDocument.getConfig().getVersion() != null}">
+                    <div th:if="${ontologyDocument.getConfig().getVersion() != null}">
                         <b>Version: </b> <span th:text="${ontologyDocument.getConfig().getVersion()}">NCBI:9606</span>
                     </div>
                     <div>

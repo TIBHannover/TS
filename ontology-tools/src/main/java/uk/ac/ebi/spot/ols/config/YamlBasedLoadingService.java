@@ -53,7 +53,8 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             //Build the OntologyResourceConfig and add it to the Collection.
             OntologyResourceConfig.OntologyResourceConfigBuilder builder =
                     new OntologyResourceConfig.OntologyResourceConfigBuilder(uri, ontologyTitle, id, ontologyPURL);
-
+            
+            
             builder.setPreferredPrefix(prefix);
 
             populateLabelProperty(builder);
@@ -68,6 +69,19 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
                 }
                 builder.setHiddenProperties(hiddenUris);
             }
+         // extract embedded metadata for basic config fields.
+            OntologyMetaData omd = new OntologyMetaData(uri);
+            omd = omd.extract();
+            if(omd.getDescription() != null)
+                builder.setDescription(omd.getDescription());
+            if(omd.getHomepage() != null)
+                builder.setHomepage(omd.getHomepage());
+            if(omd.getVersion() != null)
+                builder.setVersion(omd.getVersion());
+            if(omd.getDescription() != null)
+                builder.setTitle(omd.getTitle());
+            if(omd.getDescription() != null)
+                builder.setMailingList(omd.getEmail());       
 
             populateHierarchicalProperty(builder);
             populateBaseURI(id, builder);

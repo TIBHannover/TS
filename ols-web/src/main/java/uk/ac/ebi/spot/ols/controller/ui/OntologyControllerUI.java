@@ -132,11 +132,6 @@ public class OntologyControllerUI {
             model.addAttribute("contact", contact);
 
             model.addAttribute("ontologyDocument", document);
-            
-            UserOntology userOntology = new UserOntology(ontologyId,document.getConfig().getId(),ontologyId);
-            userOntology = UserOntologyUtilities.extractMetaData(userOntology);
-            
-            model.addAttribute("extractedOntology",userOntology);
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);

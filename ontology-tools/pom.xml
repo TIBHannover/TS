@@ -95,5 +95,18 @@
             <version>2.9.0</version>
         </dependency>
         
+        <dependency>
+	        <groupId>org.apache.jena</groupId>
+	        <artifactId>jena-core</artifactId>
+	        <version>3.17.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>apache-jena-libs</artifactId>
+            <type>pom</type>
+            <version>3.17.0</version>
+        </dependency>
+        
     </dependencies>
 </project>
