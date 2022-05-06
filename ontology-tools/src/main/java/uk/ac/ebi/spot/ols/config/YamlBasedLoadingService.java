@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.spot.ols.exception.ConfigParsingException;
 import uk.ac.ebi.spot.ols.util.License;
+import uk.ac.ebi.spot.ols.util.OntologyMetaData;
 import uk.ac.ebi.spot.ols.util.ReasonerType;
 
 import java.net.URI;
@@ -68,20 +69,7 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
                     hiddenUris.add(URI.create(hidden));
                 }
                 builder.setHiddenProperties(hiddenUris);
-            }
-         // extract embedded metadata for basic config fields.
-            OntologyMetaData omd = new OntologyMetaData(uri);
-            omd = omd.extract();
-            if(omd.getDescription() != null)
-                builder.setDescription(omd.getDescription());
-            if(omd.getHomepage() != null)
-                builder.setHomepage(omd.getHomepage());
-            if(omd.getVersion() != null)
-                builder.setVersion(omd.getVersion());
-            if(omd.getDescription() != null)
-                builder.setTitle(omd.getTitle());
-            if(omd.getDescription() != null)
-                builder.setMailingList(omd.getEmail());       
+            }     
 
             populateHierarchicalProperty(builder);
             populateBaseURI(id, builder);

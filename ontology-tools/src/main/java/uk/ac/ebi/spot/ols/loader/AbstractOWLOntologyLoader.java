@@ -214,7 +214,8 @@ AbstractOWLOntologyLoader extends Initializable implements OntologyLoader {
     		throws OntologyLoadingException {
     	
         this.databaseService = databaseService;
-        this.ontologyLoadingConfiguration = ontologyLoadingConfiguration;
+        this.ontologyLoadingConfiguration = ontologyLoadingConfiguration;  
+        
     	readConfiguration(config);
     	initializeOWLAPIWithoutReasoner();
     	initializeEnglishLanguagePreference();

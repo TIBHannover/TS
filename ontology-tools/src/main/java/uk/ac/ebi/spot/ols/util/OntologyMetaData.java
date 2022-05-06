@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.ols.config;
+package uk.ac.ebi.spot.ols.util;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -20,9 +20,11 @@ public class OntologyMetaData {
 	private String email;
 	private String version;
 
-    public OntologyMetaData(String purl) {
+    public OntologyMetaData(String purl, boolean extract) {
 		super();
 		this.purl = purl;
+		if(extract)
+			this.extract();
 	}
 
 	public String getPurl() {
@@ -75,6 +77,7 @@ public class OntologyMetaData {
 
     public OntologyMetaData extract() {
     	
+    	FileManager.get().addLocatorClassLoader(org.apache.commons.codec.digest.MurmurHash3.class.getClassLoader());
     	org.apache.jena.rdf.model.Model modelQuery = null;
     	Query query;
 

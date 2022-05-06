@@ -17,7 +17,8 @@ public class UserOntologyUtilities {
 
 	   public static UserOntology extractMetaData(UserOntology userOntology) {
 	    	
-	    	org.apache.jena.rdf.model.Model modelQuery = null;
+		   FileManager.get().addLocatorClassLoader(org.apache.commons.codec.digest.MurmurHash3.class.getClassLoader());
+		   org.apache.jena.rdf.model.Model modelQuery = null;
 	    	Query query;
 
 	    	try {
