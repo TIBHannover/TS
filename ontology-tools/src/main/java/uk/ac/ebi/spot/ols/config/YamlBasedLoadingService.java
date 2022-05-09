@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.spot.ols.exception.ConfigParsingException;
 import uk.ac.ebi.spot.ols.util.License;
-import uk.ac.ebi.spot.ols.util.OntologyMetaData;
 import uk.ac.ebi.spot.ols.util.ReasonerType;
 
 import java.net.URI;
@@ -54,8 +53,7 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             //Build the OntologyResourceConfig and add it to the Collection.
             OntologyResourceConfig.OntologyResourceConfigBuilder builder =
                     new OntologyResourceConfig.OntologyResourceConfigBuilder(uri, ontologyTitle, id, ontologyPURL);
-            
-            
+                        
             builder.setPreferredPrefix(prefix);
 
             populateLabelProperty(builder);
