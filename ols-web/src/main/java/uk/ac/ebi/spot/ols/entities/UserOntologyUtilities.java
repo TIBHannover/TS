@@ -43,15 +43,14 @@ public class UserOntologyUtilities {
 	        	"PREFIX dc: <http://purl.org/dc/elements/1.1/>" +  "\n" +
 	        	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" +  "\n" +
 
-	        	"SELECT ?title ?description ?license_url ?homepage ?contact_email ?creator ?versionInfo" +  "\n" + 
-	        	"# ?IRI" +  "\n" +
+	        	"SELECT ?title ?description ?license_url ?homepage ?contact_email ?creator ?versionInfo ?IRI" +  "\n" + 
 	        	"WHERE {" +  "\n" +
 	        	        "?ontology a owl:Ontology . # Does not exclude imported ontologies." + "\n" +
 	        	        "OPTIONAL{?ontology terms:license|terms:rights|dc:rights ?license_url .}" + "\n" +
 	        	        "OPTIONAL{?ontology terms:title|dc:title|rdfs:label ?title .}" + "\n" +
 	        	        "OPTIONAL{?ontology terms:description|dc:description ?description .}" + "\n" +
 	        	        "OPTIONAL{?ontology owl:versionInfo ?versionInfo .}" + "\n" +
-	        	        "# OPTIONAL{?ontology owl:versionIRI  ?IRI .}" + "\n" +
+	        	        "OPTIONAL{?ontology owl:versionIRI  ?IRI .}" + "\n" +
 	        	        "OPTIONAL{?ontology foaf:homepage ?homepage .}" + "\n" +
 	        	        "OPTIONAL{" + "\n" +
 	        	                "?ontology foaf:mbox ?contact_email_tmp ." + "\n" +
@@ -92,7 +91,15 @@ public class UserOntologyUtilities {
 	                Literal contact_email = soln.getLiteral("contact_email");
 	                Literal creator = soln.getLiteral("creator");
 	                Literal versionInfo = soln.getLiteral("versionInfo");
-	                Literal IRI = soln.getLiteral("IRI");             
+	                Literal IRI_literal = null;      
+	                Resource IRI_resource = null;
+	                
+	                if(soln.get("IRI")!=null)
+		                  if(soln.get("IRI").isResource()) {
+			                IRI_resource = soln.getResource("IRI");
+		                  } else
+		                	  IRI_literal = soln.getLiteral("IRI");  
+	                
 	                if(title != null) {
 	                	System.out.println("title: "+title);
 	                	userOntology.setTitle(title.toString());
@@ -131,9 +138,13 @@ public class UserOntologyUtilities {
 	                	userOntology.setCreator(creatorList);
 	                }
 	                
-	                if (IRI != null) {
-	                	System.out.println("IRI: "+IRI);
-	                	userOntology.setURI(IRI.toString());
+	                if (IRI_resource != null) {
+	                	System.out.println("IRI: "+IRI_resource);
+	                	userOntology.setURI(IRI_resource.toString());
+	                }
+	                else if (IRI_literal != null) {
+	                	System.out.println("IRI: "+IRI_literal);
+	                	userOntology.setURI(IRI_literal.toString());
 	                }
 	                
 	                if (versionInfo != null) {
