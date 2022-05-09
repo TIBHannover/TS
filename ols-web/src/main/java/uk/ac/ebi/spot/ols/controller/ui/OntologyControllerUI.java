@@ -9,6 +9,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Sort;
+
+import uk.ac.ebi.spot.ols.entities.UserOntology;
+import uk.ac.ebi.spot.ols.entities.UserOntologyUtilities;
+import uk.ac.ebi.spot.ols.entities.YamlBasedPersistence;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;

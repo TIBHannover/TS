@@ -13,23 +13,25 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
 
-import uk.ac.ebi.spot.ols.controller.api.OntologySuggestionController;
-
 public class UserOntologyUtilities {
 
 	   public static UserOntology extractMetaData(UserOntology userOntology) {
 	    	
-	    	FileManager.get().addLocatorClassLoader(OntologySuggestionController.class.getClassLoader());
-	    	org.apache.jena.rdf.model.Model modelQuery = null;
+		   FileManager.get().addLocatorClassLoader(org.apache.commons.codec.digest.MurmurHash3.class.getClassLoader());
+		   org.apache.jena.rdf.model.Model modelQuery = null;
 	    	Query query;
+
 	    	try {
-				modelQuery = FileManager.get().loadModel(userOntology.getPermanenturl());
-			} catch (org.apache.jena.riot.RiotException e) {
-				System.out.println(e.getMessage());
+	    		modelQuery = FileManager.get().loadModel(userOntology.getPermanenturl());
+				if(modelQuery.isEmpty()) {
+					System.out.println("No valid statements");
+					return userOntology;
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("query::: "+e.getMessage());
+				return userOntology;
 			}
-	    	if(modelQuery.isEmpty()) {
-	    		System.out.println("No valid statements");
-	    	}
 	    	
 	        String queryString = 
 	            "PREFIX owl: <http://www.w3.org/2002/07/owl#>" + "\n" +
@@ -41,15 +43,14 @@ public class UserOntologyUtilities {
 	        	"PREFIX dc: <http://purl.org/dc/elements/1.1/>" +  "\n" +
 	        	"PREFIX foaf: <http://xmlns.com/foaf/0.1/>" +  "\n" +
 
-	        	"SELECT ?title ?description ?license_url ?homepage ?contact_email ?creator" +  "\n" + 
-	        	"# ?versionInfo ?IRI" +  "\n" +
+	        	"SELECT ?title ?description ?license_url ?homepage ?contact_email ?creator ?versionInfo ?IRI" +  "\n" + 
 	        	"WHERE {" +  "\n" +
 	        	        "?ontology a owl:Ontology . # Does not exclude imported ontologies." + "\n" +
 	        	        "OPTIONAL{?ontology terms:license|terms:rights|dc:rights ?license_url .}" + "\n" +
 	        	        "OPTIONAL{?ontology terms:title|dc:title|rdfs:label ?title .}" + "\n" +
 	        	        "OPTIONAL{?ontology terms:description|dc:description ?description .}" + "\n" +
-	        	        "# OPTIONAL{?ontology owl:versionInfo ?versionInfo .}" + "\n" +
-	        	        "# OPTIONAL{?ontology owl:versionIRI  ?IRI .}" + "\n" +
+	        	        "OPTIONAL{?ontology owl:versionInfo ?versionInfo .}" + "\n" +
+	        	        "OPTIONAL{?ontology owl:versionIRI  ?IRI .}" + "\n" +
 	        	        "OPTIONAL{?ontology foaf:homepage ?homepage .}" + "\n" +
 	        	        "OPTIONAL{" + "\n" +
 	        	                "?ontology foaf:mbox ?contact_email_tmp ." + "\n" +
@@ -66,7 +67,9 @@ public class UserOntologyUtilities {
 	        QueryExecution qexec = QueryExecutionFactory.create(query, modelQuery);
 	        try {
 	            ResultSet results = qexec.execSelect();
-	            while ( results.hasNext() ) {
+	            List<String> creatorList = new ArrayList<String>();
+	            String firstCreator = "";
+	            if ( results.hasNext() ) {
 	                QuerySolution soln = results.nextSolution();
 	                Literal title = soln.getLiteral("title");
 	                Literal description = soln.getLiteral("description");
@@ -88,7 +91,14 @@ public class UserOntologyUtilities {
 	                Literal contact_email = soln.getLiteral("contact_email");
 	                Literal creator = soln.getLiteral("creator");
 	                Literal versionInfo = soln.getLiteral("versionInfo");
-	                Literal IRI = soln.getLiteral("IRI");
+	                Literal IRI_literal = null;      
+	                Resource IRI_resource = null;
+	                
+	                if(soln.get("IRI")!=null)
+		                  if(soln.get("IRI").isResource()) {
+			                IRI_resource = soln.getResource("IRI");
+		                  } else
+		                	  IRI_literal = soln.getLiteral("IRI");  
 	                
 	                if(title != null) {
 	                	System.out.println("title: "+title);
@@ -123,23 +133,43 @@ public class UserOntologyUtilities {
 	                if(creator != null) 
 	                {
 	                	System.out.println("creator: "+creator.toString());
-	                	List<String> temp;
-	                	if (userOntology.getCreator() != null)
-	                	   temp = userOntology.getCreator();
-	                	else
-	                		temp = new ArrayList<String>();
-	                	temp.add(creator.toString());
-	                	userOntology.setCreator(temp);
+	                	firstCreator = creator.toString();
+	                	creatorList.add(creator.toString());
+	                	userOntology.setCreator(creatorList);
 	                }
 	                
-	                if (IRI != null) {
-	                	System.out.println("IRI: "+IRI);
-	                	userOntology.setURI(IRI.toString());
+	                if (IRI_resource != null) {
+	                	System.out.println("IRI: "+IRI_resource);
+	                	userOntology.setURI(IRI_resource.toString());
+	                }
+	                else if (IRI_literal != null) {
+	                	System.out.println("IRI: "+IRI_literal);
+	                	userOntology.setURI(IRI_literal.toString());
 	                }
 	                
-	                System.out.println("versionInfo: "+versionInfo);
-	                
+	                if (versionInfo != null) {
+	                	System.out.println("versionInfo: "+versionInfo);
+	                	userOntology.setVersionInfo(versionInfo.toString());
+	                }
+	                     
 	            }
+	            
+	            while ( results.hasNext() ) {
+	                QuerySolution soln = results.nextSolution();
+
+	                Literal creator = soln.getLiteral("creator");
+	                            
+	                if(firstCreator.equals(creator.toString()))
+	                	break;
+	                
+	                if(creator != null) 
+	                {
+	                	System.out.println("creator: "+creator.toString());
+	                	creatorList.add(creator.toString());
+	                	userOntology.setCreator(creatorList);
+	                }        
+	            }    
+	            
 	        } finally {
 	            qexec.close();
 	        }

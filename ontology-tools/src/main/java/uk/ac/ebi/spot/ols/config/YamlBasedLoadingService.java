@@ -53,7 +53,7 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             //Build the OntologyResourceConfig and add it to the Collection.
             OntologyResourceConfig.OntologyResourceConfigBuilder builder =
                     new OntologyResourceConfig.OntologyResourceConfigBuilder(uri, ontologyTitle, id, ontologyPURL);
-
+                        
             builder.setPreferredPrefix(prefix);
 
             populateLabelProperty(builder);
@@ -67,7 +67,7 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
                     hiddenUris.add(URI.create(hidden));
                 }
                 builder.setHiddenProperties(hiddenUris);
-            }
+            }     
 
             populateHierarchicalProperty(builder);
             populateBaseURI(id, builder);

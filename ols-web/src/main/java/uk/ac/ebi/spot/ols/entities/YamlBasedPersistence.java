@@ -146,6 +146,9 @@ public class YamlBasedPersistence {
 		      data.put("logo", userOntology.getLogo());
 		   if( userOntology.isFoundary() == true)
 		      data.put("is_foundary", userOntology.isFoundary());
+		   if(userOntology.getVersionInfo() != null)
+		   if(!userOntology.getVersionInfo().isEmpty())
+		      data.put("version_info", userOntology.getVersionInfo());
 		   
 		   if(includeUserData) {
 			   if(userOntology.getApproval() != null)
@@ -221,6 +224,7 @@ public class YamlBasedPersistence {
 				} else if (map.get("is_foundary") instanceof java.lang.Boolean)
 					uo.setFoundary((boolean) map.get("is_foundary"));
 			}	
+			uo.setVersionInfo((String) map.get("version_info"));
 			
 			if (map.get("approval") != null)
 			    uo.setApproval(ApprovalEnum.valueOf((String) map.get("approval")));
