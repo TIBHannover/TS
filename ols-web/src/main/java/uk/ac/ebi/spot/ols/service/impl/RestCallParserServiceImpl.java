@@ -21,18 +21,28 @@ import java.util.Set;
 @Service
 public class RestCallParserServiceImpl implements RestCallParserService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final UrlCyclicDecoder decoder = new UrlCyclicDecoder();
 
     @Override
     public HttpServletRequestInfo parse(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
+        requestURI = decoder.decode(requestURI);
 
         Map<String, String> pathVariablesMap = (Map<String, String>) request
             .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
         Set<RestCallParameter> pathVariables = new HashSet<>();
         for (Map.Entry<String, String> entry : pathVariablesMap.entrySet()) {
-            requestURI = requestURI.replace(entry.getValue(), String.format("{%s}", entry.getKey()));
-            pathVariables.add(new RestCallParameter(entry.getKey(), entry.getValue(), RestCallParameterType.PATH));
+            String parameterName = entry.getKey();
+            String parameterValue = decoder.decode(entry.getValue());
+
+            int startIndex = requestURI.indexOf(parameterValue) - 1;
+            int endIndex = startIndex + parameterValue.length() + 1;
+
+            if (startIndex >= 0 && requestURI.charAt(startIndex) == '/') {
+                requestURI = doReplacement(requestURI, parameterName, startIndex, endIndex);
+                pathVariables.add(new RestCallParameter(parameterName, parameterValue, RestCallParameterType.PATH));
+            }
         }
 
         Set<RestCallParameter> queryParameters = new HashSet<>();
@@ -43,6 +53,12 @@ public class RestCallParserServiceImpl implements RestCallParserService {
         }
 
         return new HttpServletRequestInfo(requestURI, pathVariables, queryParameters);
+    }
+
+    private String doReplacement(String str, String parameterName, int startIndex, int endIndex) {
+        return str.substring(0, startIndex + 1) +
+            String.format("{%s}", parameterName) +
+            str.substring(endIndex);
     }
 
     private Set<RestCallParameter> getQueryParameters(HttpServletRequest request) throws UnsupportedEncodingException {
