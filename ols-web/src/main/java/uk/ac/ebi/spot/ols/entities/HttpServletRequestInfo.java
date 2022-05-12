@@ -1,5 +1,6 @@
 package uk.ac.ebi.spot.ols.entities;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class HttpServletRequestInfo {
@@ -40,5 +41,18 @@ public class HttpServletRequestInfo {
 
     public void setQueryParameters(Set<RestCallParameter> queryParameters) {
         this.queryParameters = queryParameters;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HttpServletRequestInfo that = (HttpServletRequestInfo) o;
+        return url.equals(that.url) && Objects.equals(pathVariables, that.pathVariables) && Objects.equals(queryParameters, that.queryParameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, pathVariables, queryParameters);
     }
 }
