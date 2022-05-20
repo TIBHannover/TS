@@ -289,6 +289,8 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             if(ontologyTitle != null && !titles.containsKey("en")) {
                 titles.put("en", ontologyTitle);
             }
+
+            builder.setTitle(ontologyTitle);
         }
 
         if(!titles.containsKey("en")) {
@@ -312,6 +314,8 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             if(ontologyDescription != null && !descriptions.containsKey("en")) {
                 descriptions.put("en", ontologyDescription);
             }
+
+            builder.setDescription(ontologyDescription);
         }
 
         builder.setLocalizedDescriptions(descriptions);
