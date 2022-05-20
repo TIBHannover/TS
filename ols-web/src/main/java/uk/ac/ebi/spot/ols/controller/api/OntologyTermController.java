@@ -21,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
+
+import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.ClassJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
@@ -28,8 +30,10 @@ import uk.ac.ebi.spot.ols.neo4j.service.ViewMode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Simon Jupp
@@ -588,6 +592,48 @@ public class OntologyTermController {
         Page<Term>  terms = ontologyTermGraphService.getHierarchicalAncestors(ontologyId, target.getIri(), pageable);
         return new ResponseEntity<>( assembler.toResource(terms, termAssembler), HttpStatus.OK);
     }
+    @RequestMapping(path = "/{onto}/termtree", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<List<TreeNode<Term>>> getTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+            @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) 
+    boolean includeObsoletes,
+  Pageable pageable,
+  PagedResourcesAssembler assembler){
+    	
+    	
+    	Page<Term> roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, pageable);
+    	List<Term> rootTermDataList = roots.getContent();
+    	List<TreeNode<Term>> rootTerms = new ArrayList<TreeNode<Term>>();
+    	
+    	for (Term rootTermData : rootTermDataList) {
+    		TreeNode<Term> rootTerm =  new TreeNode<Term>(rootTermData);
+    		populateChildren(ontologyId, rootTerm, pageable);	
+    		rootTerms.add(rootTerm);
+    	}
+    	
+        if (roots == null) 
+            throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
+          return new ResponseEntity<>( rootTerms, HttpStatus.OK);
+    }
+    
+    public void populateChildren(String ontologyId, TreeNode<Term> root, Pageable pageable) {
+		String decoded;
+		try {
+			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
+			Page<Term> children = ontologyTermGraphService.getChildren(ontologyId, decoded, pageable);
+					
+			for (Term term : children.getContent()) {
+				TreeNode<Term> child =  new TreeNode<Term>(term);
+				populateChildren(ontologyId, child, pageable);
+				root.addChild(child);
+			}
+			
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
     @ExceptionHandler(ResourceNotFoundException.class)

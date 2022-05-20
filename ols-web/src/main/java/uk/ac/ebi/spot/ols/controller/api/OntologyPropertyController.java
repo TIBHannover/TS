@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 import uk.ac.ebi.spot.ols.neo4j.model.Property;
+import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.JsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyPropertyGraphService;
 import uk.ac.ebi.spot.ols.neo4j.service.PropertyJsTreeBuilder;
@@ -27,7 +28,9 @@ import uk.ac.ebi.spot.ols.neo4j.service.ViewMode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Simon Jupp
@@ -217,6 +220,48 @@ public class OntologyPropertyController {
             e.printStackTrace();
         }
         throw new ResourceNotFoundException();
+    }
+    
+    @RequestMapping(path = "/{onto}/propertytree", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<List<TreeNode<Property>>> getTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+            @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) 
+    boolean includeObsoletes,
+  Pageable pageable,
+  PagedResourcesAssembler assembler){
+    	
+    	
+    	Page<Property> roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, pageable);
+    	List<Property> rootPropertyDataList = roots.getContent();
+    	List<TreeNode<Property>> rootProperties = new ArrayList<TreeNode<Property>>();
+    	
+    	for (Property rootPropertyData : rootPropertyDataList) {
+    		TreeNode<Property> rootProperty =  new TreeNode<Property>(rootPropertyData);
+    		populateChildren(ontologyId, rootProperty, pageable);	
+    		rootProperties.add(rootProperty);
+    	}
+    	
+        if (roots == null) 
+            throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
+          return new ResponseEntity<>( rootProperties, HttpStatus.OK);
+    }
+    
+    public void populateChildren(String ontologyId, TreeNode<Property> root, Pageable pageable) {
+		String decoded;
+		try {
+			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
+			Page<Property> children = ontologyPropertyGraphService.getChildren(ontologyId, decoded, pageable);
+					
+			for (Property property : children.getContent()) {
+				TreeNode<Property> child =  new TreeNode<Property>(property);
+				populateChildren(ontologyId, child, pageable);
+				root.addChild(child);
+			}
+			
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
