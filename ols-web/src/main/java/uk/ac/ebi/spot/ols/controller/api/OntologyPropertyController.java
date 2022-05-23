@@ -234,7 +234,7 @@ public class OntologyPropertyController {
     	List<Property> rootPropertyDataList = roots.getContent();
     	List<TreeNode<Property>> rootProperties = new ArrayList<TreeNode<Property>>();
     	
-    	while(!roots.isLast()) {
+    	while(roots.hasNext()) {
     		roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
     		rootPropertyDataList.addAll(roots.getContent());
     	}
@@ -259,8 +259,14 @@ public class OntologyPropertyController {
 		try {
 			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
 			Page<Property> children = ontologyPropertyGraphService.getChildren(ontologyId, decoded, pageable);
-					
-			for (Property property : children.getContent()) {
+			
+			List<Property> childrenPropertyDataList = children.getContent();
+	    	while(children.hasNext()) {
+	    		children = ontologyPropertyGraphService.getChildren(ontologyId, decoded, children.nextPageable());
+	    		childrenPropertyDataList.addAll(children.getContent());
+	    	}		
+			
+			for (Property property : childrenPropertyDataList) {
 				TreeNode<Property> child =  new TreeNode<Property>(property);
 				child.setIndex(root.getIndex()+"."+ ++count);
 				populateChildren(ontologyId, child, pageable);

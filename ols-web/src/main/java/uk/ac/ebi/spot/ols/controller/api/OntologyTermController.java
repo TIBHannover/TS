@@ -602,7 +602,7 @@ public class OntologyTermController {
     	List<Term> rootTermDataList = roots.getContent();
     	List<TreeNode<Term>> rootTerms = new ArrayList<TreeNode<Term>>();
     	
-    	while(!roots.isLast()) {
+    	while(roots.hasNext()) {
     		roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
     		rootTermDataList.addAll(roots.getContent());
     	}
@@ -626,8 +626,14 @@ public class OntologyTermController {
 		try {
 			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
 			Page<Term> children = ontologyTermGraphService.getChildren(ontologyId, decoded, pageable);
+			List<Term> childrenTermDataList = children.getContent();
+	    	while(children.hasNext()) {
+	    		children = ontologyTermGraphService.getChildren(ontologyId, decoded, children.nextPageable());
+	    		childrenTermDataList.addAll(children.getContent());
+	    	}
+			
 					
-			for (Term term : children.getContent()) {
+			for (Term term : childrenTermDataList) {
 				TreeNode<Term> child =  new TreeNode<Term>(term);
 				child.setIndex(root.getIndex()+"."+ ++count);
 				populateChildren(ontologyId, child, pageable);
