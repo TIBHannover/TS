@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -224,19 +225,18 @@ public class OntologyPropertyController {
     
     @RequestMapping(path = "/{onto}/propertytree", produces = {MediaType.APPLICATION_JSON_VALUE, 
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<List<TreeNode<Property>>> getTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+    HttpEntity<List<TreeNode<Property>>> getPropertyHierarchyByOntology(  @PathVariable("onto") String ontologyId,
             @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) 
-    boolean includeObsoletes,
-  Pageable pageable,
-  PagedResourcesAssembler assembler){
+    boolean includeObsoletes, PagedResourcesAssembler assembler){
     	
-    	
+    	Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
     	Page<Property> roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, pageable);
     	List<Property> rootPropertyDataList = roots.getContent();
     	List<TreeNode<Property>> rootProperties = new ArrayList<TreeNode<Property>>();
-    	
+    	int count = 0;
     	for (Property rootPropertyData : rootPropertyDataList) {
     		TreeNode<Property> rootProperty =  new TreeNode<Property>(rootPropertyData);
+    		rootProperty.setIndex(String.valueOf(++count));
     		populateChildren(ontologyId, rootProperty, pageable);	
     		rootProperties.add(rootProperty);
     	}
@@ -248,12 +248,14 @@ public class OntologyPropertyController {
     
     public void populateChildren(String ontologyId, TreeNode<Property> root, Pageable pageable) {
 		String decoded;
+		int count = 0;
 		try {
 			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
 			Page<Property> children = ontologyPropertyGraphService.getChildren(ontologyId, decoded, pageable);
 					
 			for (Property property : children.getContent()) {
 				TreeNode<Property> child =  new TreeNode<Property>(property);
+				child.setIndex(root.getIndex()+"."+ ++count);
 				populateChildren(ontologyId, child, pageable);
 				root.addChild(child);
 			}

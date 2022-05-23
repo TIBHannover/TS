@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -596,17 +597,15 @@ public class OntologyTermController {
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<TreeNode<Term>>> getTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
             @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) 
-    boolean includeObsoletes,
-  Pageable pageable,
-  PagedResourcesAssembler assembler){
-    	
-    	
+    boolean includeObsoletes, PagedResourcesAssembler assembler){
+        Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
     	Page<Term> roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, pageable);
     	List<Term> rootTermDataList = roots.getContent();
     	List<TreeNode<Term>> rootTerms = new ArrayList<TreeNode<Term>>();
-    	
+    	int count = 0;
     	for (Term rootTermData : rootTermDataList) {
     		TreeNode<Term> rootTerm =  new TreeNode<Term>(rootTermData);
+    		rootTerm.setIndex(String.valueOf(++count));
     		populateChildren(ontologyId, rootTerm, pageable);	
     		rootTerms.add(rootTerm);
     	}
@@ -618,12 +617,14 @@ public class OntologyTermController {
     
     public void populateChildren(String ontologyId, TreeNode<Term> root, Pageable pageable) {
 		String decoded;
+		int count = 0;
 		try {
 			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
 			Page<Term> children = ontologyTermGraphService.getChildren(ontologyId, decoded, pageable);
 					
 			for (Term term : children.getContent()) {
 				TreeNode<Term> child =  new TreeNode<Term>(term);
+				child.setIndex(root.getIndex()+"."+ ++count);
 				populateChildren(ontologyId, child, pageable);
 				root.addChild(child);
 			}
