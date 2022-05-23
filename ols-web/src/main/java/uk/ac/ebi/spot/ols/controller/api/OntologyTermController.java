@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -596,8 +597,11 @@ public class OntologyTermController {
     @RequestMapping(path = "/{onto}/termtree", produces = {MediaType.APPLICATION_JSON_VALUE, 
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<TreeNode<Term>>> getTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
-            @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) 
-    boolean includeObsoletes, Pageable pageable, PagedResourcesAssembler assembler){
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes, 
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+    	Pageable pageable = new PageRequest(0, pageSize);
     	Page<Term> roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, pageable);
     	List<Term> rootTermDataList = new ArrayList<Term>();
     	rootTermDataList.addAll(roots.getContent());

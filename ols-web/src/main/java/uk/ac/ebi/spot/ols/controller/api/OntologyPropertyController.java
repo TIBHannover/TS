@@ -3,6 +3,9 @@ package uk.ac.ebi.spot.ols.controller.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import io.swagger.annotations.ApiParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -226,10 +229,12 @@ public class OntologyPropertyController {
     @RequestMapping(path = "/{onto}/propertytree", produces = {MediaType.APPLICATION_JSON_VALUE, 
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<TreeNode<Property>>> getPropertyHierarchyByOntology(  @PathVariable("onto") String ontologyId,
-            @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) 
-    boolean includeObsoletes, Pageable pageable, PagedResourcesAssembler assembler){
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes, 
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
     	
-    	
+    	Pageable pageable = new PageRequest(0, pageSize);
     	Page<Property> roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, pageable);
     	List<Property> rootPropertyDataList = new ArrayList<Property>();
     	rootPropertyDataList.addAll(roots.getContent());
