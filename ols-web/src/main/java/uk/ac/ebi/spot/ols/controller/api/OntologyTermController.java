@@ -597,11 +597,16 @@ public class OntologyTermController {
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<TreeNode<Term>>> getTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
             @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) 
-    boolean includeObsoletes, PagedResourcesAssembler assembler){
-        Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
+    boolean includeObsoletes, Pageable pageable, PagedResourcesAssembler assembler){
     	Page<Term> roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, pageable);
     	List<Term> rootTermDataList = roots.getContent();
     	List<TreeNode<Term>> rootTerms = new ArrayList<TreeNode<Term>>();
+    	
+    	while(!roots.isLast()) {
+    		roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
+    		rootTermDataList.addAll(roots.getContent());
+    	}
+    	
     	int count = 0;
     	for (Term rootTermData : rootTermDataList) {
     		TreeNode<Term> rootTerm =  new TreeNode<Term>(rootTermData);

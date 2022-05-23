@@ -227,12 +227,19 @@ public class OntologyPropertyController {
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<TreeNode<Property>>> getPropertyHierarchyByOntology(  @PathVariable("onto") String ontologyId,
             @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) 
-    boolean includeObsoletes, PagedResourcesAssembler assembler){
+    boolean includeObsoletes, Pageable pageable, PagedResourcesAssembler assembler){
     	
-    	Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
+    	
     	Page<Property> roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, pageable);
     	List<Property> rootPropertyDataList = roots.getContent();
     	List<TreeNode<Property>> rootProperties = new ArrayList<TreeNode<Property>>();
+    	
+    	while(!roots.isLast()) {
+    		roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
+    		rootPropertyDataList.addAll(roots.getContent());
+    	}
+    	
+    	
     	int count = 0;
     	for (Property rootPropertyData : rootPropertyDataList) {
     		TreeNode<Property> rootProperty =  new TreeNode<Property>(rootPropertyData);
