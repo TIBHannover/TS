@@ -3,9 +3,13 @@ package uk.ac.ebi.spot.ols.controller.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import io.swagger.annotations.ApiParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 import uk.ac.ebi.spot.ols.neo4j.model.Property;
+import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.JsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyPropertyGraphService;
 import uk.ac.ebi.spot.ols.neo4j.service.PropertyJsTreeBuilder;
@@ -27,7 +32,9 @@ import uk.ac.ebi.spot.ols.neo4j.service.ViewMode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Simon Jupp
@@ -217,6 +224,66 @@ public class OntologyPropertyController {
             e.printStackTrace();
         }
         throw new ResourceNotFoundException();
+    }
+    
+    @RequestMapping(path = "/{onto}/propertytree", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<List<TreeNode<Property>>> getPropertyHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes, 
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+    	
+    	Pageable pageable = new PageRequest(0, pageSize);
+    	Page<Property> roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, pageable);
+    	List<Property> rootPropertyDataList = new ArrayList<Property>();
+    	rootPropertyDataList.addAll(roots.getContent());
+    	List<TreeNode<Property>> rootProperties = new ArrayList<TreeNode<Property>>();
+    	
+    	while(roots.hasNext()) {
+    		roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
+    		rootPropertyDataList.addAll(roots.getContent());
+    	}
+    	
+    	
+    	int count = 0;
+    	for (Property rootPropertyData : rootPropertyDataList) {
+    		TreeNode<Property> rootProperty =  new TreeNode<Property>(rootPropertyData);
+    		rootProperty.setIndex(String.valueOf(++count));
+    		populateChildren(ontologyId, rootProperty, pageable);	
+    		rootProperties.add(rootProperty);
+    	}
+    	
+        if (roots == null) 
+            throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
+          return new ResponseEntity<>( rootProperties, HttpStatus.OK);
+    }
+    
+    public void populateChildren(String ontologyId, TreeNode<Property> root, Pageable pageable) {
+		String decoded;
+		int count = 0;
+		try {
+			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
+			Page<Property> children = ontologyPropertyGraphService.getChildren(ontologyId, decoded, pageable);
+			
+			List<Property> childrenPropertyDataList = new ArrayList<Property>();
+			childrenPropertyDataList.addAll(children.getContent());
+	    	while(children.hasNext()) {
+	    		children = ontologyPropertyGraphService.getChildren(ontologyId, decoded, children.nextPageable());
+	    		childrenPropertyDataList.addAll(children.getContent());
+	    	}		
+			
+			for (Property property : childrenPropertyDataList) {
+				TreeNode<Property> child =  new TreeNode<Property>(property);
+				child.setIndex(root.getIndex()+"."+ ++count);
+				populateChildren(ontologyId, child, pageable);
+				root.addChild(child);
+			}
+			
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")

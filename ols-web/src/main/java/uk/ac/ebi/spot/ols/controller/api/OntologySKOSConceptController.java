@@ -42,20 +42,20 @@ public class OntologySKOSConceptController {
     private OntologyIndividualService ontologyIndividualRepository;
     
     @RequestMapping(path = "/{onto}/concepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<List<SKOSConceptNode<Individual>>> getSKOSConceptHierarchyByOntology(
+    HttpEntity<List<TreeNode<Individual>>> getSKOSConceptHierarchyByOntology(
     	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
     	    @ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships", required = true)
             @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "Maximum number of concepts", required = true)
-            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
     	if (TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		return new ResponseEntity<>(conceptTreeWithoutTop(ontologyId,individualCount, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(conceptTreeWithoutTop(ontologyId,pageSize, narrower), HttpStatus.OK);
     	else
-    		return new ResponseEntity<>(conceptTree(ontologyId,individualCount,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
     } 
     
     @RequestMapping(path = "/{onto}/displayconcepthierarchy", method = RequestMethod.GET)
@@ -69,16 +69,16 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @ApiParam(value = "display related concepts", required = true)
             @RequestParam(value = "display_related", required = true, defaultValue = "false") boolean displayRelated,
-            @ApiParam(value = "Maximum number of concepts", required = true)
-            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	 ontologyId = ontologyId.toLowerCase();
-     	 List<SKOSConceptNode<Individual>> rootIndividuals = null;
+     	 List<TreeNode<Individual>> rootIndividuals = null;
     	 if(TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		 rootIndividuals = conceptTreeWithoutTop(ontologyId,individualCount, narrower);
+    		 rootIndividuals = conceptTreeWithoutTop(ontologyId,pageSize, narrower);
     	 else
-    		 rootIndividuals = conceptTree(ontologyId,individualCount,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
+    		 rootIndividuals = conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
          StringBuilder sb = new StringBuilder();
-         for (SKOSConceptNode<Individual> root : rootIndividuals) {
+         for (TreeNode<Individual> root : rootIndividuals) {
         	 sb.append(root.getIndex() + " , "+ root.getData().getLabel() + " , " + root.getData().getIri()).append("\n");
         	 sb.append(generateConceptHierarchyTextByOntology(root, displayRelated)); 
          }
@@ -87,7 +87,7 @@ public class OntologySKOSConceptController {
     }  
     
     @RequestMapping(path = "/{onto}/concepthierarchy/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-    HttpEntity<SKOSConceptNode<Individual>> getSKOSConceptHierarchyByOntologyAndIri(
+    HttpEntity<TreeNode<Individual>> getSKOSConceptHierarchyByOntologyAndIri(
     	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
             @ApiParam(value = "encoded concept IRI", required = true)
@@ -96,16 +96,22 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @ApiParam(value = "index value for the root term", required = true)
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
-            @ApiParam(value = "Maximum number of concepts", required = true)
-            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
-        List<Individual> listOfTerms = terms.getContent(); 
-        SKOSConceptNode<Individual> topConcept = new SKOSConceptNode<Individual>(new Individual());
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
+        List<Individual> listOfTerms = new ArrayList<Individual>();
+        listOfTerms.addAll(terms.getContent()); 
+        
+    	while(terms.hasNext()) {
+    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
+    		listOfTerms.addAll(terms.getContent());
+    	}  
+        TreeNode<Individual> topConcept = new TreeNode<Individual>(new Individual());
         try {
 			String decodedIri = UriUtils.decode(iri, "UTF-8");	        
 	        Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);
-	        topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
+	        topConcept =  new TreeNode<Individual>(topConceptIndividual);
 		    topConcept.setIndex(index);
 		    if(narrower)
 		        populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
@@ -131,16 +137,22 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "display_related", required = true, defaultValue = "false") boolean displayRelated,
             @ApiParam(value = "index value for the root term", required = true)
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
-            @ApiParam(value = "Maximum number of concepts", required = true)
-            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
-        List<Individual> listOfTerms = terms.getContent();
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
+        List<Individual> listOfTerms = new ArrayList<Individual>();
+        listOfTerms.addAll(terms.getContent()); 
+        
+    	while(terms.hasNext()) {
+    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
+    		listOfTerms.addAll(terms.getContent());
+    	}  
         StringBuilder sb = new StringBuilder();
         try {
         	String decodedIri = UriUtils.decode(iri, "UTF-8");
 			Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);	        
-	        SKOSConceptNode<Individual> topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
+	        TreeNode<Individual> topConcept =  new TreeNode<Individual>(topConceptIndividual);
 		     topConcept.setIndex(index);
 		     if(narrower)
 		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
@@ -191,10 +203,17 @@ public class OntologySKOSConceptController {
 
     }
     
-    public List<SKOSConceptNode<Individual>> conceptTree (String ontologyId, Integer individualCount, boolean schema, boolean narrower){
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
-        List<Individual> listOfTerms = terms.getContent(); 
-        List<SKOSConceptNode<Individual>> rootIndividuals = new ArrayList<SKOSConceptNode<Individual>>();      
+    public List<TreeNode<Individual>> conceptTree (String ontologyId, Integer pageSize, boolean schema, boolean narrower){
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
+        List<Individual> listOfTerms = new ArrayList<Individual>();
+        listOfTerms.addAll(terms.getContent()); 
+        
+    	while(terms.hasNext()) {
+    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
+    		listOfTerms.addAll(terms.getContent());
+    	}       
+        
+        List<TreeNode<Individual>> rootIndividuals = new ArrayList<TreeNode<Individual>>();      
         int count = 0;
         
         if(schema) {
@@ -202,7 +221,7 @@ public class OntologySKOSConceptController {
            	    if (indiv.getAnnotation().get("hasTopConcept") != null) {
         		 for (String iriTopConcept : (String[]) indiv.getAnnotation().get("hasTopConcept")) {
         			 Individual topConceptIndividual = findIndividual(listOfTerms,iriTopConcept);
-        			 SKOSConceptNode<Individual> topConcept =  new SKOSConceptNode<Individual>(topConceptIndividual);
+        			 TreeNode<Individual> topConcept =  new TreeNode<Individual>(topConceptIndividual);
         		     topConcept.setIndex(String.valueOf(++count));
         		     if(narrower)
         		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
@@ -212,7 +231,7 @@ public class OntologySKOSConceptController {
         		 }
            	    }  
         } else for (Individual individual : listOfTerms) {
-        	 SKOSConceptNode<Individual> tree = new SKOSConceptNode<Individual>(individual);
+        	 TreeNode<Individual> tree = new TreeNode<Individual>(individual);
         	 
         	 if (tree.isRoot() && individual.getAnnotation().get("topConceptOf") != null) {
 				tree.setIndex(String.valueOf(++count));
@@ -228,11 +247,11 @@ public class OntologySKOSConceptController {
          return rootIndividuals;
     }
     
-    public List<SKOSConceptNode<Individual>> conceptTreeWithoutTop (String ontologyId, Integer individualCount, boolean narrower){
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
+    public List<TreeNode<Individual>> conceptTreeWithoutTop (String ontologyId, Integer pageSize, boolean narrower){
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
         List<Individual> listOfTerms = terms.getContent();       
         Set<String> rootIRIs = new HashSet<String>();
-        List<SKOSConceptNode<Individual>> rootIndividuals = new ArrayList<SKOSConceptNode<Individual>>();
+        List<TreeNode<Individual>> rootIndividuals = new ArrayList<TreeNode<Individual>>();
         int count = 0;
         if(!narrower) {
             for (Individual individual : listOfTerms) {
@@ -248,7 +267,7 @@ public class OntologySKOSConceptController {
             
             for (String iri : rootIRIs) {
             	Individual topConceptIndividual = findIndividual(listOfTerms, iri);
-        		SKOSConceptNode<Individual> topConcept = new SKOSConceptNode<Individual>(topConceptIndividual);
+        		TreeNode<Individual> topConcept = new TreeNode<Individual>(topConceptIndividual);
         		topConcept.setIndex(String.valueOf(++count));
     		    populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
         		rootIndividuals.add(topConcept);
@@ -268,7 +287,7 @@ public class OntologySKOSConceptController {
         			}
         			
         			if(root) {
-                		SKOSConceptNode<Individual> topConcept = new SKOSConceptNode<Individual>(individual);
+                		TreeNode<Individual> topConcept = new TreeNode<Individual>(individual);
                 		topConcept.setIndex(String.valueOf(++count));
         		        populateChildrenandRelatedByNarrower(individual,topConcept,listOfTerms);
         		        rootIndividuals.add(topConcept);
@@ -287,11 +306,11 @@ public class OntologySKOSConceptController {
     	return new Individual();
     }
     
-    public void populateChildrenandRelatedByNarrower(Individual individual, SKOSConceptNode<Individual> tree, List<Individual> listOfTerms ) {
+    public void populateChildrenandRelatedByNarrower(Individual individual, TreeNode<Individual> tree, List<Individual> listOfTerms ) {
 		
 		if (individual.getAnnotation().get("related") != null)
 		for (String iriRelated : (String[]) individual.getAnnotation().get("related")) {
-			SKOSConceptNode<Individual> related = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriRelated));
+			TreeNode<Individual> related = new TreeNode<Individual>(findIndividual(listOfTerms,iriRelated));
 			related.setIndex(tree.getIndex()+ ".related");
 			tree.addRelated(related);
 		}
@@ -299,17 +318,17 @@ public class OntologySKOSConceptController {
     	if (individual.getAnnotation().get("narrower") != null)
 		for (String iriChild : (String[]) individual.getAnnotation().get("narrower")) {
 			Individual childIndividual = findIndividual(listOfTerms,iriChild);
-			SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(childIndividual);
+			TreeNode<Individual> child = new TreeNode<Individual>(childIndividual);
 			child.setIndex(tree.getIndex()+"."+ ++count);			
 			populateChildrenandRelatedByNarrower(childIndividual,child,listOfTerms);
 			tree.addChild(child);
 		}
     }
     
-    public void populateChildrenandRelatedByBroader(Individual individual, SKOSConceptNode<Individual> tree, List<Individual> listOfTerms) {
+    public void populateChildrenandRelatedByBroader(Individual individual, TreeNode<Individual> tree, List<Individual> listOfTerms) {
 		if (individual.getAnnotation().get("related") != null)
 		for (String iriRelated : (String[]) individual.getAnnotation().get("related")) {
-			SKOSConceptNode<Individual> related = new SKOSConceptNode<Individual>(findIndividual(listOfTerms,iriRelated));
+			TreeNode<Individual> related = new TreeNode<Individual>(findIndividual(listOfTerms,iriRelated));
 			related.setIndex(tree.getIndex()+ ".related");
 			tree.addRelated(related);
 		}
@@ -319,7 +338,7 @@ public class OntologySKOSConceptController {
 				for (String iriBroader : (String[]) indiv.getAnnotation().get("broader"))
 					if(individual.getIri() != null)
 						if (individual.getIri().equals(iriBroader)) {
-							SKOSConceptNode<Individual> child = new SKOSConceptNode<Individual>(indiv);
+							TreeNode<Individual> child = new TreeNode<Individual>(indiv);
 							child.setIndex(tree.getIndex()+"."+ ++count);	
 							populateChildrenandRelatedByBroader(indiv,child,listOfTerms);
 							tree.addChild(child);
@@ -327,14 +346,14 @@ public class OntologySKOSConceptController {
 		}
     }
     
-    public StringBuilder generateConceptHierarchyTextByOntology(SKOSConceptNode<Individual> rootConcept, boolean displayRelated) {
+    public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Individual> rootConcept, boolean displayRelated) {
     	StringBuilder sb = new StringBuilder();
-        for (SKOSConceptNode<Individual> childConcept : rootConcept.getChildren()) {
+        for (TreeNode<Individual> childConcept : rootConcept.getChildren()) {
        	     sb.append(childConcept.getIndex() + " , "+ childConcept.getData().getLabel() + " , " + childConcept.getData().getIri()).append("\n");
        	     sb.append(generateConceptHierarchyTextByOntology(childConcept,displayRelated));
         }
         if(displayRelated)
-	        for (SKOSConceptNode<Individual> relatedConcept : rootConcept.getRelated()) {
+	        for (TreeNode<Individual> relatedConcept : rootConcept.getRelated()) {
 	      	     sb.append(relatedConcept.getIndex() + " , "+ relatedConcept.getData().getLabel() + " , " + relatedConcept.getData().getIri()).append("\n");
 	      	     sb.append(generateConceptHierarchyTextByOntology(relatedConcept,displayRelated));
 	       }
