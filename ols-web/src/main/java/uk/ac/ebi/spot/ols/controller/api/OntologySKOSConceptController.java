@@ -49,13 +49,13 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "Maximum number of concepts", required = true)
-            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
     	if (TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		return new ResponseEntity<>(conceptTreeWithoutTop(ontologyId,individualCount, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(conceptTreeWithoutTop(ontologyId,pageSize, narrower), HttpStatus.OK);
     	else
-    		return new ResponseEntity<>(conceptTree(ontologyId,individualCount,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
     } 
     
     @RequestMapping(path = "/{onto}/displayconcepthierarchy", method = RequestMethod.GET)
@@ -69,14 +69,14 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @ApiParam(value = "display related concepts", required = true)
             @RequestParam(value = "display_related", required = true, defaultValue = "false") boolean displayRelated,
-            @ApiParam(value = "Maximum number of concepts", required = true)
-            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	 ontologyId = ontologyId.toLowerCase();
      	 List<TreeNode<Individual>> rootIndividuals = null;
     	 if(TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		 rootIndividuals = conceptTreeWithoutTop(ontologyId,individualCount, narrower);
+    		 rootIndividuals = conceptTreeWithoutTop(ontologyId,pageSize, narrower);
     	 else
-    		 rootIndividuals = conceptTree(ontologyId,individualCount,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
+    		 rootIndividuals = conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
          StringBuilder sb = new StringBuilder();
          for (TreeNode<Individual> root : rootIndividuals) {
         	 sb.append(root.getIndex() + " , "+ root.getData().getLabel() + " , " + root.getData().getIri()).append("\n");
@@ -96,11 +96,17 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
             @ApiParam(value = "index value for the root term", required = true)
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
-            @ApiParam(value = "Maximum number of concepts", required = true)
-            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
-        List<Individual> listOfTerms = terms.getContent(); 
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
+        List<Individual> listOfTerms = new ArrayList<Individual>();
+        listOfTerms.addAll(terms.getContent()); 
+        
+    	while(terms.hasNext()) {
+    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
+    		listOfTerms.addAll(terms.getContent());
+    	}  
         TreeNode<Individual> topConcept = new TreeNode<Individual>(new Individual());
         try {
 			String decodedIri = UriUtils.decode(iri, "UTF-8");	        
@@ -131,11 +137,17 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "display_related", required = true, defaultValue = "false") boolean displayRelated,
             @ApiParam(value = "index value for the root term", required = true)
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
-            @ApiParam(value = "Maximum number of concepts", required = true)
-            @RequestParam(value = "individual_count", required = true, defaultValue = "1000000") Integer individualCount) {
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
-        List<Individual> listOfTerms = terms.getContent();
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
+        List<Individual> listOfTerms = new ArrayList<Individual>();
+        listOfTerms.addAll(terms.getContent()); 
+        
+    	while(terms.hasNext()) {
+    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
+    		listOfTerms.addAll(terms.getContent());
+    	}  
         StringBuilder sb = new StringBuilder();
         try {
         	String decodedIri = UriUtils.decode(iri, "UTF-8");
@@ -191,9 +203,16 @@ public class OntologySKOSConceptController {
 
     }
     
-    public List<TreeNode<Individual>> conceptTree (String ontologyId, Integer individualCount, boolean schema, boolean narrower){
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
-        List<Individual> listOfTerms = terms.getContent(); 
+    public List<TreeNode<Individual>> conceptTree (String ontologyId, Integer pageSize, boolean schema, boolean narrower){
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
+        List<Individual> listOfTerms = new ArrayList<Individual>();
+        listOfTerms.addAll(terms.getContent()); 
+        
+    	while(terms.hasNext()) {
+    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
+    		listOfTerms.addAll(terms.getContent());
+    	}       
+        
         List<TreeNode<Individual>> rootIndividuals = new ArrayList<TreeNode<Individual>>();      
         int count = 0;
         
@@ -228,8 +247,8 @@ public class OntologySKOSConceptController {
          return rootIndividuals;
     }
     
-    public List<TreeNode<Individual>> conceptTreeWithoutTop (String ontologyId, Integer individualCount, boolean narrower){
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, individualCount));
+    public List<TreeNode<Individual>> conceptTreeWithoutTop (String ontologyId, Integer pageSize, boolean narrower){
+        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
         List<Individual> listOfTerms = terms.getContent();       
         Set<String> rootIRIs = new HashSet<String>();
         List<TreeNode<Individual>> rootIndividuals = new ArrayList<TreeNode<Individual>>();

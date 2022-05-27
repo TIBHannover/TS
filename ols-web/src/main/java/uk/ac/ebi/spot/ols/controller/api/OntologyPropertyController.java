@@ -238,13 +238,11 @@ public class OntologyPropertyController {
     	Page<Property> roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, pageable);
     	List<Property> rootPropertyDataList = new ArrayList<Property>();
     	rootPropertyDataList.addAll(roots.getContent());
-//    	roots.getContent().forEach(x -> rootPropertyDataList.add(x));
     	List<TreeNode<Property>> rootProperties = new ArrayList<TreeNode<Property>>();
     	
     	while(roots.hasNext()) {
     		roots = ontologyPropertyGraphService.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
     		rootPropertyDataList.addAll(roots.getContent());
-//    		roots.getContent().forEach(x -> rootPropertyDataList.add(x));
     	}
     	
     	
@@ -270,11 +268,9 @@ public class OntologyPropertyController {
 			
 			List<Property> childrenPropertyDataList = new ArrayList<Property>();
 			childrenPropertyDataList.addAll(children.getContent());
-//			children.getContent().forEach(x -> childrenPropertyDataList.add(x));
 	    	while(children.hasNext()) {
 	    		children = ontologyPropertyGraphService.getChildren(ontologyId, decoded, children.nextPageable());
 	    		childrenPropertyDataList.addAll(children.getContent());
-//	    		children.getContent().forEach(x -> childrenPropertyDataList.add(x));
 	    	}		
 			
 			for (Property property : childrenPropertyDataList) {

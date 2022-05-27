@@ -605,13 +605,11 @@ public class OntologyTermController {
     	Page<Term> roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, pageable);
     	List<Term> rootTermDataList = new ArrayList<Term>();
     	rootTermDataList.addAll(roots.getContent());
-//        roots.getContent().forEach(x -> rootTermDataList.add(x));
     	List<TreeNode<Term>> rootTerms = new ArrayList<TreeNode<Term>>();
     	
     	while(roots.hasNext()) {
     		roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
     		rootTermDataList.addAll(roots.getContent());
-//    		roots.getContent().forEach(x -> rootTermDataList.add(x));
     	}
     	
     	int count = 0;
@@ -635,11 +633,9 @@ public class OntologyTermController {
 			Page<Term> children = ontologyTermGraphService.getChildren(ontologyId, decoded, pageable);
 			List<Term> childrenTermDataList = new ArrayList<Term>();
 			childrenTermDataList.addAll(children.getContent());
-//			children.getContent().forEach(x->childrenTermDataList.add(x));
 	    	while(children.hasNext()) {
 	    		children = ontologyTermGraphService.getChildren(ontologyId, decoded, children.nextPageable());
 	    		childrenTermDataList.addAll(children.getContent());
-//	    		children.getContent().forEach(x->childrenTermDataList.add(x));
 	    	}
 			
 					
