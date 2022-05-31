@@ -8,6 +8,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,11 +26,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
-import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.ClassJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.neo4j.service.ViewMode;
+import uk.ac.ebi.spot.ols.service.TreePopulateService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
@@ -58,6 +60,9 @@ public class OntologyTermController {
     
     @Autowired
     ClassJsTreeBuilder jsTreeBuilder;
+    
+    @Autowired
+    TreePopulateService treePopulateService;
 
 
     @RequestMapping(path = "/{onto}/terms", produces = {MediaType.APPLICATION_JSON_VALUE, 
@@ -601,55 +606,16 @@ public class OntologyTermController {
     @ApiParam(value = "Page Size", required = true)
     @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
     PagedResourcesAssembler assembler){
-    	Pageable pageable = new PageRequest(0, pageSize);
-    	Page<Term> roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, pageable);
-    	List<Term> rootTermDataList = new ArrayList<Term>();
-    	rootTermDataList.addAll(roots.getContent());
-    	List<TreeNode<Term>> rootTerms = new ArrayList<TreeNode<Term>>();
+    	List<TreeNode<Term>> termTree = treePopulateService.populateTermTree(ontologyTermGraphService, ontologyId, includeObsoletes, pageSize);
     	
-    	while(roots.hasNext()) {
-    		roots = ontologyTermGraphService.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
-    		rootTermDataList.addAll(roots.getContent());
-    	}
-    	
-    	int count = 0;
-    	for (Term rootTermData : rootTermDataList) {
-    		TreeNode<Term> rootTerm =  new TreeNode<Term>(rootTermData);
-    		rootTerm.setIndex(String.valueOf(++count));
-    		populateChildren(ontologyId, rootTerm, pageable);	
-    		rootTerms.add(rootTerm);
-    	}
-    	
-        if (roots == null) 
+        if (termTree == null) 
             throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
-          return new ResponseEntity<>( rootTerms, HttpStatus.OK);
+          return new ResponseEntity<>( termTree, HttpStatus.OK);
     }
-    
-    public void populateChildren(String ontologyId, TreeNode<Term> root, Pageable pageable) {
-		String decoded;
-		int count = 0;
-		try {
-			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
-			Page<Term> children = ontologyTermGraphService.getChildren(ontologyId, decoded, pageable);
-			List<Term> childrenTermDataList = new ArrayList<Term>();
-			childrenTermDataList.addAll(children.getContent());
-	    	while(children.hasNext()) {
-	    		children = ontologyTermGraphService.getChildren(ontologyId, decoded, children.nextPageable());
-	    		childrenTermDataList.addAll(children.getContent());
-	    	}
-			
-					
-			for (Term term : childrenTermDataList) {
-				TreeNode<Term> child =  new TreeNode<Term>(term);
-				child.setIndex(root.getIndex()+"."+ ++count);
-				populateChildren(ontologyId, child, pageable);
-				root.addChild(child);
-			}
-			
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+  
+    @RequestMapping(method = RequestMethod.GET, value = "/removeCache")
+    public String removeCache() {
+    	return treePopulateService.removeCache();
     }
     
 
