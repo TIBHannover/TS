@@ -8,11 +8,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -30,11 +27,10 @@ import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.ClassJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.neo4j.service.ViewMode;
-import uk.ac.ebi.spot.ols.service.TreePopulateService;
+import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -60,10 +56,6 @@ public class OntologyTermController {
     
     @Autowired
     ClassJsTreeBuilder jsTreeBuilder;
-    
-    @Autowired
-    TreePopulateService treePopulateService;
-
 
     @RequestMapping(path = "/{onto}/terms", produces = {MediaType.APPLICATION_JSON_VALUE, 
         MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
@@ -606,16 +598,16 @@ public class OntologyTermController {
     @ApiParam(value = "Page Size", required = true)
     @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
     PagedResourcesAssembler assembler){
-    	List<TreeNode<Term>> termTree = treePopulateService.populateTermTree(ontologyTermGraphService, ontologyId, includeObsoletes, pageSize);
+    	List<TreeNode<Term>> termTree = ontologyTermGraphService.populateTermTree(ontologyId, includeObsoletes, pageSize);
     	
         if (termTree == null) 
             throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
           return new ResponseEntity<>( termTree, HttpStatus.OK);
     }
   
-    @RequestMapping(method = RequestMethod.GET, value = "/removeCache")
+    @RequestMapping(method = RequestMethod.GET, value = "/removeTermCache")
     public String removeCache() {
-    	return treePopulateService.removeCache();
+    	return ontologyTermGraphService.removeCache();
     }
     
 

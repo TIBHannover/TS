@@ -3,13 +3,20 @@ package uk.ac.ebi.spot.ols.neo4j.service;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
+
+import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.repository.OntologyTermRepository;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -186,5 +193,80 @@ public class OntologyTermGraphService {
 
     public Page<Individual> getInstances(String ontologyId, String iri, Pageable pageable) {
         return termRepository.getInstances(ontologyId, iri, pageable);
+    }
+    
+    @Cacheable(value = "termtree", key="#ontologyId.concat('-').concat(#includeObsoletes)")
+    public List<TreeNode<Term>> populateTermTree(String ontologyId, boolean includeObsoletes, Integer pageSize){
+    	Pageable pageable = new PageRequest(0, pageSize);
+    	Page<Term> roots = this.getRoots(ontologyId, includeObsoletes, pageable);
+    	if (roots == null) 
+    		return null;
+    	List<Term> rootTermDataList = new ArrayList<Term>();
+    	rootTermDataList.addAll(roots.getContent());
+    	List<TreeNode<Term>> rootTerms = new ArrayList<TreeNode<Term>>();
+    	
+    	while(roots.hasNext()) {
+    		roots = this.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
+    		rootTermDataList.addAll(roots.getContent());
+    	}
+    	
+    	int count = 0;
+    	for (Term rootTermData : rootTermDataList) {
+    		TreeNode<Term> rootTerm =  new TreeNode<Term>(rootTermData);
+    		rootTerm.setIndex(String.valueOf(++count));
+    		populateChildren(ontologyId, rootTerm, pageable);	
+    		rootTerms.add(rootTerm);
+    	}
+    	System.out.println("Kamil!!!");
+    	return rootTerms;
+    }
+    
+    @Cacheable(value = "termtree", key="#ontologyId.concat('-').concat(#iri).concat('-').concat(#includeObsoletes)")
+    public TreeNode<Term> populateTermSubTree(String ontologyId, String iri,  boolean includeObsoletes, String rootIndex, Integer pageSize){
+    	Pageable pageable = new PageRequest(0, pageSize);
+    	TreeNode<Term> rootTerm = null;
+    	try {
+			String decoded = UriUtils.decode(iri, "UTF-8");
+			Term root = this.findByOntologyAndIri(ontologyId, decoded);
+	    	rootTerm =  new TreeNode<Term>(root);
+	    	rootTerm.setIndex(rootIndex);
+	    	populateChildren(ontologyId, rootTerm, pageable);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return rootTerm;
+    }
+    
+    @CacheEvict(value="termtree", allEntries=true)
+    public String removeCache() {
+    	return "All term cache removed";
+    }
+    
+    public void populateChildren(String ontologyId, TreeNode<Term> root, Pageable pageable) {
+		String decoded;
+		int count = 0;
+		try {
+			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
+			Page<Term> children = this.getChildren(ontologyId, decoded, pageable);
+			List<Term> childrenTermDataList = new ArrayList<Term>();
+			childrenTermDataList.addAll(children.getContent());
+	    	while(children.hasNext()) {
+	    		children = this.getChildren(ontologyId, decoded, children.nextPageable());
+	    		childrenTermDataList.addAll(children.getContent());
+	    	}			
+					
+			for (Term term : childrenTermDataList) {
+				TreeNode<Term> child =  new TreeNode<Term>(term);
+				child.setIndex(root.getIndex()+"."+ ++count);
+				populateChildren(ontologyId, child, pageable);
+				root.addChild(child);
+			}
+			
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }

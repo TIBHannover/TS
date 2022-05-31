@@ -19,6 +19,7 @@ import org.springframework.web.util.UriUtils;
 
 import io.swagger.annotations.ApiParam;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
+import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -249,7 +250,14 @@ public class OntologySKOSConceptController {
     
     public List<TreeNode<Individual>> conceptTreeWithoutTop (String ontologyId, Integer pageSize, boolean narrower){
         Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
-        List<Individual> listOfTerms = terms.getContent();       
+        List<Individual> listOfTerms = new ArrayList<Individual>();
+        listOfTerms.addAll(terms.getContent()); 
+        
+    	while(terms.hasNext()) {
+    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
+    		listOfTerms.addAll(terms.getContent());
+    	}  
+    	
         Set<String> rootIRIs = new HashSet<String>();
         List<TreeNode<Individual>> rootIndividuals = new ArrayList<TreeNode<Individual>>();
         int count = 0;
