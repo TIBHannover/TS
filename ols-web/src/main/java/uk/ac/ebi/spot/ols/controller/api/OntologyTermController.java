@@ -604,13 +604,38 @@ public class OntologyTermController {
             throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
           return new ResponseEntity<>( termTree, HttpStatus.OK);
     }
+    
+    @RequestMapping(path = "/{onto}/termtree/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<TreeNode<Term>> getSubTermHierarchyByOntology(  
+    @PathVariable("onto") String ontologyId, 
+    @PathVariable("iri") String iri,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes,
+    @ApiParam(value = "index value for the root term", required = true)
+    @RequestParam(value = "index", required = true, defaultValue = "1") String index,
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+    	ontologyId = ontologyId.toLowerCase();
+    	TreeNode<Term> termTree = new TreeNode<Term>(new Term());
+    	
+    	try {
+			String decoded = UriUtils.decode(iri, "UTF-8");
+			termTree = ontologyTermGraphService.populateTermSubTree(ontologyId, decoded,includeObsoletes, index, pageSize);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        if (termTree.getData().getIri() == null) 
+            throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
+          return new ResponseEntity<>( termTree, HttpStatus.OK);
+    }
   
-    @RequestMapping(method = RequestMethod.GET, value = "/removeTermCache")
-    public String removeCache() {
-    	return ontologyTermGraphService.removeCache();
+    @RequestMapping(method = RequestMethod.GET, value = "/removeTermTreeCache")
+    public String removeTermTreeCache() {
+    	return ontologyTermGraphService.removeTermTreeCache();
     }
     
-
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
     @ExceptionHandler(ResourceNotFoundException.class)
     public void handleError(HttpServletRequest req, Exception exception) {

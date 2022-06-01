@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -24,16 +23,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 import uk.ac.ebi.spot.ols.neo4j.model.Property;
-import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
-import uk.ac.ebi.spot.ols.neo4j.service.JsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyPropertyGraphService;
 import uk.ac.ebi.spot.ols.neo4j.service.PropertyJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.ViewMode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -241,10 +237,37 @@ public class OntologyPropertyController {
             throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
           return new ResponseEntity<>( propertyTree, HttpStatus.OK);
     }
+    
+    @RequestMapping(path = "/{onto}/propertytree/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<TreeNode<Property>> getSubPropertyHierarchyByOntology(  
+    @PathVariable("onto") String ontologyId, 
+    @PathVariable("iri") String iri,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes,
+    @ApiParam(value = "index value for the root term", required = true)
+    @RequestParam(value = "index", required = true, defaultValue = "1") String index,
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+    	ontologyId = ontologyId.toLowerCase();
+    	TreeNode<Property> propertyTree = new TreeNode<Property>(new Property());
+    	String decoded;
+		try {
+			decoded = UriUtils.decode(iri, "UTF-8");
+			propertyTree = ontologyPropertyGraphService.populatePropertySubTree(ontologyId, decoded,includeObsoletes, index, pageSize);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	    	
+        if (propertyTree.getData().getIri() == null) 
+            throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
+          return new ResponseEntity<>( propertyTree, HttpStatus.OK);
+    }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/removePropertyCache")
-    public String removeCache() {
-    	return ontologyPropertyGraphService.removeCache();
+    @RequestMapping(method = RequestMethod.GET, value = "/removePropertyTreeCache")
+    public String removePropertyTreeCache() {
+    	return ontologyPropertyGraphService.removePropertyTreeCache();
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")

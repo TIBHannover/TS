@@ -9,14 +9,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriUtils;
 
 import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.repository.OntologyTermRepository;
 
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -221,52 +219,37 @@ public class OntologyTermGraphService {
     	return rootTerms;
     }
     
-    @Cacheable(value = "termtree", key="#ontologyId.concat('-').concat(#iri).concat('-').concat(#includeObsoletes)")
+    @Cacheable(value = "termtree", key="#ontologyId.concat('-').concat('s').concat('-').concat(#iri).concat('-').concat(#includeObsoletes)")
     public TreeNode<Term> populateTermSubTree(String ontologyId, String iri,  boolean includeObsoletes, String rootIndex, Integer pageSize){
     	Pageable pageable = new PageRequest(0, pageSize);
-    	TreeNode<Term> rootTerm = null;
-    	try {
-			String decoded = UriUtils.decode(iri, "UTF-8");
-			Term root = this.findByOntologyAndIri(ontologyId, decoded);
-	    	rootTerm =  new TreeNode<Term>(root);
-	    	rootTerm.setIndex(rootIndex);
-	    	populateChildren(ontologyId, rootTerm, pageable);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Term root = this.findByOntologyAndIri(ontologyId, iri);
+		TreeNode<Term> rootTerm =  new TreeNode<Term>(root);
+    	rootTerm.setIndex(rootIndex);
+    	populateChildren(ontologyId, rootTerm, pageable);
     	
     	return rootTerm;
     }
     
     @CacheEvict(value="termtree", allEntries=true)
-    public String removeCache() {
-    	return "All term cache removed";
+    public String removeTermTreeCache() {
+    	return "All term tree cache removed!";
     }
     
     public void populateChildren(String ontologyId, TreeNode<Term> root, Pageable pageable) {
-		String decoded;
 		int count = 0;
-		try {
-			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
-			Page<Term> children = this.getChildren(ontologyId, decoded, pageable);
-			List<Term> childrenTermDataList = new ArrayList<Term>();
-			childrenTermDataList.addAll(children.getContent());
-	    	while(children.hasNext()) {
-	    		children = this.getChildren(ontologyId, decoded, children.nextPageable());
-	    		childrenTermDataList.addAll(children.getContent());
-	    	}			
-					
-			for (Term term : childrenTermDataList) {
-				TreeNode<Term> child =  new TreeNode<Term>(term);
-				child.setIndex(root.getIndex()+"."+ ++count);
-				populateChildren(ontologyId, child, pageable);
-				root.addChild(child);
-			}
-			
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		Page<Term> children = this.getChildren(ontologyId, root.getData().getIri(), pageable);
+		List<Term> childrenTermDataList = new ArrayList<Term>();
+		childrenTermDataList.addAll(children.getContent());
+    	while(children.hasNext()) {
+    		children = this.getChildren(ontologyId, root.getData().getIri(), children.nextPageable());
+    		childrenTermDataList.addAll(children.getContent());
+    	}			
+				
+		for (Term term : childrenTermDataList) {
+			TreeNode<Term> child =  new TreeNode<Term>(term);
+			child.setIndex(root.getIndex()+"."+ ++count);
+			populateChildren(ontologyId, child, pageable);
+			root.addChild(child);
 		}
     }
 }

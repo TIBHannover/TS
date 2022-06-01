@@ -1,6 +1,5 @@
 package uk.ac.ebi.spot.ols.neo4j.service;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriUtils;
 
 import uk.ac.ebi.spot.ols.neo4j.model.Property;
 import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
@@ -65,9 +63,7 @@ public class OntologyPropertyGraphService {
     public Page<Property> findAllByOboIdAndIsDefiningOntology(String oboId, Pageable pageable) {
         return ontologyPropertyRepository.findAllByOboIdAndIsDefiningOntology(oboId, pageable);
     }
-    
-    
-    
+      
     public Page<Property> findAllByOntology(String ontologyId, Pageable pageable) {
         return ontologyPropertyRepository.findAllByOntology(ontologyId, pageable);
     }
@@ -129,53 +125,39 @@ public class OntologyPropertyGraphService {
     	return rootProperties;
     }
     
-    @Cacheable(value = "propertytree", key="#ontologyId.concat('-').concat(#iri).concat('-').concat(#includeObsoletes)")
+    @Cacheable(value = "propertytree", key="#ontologyId.concat('-').concat('s').concat('-').concat(#iri).concat('-').concat(#includeObsoletes)")
     public TreeNode<Property> populatePropertySubTree(String ontologyId, String iri,  boolean includeObsoletes, String rootIndex, Integer pageSize){
     	Pageable pageable = new PageRequest(0, pageSize);
-    	TreeNode<Property> rootProperty = null;
-    	try {
-			String decoded = UriUtils.decode(iri, "UTF-8");
-			Property root = this.findByOntologyAndIri(ontologyId, decoded);
-	    	rootProperty =  new TreeNode<Property>(root);
-	    	rootProperty.setIndex(rootIndex);
-	    	populateChildren(ontologyId, rootProperty, pageable);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Property root = this.findByOntologyAndIri(ontologyId, iri);
+		TreeNode<Property> rootProperty =  new TreeNode<Property>(root);
+    	rootProperty.setIndex(rootIndex);
+    	populateChildren(ontologyId, rootProperty, pageable);
     	
     	return rootProperty;
     }
     
     @CacheEvict(value="propertytree", allEntries=true)
-    public String removeCache() {
-    	return "All property cache removed";
+    public String removePropertyTreeCache() {
+    	return "All property tree cache removed";
     }
     
     public void populateChildren(String ontologyId, TreeNode<Property> root, Pageable pageable) {
-		String decoded;
 		int count = 0;
-		try {
-			decoded = UriUtils.decode(root.getData().getIri(), "UTF-8");
-			Page<Property> children = this.getChildren(ontologyId, decoded, pageable);
-			List<Property> childrenPropertyDataList = new ArrayList<Property>();
-			childrenPropertyDataList.addAll(children.getContent());
-	    	while(children.hasNext()) {
-	    		children = this.getChildren(ontologyId, decoded, children.nextPageable());
-	    		childrenPropertyDataList.addAll(children.getContent());
-	    	}			
-					
-			for (Property property : childrenPropertyDataList) {
-				TreeNode<Property> child =  new TreeNode<Property>(property);
-				child.setIndex(root.getIndex()+"."+ ++count);
-				populateChildren(ontologyId, child, pageable);
-				root.addChild(child);
-			}
-			
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		Page<Property> children = this.getChildren(ontologyId, root.getData().getIri(), pageable);
+		List<Property> childrenPropertyDataList = new ArrayList<Property>();
+		childrenPropertyDataList.addAll(children.getContent());
+    	while(children.hasNext()) {
+    		children = this.getChildren(ontologyId, root.getData().getIri(), children.nextPageable());
+    		childrenPropertyDataList.addAll(children.getContent());
+    	}			
+				
+		for (Property property : childrenPropertyDataList) {
+			TreeNode<Property> child =  new TreeNode<Property>(property);
+			child.setIndex(root.getIndex()+"."+ ++count);
+			populateChildren(ontologyId, child, pageable);
+			root.addChild(child);
 		}
+			
     }
     
 }
