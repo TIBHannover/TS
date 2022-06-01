@@ -56,9 +56,9 @@ public class OntologySKOSConceptController {
     		return new ResponseEntity<>(ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
     } 
     
-    @RequestMapping(path = "/{onto}/displayconcepthierarchy", method = RequestMethod.GET)
+    @RequestMapping(path = "/{onto}/displayconcepthierarchy", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     @ResponseBody
-    String displaySKOSConceptHierarchyByOntology(
+    HttpEntity<String> displaySKOSConceptHierarchyByOntology(
     	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
     		@ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships", required = true)
@@ -81,7 +81,7 @@ public class OntologySKOSConceptController {
         	 sb.append(generateConceptHierarchyTextByOntology(root, displayRelated)); 
          }
          
-         return sb.toString();
+         return new HttpEntity<String>(sb.toString());
     }  
     
     @RequestMapping(path = "/{onto}/concepthierarchy/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
@@ -112,9 +112,9 @@ public class OntologySKOSConceptController {
         return new ResponseEntity<>(topConcept, HttpStatus.OK);
     } 
     
-    @RequestMapping(path = "/{onto}/displayconcepthierarchy/{iri}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{onto}/displayconcepthierarchy/{iri}", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     @ResponseBody
-    String displaySKOSConceptHierarchyByOntologyAndIri(
+    HttpEntity<String> displaySKOSConceptHierarchyByOntologyAndIri(
     	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
             @ApiParam(value = "encoded concept IRI", required = true)
@@ -142,7 +142,7 @@ public class OntologySKOSConceptController {
         	sb.append(topConcept.getIndex() + " , "+ topConcept.getData().getLabel() + " , " + topConcept.getData().getIri()).append("\n");
 	        sb.append(generateConceptHierarchyTextByOntology(topConcept, displayRelated));   
 	        
-            return sb.toString();
+            return new HttpEntity<String>(sb.toString());
     } 
     
     @RequestMapping(path = "/{onto}/conceptrelations/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)

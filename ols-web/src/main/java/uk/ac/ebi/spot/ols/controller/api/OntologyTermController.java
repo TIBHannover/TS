@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
+import uk.ac.ebi.spot.ols.neo4j.model.Property;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.ClassJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
@@ -605,6 +606,23 @@ public class OntologyTermController {
           return new ResponseEntity<>( termTree, HttpStatus.OK);
     }
     
+    @RequestMapping(path = "/{onto}/displaytermtree", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    HttpEntity<String> displayTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes, 
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+	    StringBuilder sb = new StringBuilder();
+	    List<TreeNode<Term>> termTree = ontologyTermGraphService.populateTermTree(ontologyId, includeObsoletes, pageSize);
+	    	
+	   	 for (TreeNode<Term> root : termTree) {
+			 sb.append(root.getIndex() + " , "+ root.getData().getLabel() + " , " + root.getData().getIri()).append("\n");
+		     sb.append(generateConceptHierarchyTextByOntology(root)); 
+		 }
+	    	
+	     return new HttpEntity<String>(sb.toString());
+    }
+    
     @RequestMapping(path = "/{onto}/termtree/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, 
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<TreeNode<Term>> getSubTermHierarchyByOntology(  
@@ -629,6 +647,44 @@ public class OntologyTermController {
         if (termTree.getData().getIri() == null) 
             throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
           return new ResponseEntity<>( termTree, HttpStatus.OK);
+    }
+    
+    @RequestMapping(path = "/{onto}/displaytermtree/{iri}", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    HttpEntity<String> displaySubTermHierarchyByOntology(  
+    @PathVariable("onto") String ontologyId, 
+    @PathVariable("iri") String iri,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes,
+    @ApiParam(value = "index value for the root term", required = true)
+    @RequestParam(value = "index", required = true, defaultValue = "1") String index,
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+    	ontologyId = ontologyId.toLowerCase();
+    	StringBuilder sb = new StringBuilder();
+    	TreeNode<Term> termTree = new TreeNode<Term>(new Term());
+    	
+    	try {
+			String decoded = UriUtils.decode(iri, "UTF-8");
+			termTree = ontologyTermGraphService.populateTermSubTree(ontologyId, decoded,includeObsoletes, index, pageSize);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+		 sb.append(termTree.getIndex() + " , "+ termTree.getData().getLabel() + " , " + termTree.getData().getIri()).append("\n");
+	     sb.append(generateConceptHierarchyTextByOntology(termTree));  
+
+         return new HttpEntity<String>(sb.toString());
+    }
+    
+    public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Term> rootConcept) {
+    	StringBuilder sb = new StringBuilder();
+        for (TreeNode<Term> childProperty : rootConcept.getChildren()) {
+       	     sb.append(childProperty.getIndex() + " , "+ childProperty.getData().getLabel() + " , " + childProperty.getData().getIri()).append("\n");
+       	     sb.append(generateConceptHierarchyTextByOntology(childProperty));
+        }
+
+        return sb;
     }
   
     @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removeTermTreeCache")
