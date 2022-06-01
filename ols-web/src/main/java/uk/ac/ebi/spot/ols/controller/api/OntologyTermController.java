@@ -631,9 +631,9 @@ public class OntologyTermController {
           return new ResponseEntity<>( termTree, HttpStatus.OK);
     }
   
-    @RequestMapping(method = RequestMethod.GET, value = "/removeTermTreeCache")
-    public String removeTermTreeCache() {
-    	return ontologyTermGraphService.removeTermTreeCache();
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removeTermTreeCache")
+    public HttpEntity<String> removeTermTreeCache() {
+    	return new HttpEntity<String>(ontologyTermGraphService.removeTermTreeCache());
     }
     
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")

@@ -265,9 +265,9 @@ public class OntologyPropertyController {
           return new ResponseEntity<>( propertyTree, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/removePropertyTreeCache")
-    public String removePropertyTreeCache() {
-    	return ontologyPropertyGraphService.removePropertyTreeCache();
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removePropertyTreeCache")
+    public HttpEntity<String> removePropertyTreeCache() {
+    	return new HttpEntity<String>(ontologyPropertyGraphService.removePropertyTreeCache());
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")

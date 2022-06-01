@@ -37,7 +37,7 @@ import java.util.List;
 public class OntologySKOSConceptController {
 
     @Autowired
-    private OntologyIndividualService ontologyIndividualRepository;
+    private OntologyIndividualService ontologyIndividualService;
     
     @RequestMapping(path = "/{onto}/concepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<TreeNode<Individual>>> getSKOSConceptHierarchyByOntology(
@@ -51,9 +51,9 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
     	if (TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		return new ResponseEntity<>(ontologyIndividualRepository.conceptTreeWithoutTop(ontologyId,pageSize, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(ontologyIndividualService.conceptTreeWithoutTop(ontologyId,pageSize, narrower), HttpStatus.OK);
     	else
-    		return new ResponseEntity<>(ontologyIndividualRepository.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
     } 
     
     @RequestMapping(path = "/{onto}/displayconcepthierarchy", method = RequestMethod.GET)
@@ -72,9 +72,9 @@ public class OntologySKOSConceptController {
     	 ontologyId = ontologyId.toLowerCase();
      	 List<TreeNode<Individual>> rootIndividuals = null;
     	 if(TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		 rootIndividuals = ontologyIndividualRepository.conceptTreeWithoutTop(ontologyId,pageSize, narrower);
+    		 rootIndividuals = ontologyIndividualService.conceptTreeWithoutTop(ontologyId,pageSize, narrower);
     	 else
-    		 rootIndividuals = ontologyIndividualRepository.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
+    		 rootIndividuals = ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
          StringBuilder sb = new StringBuilder();
          for (TreeNode<Individual> root : rootIndividuals) {
         	 sb.append(root.getIndex() + " , "+ root.getData().getLabel() + " , " + root.getData().getIri()).append("\n");
@@ -101,12 +101,12 @@ public class OntologySKOSConceptController {
     	String decodedIri;
 		try {
 			decodedIri = UriUtils.decode(iri, "UTF-8");
-			topConcept = ontologyIndividualRepository.conceptSubTree(ontologyId, decodedIri, narrower, index, pageSize);
+			topConcept = ontologyIndividualService.conceptSubTree(ontologyId, decodedIri, narrower, index, pageSize);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	topConcept = ontologyIndividualRepository.conceptSubTree(ontologyId, iri, narrower, index, pageSize);
+    	topConcept = ontologyIndividualService.conceptSubTree(ontologyId, iri, narrower, index, pageSize);
         if (topConcept.getData().getIri() == null) 
             throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
         return new ResponseEntity<>(topConcept, HttpStatus.OK);
@@ -133,7 +133,7 @@ public class OntologySKOSConceptController {
 	    	StringBuilder sb = new StringBuilder();
 			try {
 				decodedIri = UriUtils.decode(iri, "UTF-8");
-				topConcept = ontologyIndividualRepository.conceptSubTree(ontologyId, decodedIri, narrower, index, pageSize);
+				topConcept = ontologyIndividualService.conceptSubTree(ontologyId, decodedIri, narrower, index, pageSize);
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -160,7 +160,7 @@ public class OntologySKOSConceptController {
     	List<Individual> related = new ArrayList<Individual>();
     	try {
 			String decodedIri = UriUtils.decode(iri, "UTF-8");
-			related = ontologyIndividualRepository.findRelated(ontologyId, decodedIri, relationType);
+			related = ontologyIndividualService.findRelated(ontologyId, decodedIri, relationType);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -172,11 +172,6 @@ public class OntologySKOSConceptController {
        
         return new ResponseEntity<>( assembler.toResource(conceptPage), HttpStatus.OK);    	
 
-    }
-    
-    @RequestMapping(method = RequestMethod.GET, value = "/removeConceptTreeCache")
-    public String removeConceptTreeCache() {
-    	return  ontologyIndividualRepository.removeConceptTreeCache();
     }
     
     public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Individual> rootConcept, boolean displayRelated) {
@@ -191,6 +186,11 @@ public class OntologySKOSConceptController {
 	      	     sb.append(generateConceptHierarchyTextByOntology(relatedConcept,displayRelated));
 	       }
         return sb;
+    }
+    
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removeConceptTreeCache")
+    public HttpEntity<String> removeConceptTreeCache() {
+    	return new HttpEntity<String>(ontologyIndividualService.removeConceptTreeCache());
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
