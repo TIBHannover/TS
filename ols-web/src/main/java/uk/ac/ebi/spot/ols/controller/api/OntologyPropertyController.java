@@ -1,9 +1,5 @@
 package uk.ac.ebi.spot.ols.controller.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
 import io.swagger.annotations.ApiParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
-import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Property;
 import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyPropertyGraphService;
@@ -188,12 +183,7 @@ public class OntologyPropertyController {
 
         try {
             String decoded = UriUtils.decode(termId, "UTF-8");
-
-            Object object= jsTreeBuilder.getJsTreeChildren(ontologyId, decoded, nodeId);
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            return new HttpEntity<String>(ow.writeValueAsString(object));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            return new HttpEntity<String>(jsTreeBuilder.writeJSTreeChildrenAsString(ontologyId, decoded, nodeId));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -213,12 +203,7 @@ public class OntologyPropertyController {
 
         try {
             String decoded = UriUtils.decode(termId, "UTF-8");
-
-            Object object= jsTreeBuilder.getJsTree(ontologyId, decoded, siblings, ViewMode.getFromShortName(viewMode));
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            return new HttpEntity<String>(ow.writeValueAsString(object));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            return new HttpEntity<String>(jsTreeBuilder.writeJSTreeAsString(ontologyId, decoded, siblings, ViewMode.getFromShortName(viewMode)));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
-import uk.ac.ebi.spot.ols.neo4j.model.Property;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.ClassJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
@@ -361,12 +360,7 @@ public class OntologyTermController {
 
         try {
             String decodedTermId = UriUtils.decode(termId, "UTF-8");
-
-            Object object= jsTreeBuilder.getJsTree(ontologyId, decodedTermId, siblings, ViewMode.getFromShortName(viewMode));
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            return new HttpEntity<String>(ow.writeValueAsString(object));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            return new HttpEntity<String>(jsTreeBuilder.writeJSTreeAsString(ontologyId, decodedTermId, siblings, ViewMode.getFromShortName(viewMode)));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -383,12 +377,7 @@ public class OntologyTermController {
 
         try {
             String decoded = UriUtils.decode(termId, "UTF-8");
-
-            Object object= jsTreeBuilder.getJsTreeChildren(ontologyId, decoded, nodeId);
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            return new HttpEntity<String>(ow.writeValueAsString(object));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            return new HttpEntity<String>(jsTreeBuilder.writeJSTreeChildrenAsString(ontologyId, decoded, nodeId));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -687,6 +676,11 @@ public class OntologyTermController {
         return sb;
     }
   
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removeJSTreeCache")
+    public HttpEntity<String> removeJSTreeCache() {
+    	return new HttpEntity<String>(jsTreeBuilder.removeJSTreeCache());
+    }
+    
     @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removeTermTreeCache")
     public HttpEntity<String> removeTermTreeCache() {
     	return new HttpEntity<String>(ontologyTermGraphService.removeTermTreeCache());
