@@ -1,10 +1,15 @@
 package uk.ac.ebi.spot.ols.neo4j.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class TreeNode<T> {
+public class TreeNode<T> implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -343190255910189166L;
 	private Collection<TreeNode<T>> children = new ArrayList<TreeNode<T>>();
 	private Collection<TreeNode<T>> related = new ArrayList<TreeNode<T>>();
     private Collection<TreeNode<T>> parent = new ArrayList<TreeNode<T>>();
