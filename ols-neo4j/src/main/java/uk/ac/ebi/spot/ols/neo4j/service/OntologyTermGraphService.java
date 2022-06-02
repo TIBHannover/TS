@@ -3,9 +3,14 @@ package uk.ac.ebi.spot.ols.neo4j.service;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.repository.OntologyTermRepository;
@@ -186,5 +191,64 @@ public class OntologyTermGraphService {
 
     public Page<Individual> getInstances(String ontologyId, String iri, Pageable pageable) {
         return termRepository.getInstances(ontologyId, iri, pageable);
+    }
+    
+    @Cacheable(value = "termtree", key="#ontologyId.concat('-').concat(#includeObsoletes)")
+    public List<TreeNode<Term>> populateTermTree(String ontologyId, boolean includeObsoletes, Integer pageSize){
+    	Pageable pageable = new PageRequest(0, pageSize);
+    	Page<Term> roots = this.getRoots(ontologyId, includeObsoletes, pageable);
+    	if (roots == null) 
+    		return null;
+    	List<Term> rootTermDataList = new ArrayList<Term>();
+    	rootTermDataList.addAll(roots.getContent());
+    	List<TreeNode<Term>> rootTerms = new ArrayList<TreeNode<Term>>();
+    	
+    	while(roots.hasNext()) {
+    		roots = this.getRoots(ontologyId, includeObsoletes, roots.nextPageable());
+    		rootTermDataList.addAll(roots.getContent());
+    	}
+    	
+    	int count = 0;
+    	for (Term rootTermData : rootTermDataList) {
+    		TreeNode<Term> rootTerm =  new TreeNode<Term>(rootTermData);
+    		rootTerm.setIndex(String.valueOf(++count));
+    		populateChildren(ontologyId, rootTerm, pageable);	
+    		rootTerms.add(rootTerm);
+    	}
+    	return rootTerms;
+    }
+    
+    @Cacheable(value = "termtree", key="#ontologyId.concat('-').concat('s').concat('-').concat(#iri).concat('-').concat(#includeObsoletes)")
+    public TreeNode<Term> populateTermSubTree(String ontologyId, String iri,  boolean includeObsoletes, String rootIndex, Integer pageSize){
+    	Pageable pageable = new PageRequest(0, pageSize);
+		Term root = this.findByOntologyAndIri(ontologyId, iri);
+		TreeNode<Term> rootTerm =  new TreeNode<Term>(root);
+    	rootTerm.setIndex(rootIndex);
+    	populateChildren(ontologyId, rootTerm, pageable);
+    	
+    	return rootTerm;
+    }
+    
+    @CacheEvict(value="termtree", allEntries=true)
+    public String removeTermTreeCache() {
+    	return "All term tree cache removed!";
+    }
+    
+    public void populateChildren(String ontologyId, TreeNode<Term> root, Pageable pageable) {
+		int count = 0;
+		Page<Term> children = this.getChildren(ontologyId, root.getData().getIri(), pageable);
+		List<Term> childrenTermDataList = new ArrayList<Term>();
+		childrenTermDataList.addAll(children.getContent());
+    	while(children.hasNext()) {
+    		children = this.getChildren(ontologyId, root.getData().getIri(), children.nextPageable());
+    		childrenTermDataList.addAll(children.getContent());
+    	}			
+				
+		for (Term term : childrenTermDataList) {
+			TreeNode<Term> child =  new TreeNode<Term>(term);
+			child.setIndex(root.getIndex()+"."+ ++count);
+			populateChildren(ontologyId, child, pageable);
+			root.addChild(child);
+		}
     }
 }

@@ -3,7 +3,6 @@ package uk.ac.ebi.spot.ols.controller.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -19,15 +18,14 @@ import org.springframework.web.util.UriUtils;
 
 import io.swagger.annotations.ApiParam;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
+import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Erhun Giray TUNCAY 
@@ -39,7 +37,7 @@ import java.util.Set;
 public class OntologySKOSConceptController {
 
     @Autowired
-    private OntologyIndividualService ontologyIndividualRepository;
+    private OntologyIndividualService ontologyIndividualService;
     
     @RequestMapping(path = "/{onto}/concepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<TreeNode<Individual>>> getSKOSConceptHierarchyByOntology(
@@ -53,14 +51,14 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
     	if (TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		return new ResponseEntity<>(conceptTreeWithoutTop(ontologyId,pageSize, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(ontologyIndividualService.conceptTreeWithoutTop(ontologyId,pageSize, narrower), HttpStatus.OK);
     	else
-    		return new ResponseEntity<>(conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
     } 
     
-    @RequestMapping(path = "/{onto}/displayconcepthierarchy", method = RequestMethod.GET)
+    @RequestMapping(path = "/{onto}/displayconcepthierarchy", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     @ResponseBody
-    String displaySKOSConceptHierarchyByOntology(
+    HttpEntity<String> displaySKOSConceptHierarchyByOntology(
     	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
     		@ApiParam(value = "infer top concepts by schema (hasTopConcept) or  TopConceptOf property or broader/narrower relationships", required = true)
@@ -74,16 +72,16 @@ public class OntologySKOSConceptController {
     	 ontologyId = ontologyId.toLowerCase();
      	 List<TreeNode<Individual>> rootIndividuals = null;
     	 if(TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		 rootIndividuals = conceptTreeWithoutTop(ontologyId,pageSize, narrower);
+    		 rootIndividuals = ontologyIndividualService.conceptTreeWithoutTop(ontologyId,pageSize, narrower);
     	 else
-    		 rootIndividuals = conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
+    		 rootIndividuals = ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
          StringBuilder sb = new StringBuilder();
          for (TreeNode<Individual> root : rootIndividuals) {
         	 sb.append(root.getIndex() + " , "+ root.getData().getLabel() + " , " + root.getData().getIri()).append("\n");
         	 sb.append(generateConceptHierarchyTextByOntology(root, displayRelated)); 
          }
          
-         return sb.toString();
+         return new HttpEntity<String>(sb.toString());
     }  
     
     @RequestMapping(path = "/{onto}/concepthierarchy/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
@@ -99,34 +97,24 @@ public class OntologySKOSConceptController {
             @ApiParam(value = "Page size to retrieve individuals", required = true)
             @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
-        List<Individual> listOfTerms = new ArrayList<Individual>();
-        listOfTerms.addAll(terms.getContent()); 
-        
-    	while(terms.hasNext()) {
-    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
-    		listOfTerms.addAll(terms.getContent());
-    	}  
-        TreeNode<Individual> topConcept = new TreeNode<Individual>(new Individual());
-        try {
-			String decodedIri = UriUtils.decode(iri, "UTF-8");	        
-	        Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);
-	        topConcept =  new TreeNode<Individual>(topConceptIndividual);
-		    topConcept.setIndex(index);
-		    if(narrower)
-		        populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
-		    else
-		        populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
+    	TreeNode<Individual> topConcept = new TreeNode<Individual>(new Individual());
+    	String decodedIri;
+		try {
+			decodedIri = UriUtils.decode(iri, "UTF-8");
+			topConcept = ontologyIndividualService.conceptSubTree(ontologyId, decodedIri, narrower, index, pageSize);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+    	topConcept = ontologyIndividualService.conceptSubTree(ontologyId, iri, narrower, index, pageSize);
+        if (topConcept.getData().getIri() == null) 
+            throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
         return new ResponseEntity<>(topConcept, HttpStatus.OK);
     } 
     
-    @RequestMapping(path = "/{onto}/displayconcepthierarchy/{iri}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{onto}/displayconcepthierarchy/{iri}", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     @ResponseBody
-    String displaySKOSConceptHierarchyByOntologyAndIri(
+    HttpEntity<String> displaySKOSConceptHierarchyByOntologyAndIri(
     	    @ApiParam(value = "ontology ID", required = true)
     	    @PathVariable("onto") String ontologyId,
             @ApiParam(value = "encoded concept IRI", required = true)
@@ -139,35 +127,22 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "index", required = true, defaultValue = "1") String index,
             @ApiParam(value = "Page size to retrieve individuals", required = true)
             @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
-    	ontologyId = ontologyId.toLowerCase();
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
-        List<Individual> listOfTerms = new ArrayList<Individual>();
-        listOfTerms.addAll(terms.getContent()); 
-        
-    	while(terms.hasNext()) {
-    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
-    		listOfTerms.addAll(terms.getContent());
-    	}  
-        StringBuilder sb = new StringBuilder();
-        try {
-        	String decodedIri = UriUtils.decode(iri, "UTF-8");
-			Individual topConceptIndividual = findIndividual(listOfTerms,decodedIri);	        
-	        TreeNode<Individual> topConcept =  new TreeNode<Individual>(topConceptIndividual);
-		     topConcept.setIndex(index);
-		     if(narrower)
-		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
-		     else
-		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);      
-	         sb.append(topConcept.getIndex() + " , "+ topConcept.getData().getLabel() + " , " + topConcept.getData().getIri()).append("\n");
-	         sb.append(generateConceptHierarchyTextByOntology(topConcept, displayRelated)); 
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}   
-         	     
-        return sb.toString();
+	    	ontologyId = ontologyId.toLowerCase();
+	    	TreeNode<Individual> topConcept = new TreeNode<Individual>(new Individual());
+	    	String decodedIri;
+	    	StringBuilder sb = new StringBuilder();
+			try {
+				decodedIri = UriUtils.decode(iri, "UTF-8");
+				topConcept = ontologyIndividualService.conceptSubTree(ontologyId, decodedIri, narrower, index, pageSize);
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+   	        
+        	sb.append(topConcept.getIndex() + " , "+ topConcept.getData().getLabel() + " , " + topConcept.getData().getIri()).append("\n");
+	        sb.append(generateConceptHierarchyTextByOntology(topConcept, displayRelated));   
+	        
+            return new HttpEntity<String>(sb.toString());
     } 
     
     @RequestMapping(path = "/{onto}/conceptrelations/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
@@ -183,14 +158,10 @@ public class OntologySKOSConceptController {
     	
     	ontologyId = ontologyId.toLowerCase();
     	List<Individual> related = new ArrayList<Individual>();
-    	try {	
-    		String decodedIri = UriUtils.decode(iri, "UTF-8");
-			Individual individual = ontologyIndividualRepository.findByOntologyAndIri(ontologyId, decodedIri);
-			if (individual != null)
-				if (individual.getAnnotation().get(relationType) != null)
-					for (String iriBroader : (String[]) individual.getAnnotation().get(relationType)) 
-						related.add(ontologyIndividualRepository.findByOntologyAndIri(ontologyId, iriBroader));
-		} catch (Exception e) {
+    	try {
+			String decodedIri = UriUtils.decode(iri, "UTF-8");
+			related = ontologyIndividualService.findRelated(ontologyId, decodedIri, relationType);
+		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -199,151 +170,8 @@ public class OntologySKOSConceptController {
         final int end = Math.min((start + pageable.getPageSize()), related.size());
         Page<Individual> conceptPage = new PageImpl<>(related.subList(start, end), pageable, related.size());
        
-       return new ResponseEntity<>( assembler.toResource(conceptPage), HttpStatus.OK);    	
+        return new ResponseEntity<>( assembler.toResource(conceptPage), HttpStatus.OK);    	
 
-    }
-    
-    public List<TreeNode<Individual>> conceptTree (String ontologyId, Integer pageSize, boolean schema, boolean narrower){
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
-        List<Individual> listOfTerms = new ArrayList<Individual>();
-        listOfTerms.addAll(terms.getContent()); 
-        
-    	while(terms.hasNext()) {
-    		terms = ontologyIndividualRepository.findAllByOntology(ontologyId, terms.nextPageable());
-    		listOfTerms.addAll(terms.getContent());
-    	}       
-        
-        List<TreeNode<Individual>> rootIndividuals = new ArrayList<TreeNode<Individual>>();      
-        int count = 0;
-        
-        if(schema) {
-            for (Individual indiv : listOfTerms)
-           	    if (indiv.getAnnotation().get("hasTopConcept") != null) {
-        		 for (String iriTopConcept : (String[]) indiv.getAnnotation().get("hasTopConcept")) {
-        			 Individual topConceptIndividual = findIndividual(listOfTerms,iriTopConcept);
-        			 TreeNode<Individual> topConcept =  new TreeNode<Individual>(topConceptIndividual);
-        		     topConcept.setIndex(String.valueOf(++count));
-        		     if(narrower)
-        		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
-        		     else
-        		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
-        			 rootIndividuals.add(topConcept);
-        		 }
-           	    }  
-        } else for (Individual individual : listOfTerms) {
-        	 TreeNode<Individual> tree = new TreeNode<Individual>(individual);
-        	 
-        	 if (tree.isRoot() && individual.getAnnotation().get("topConceptOf") != null) {
-				tree.setIndex(String.valueOf(++count));
-				if(narrower)
-                    populateChildrenandRelatedByNarrower(individual,tree,listOfTerms);
-				else
-					populateChildrenandRelatedByBroader(individual,tree,listOfTerms);
-				rootIndividuals.add(tree);
-			}
-		}    
-        
-            
-         return rootIndividuals;
-    }
-    
-    public List<TreeNode<Individual>> conceptTreeWithoutTop (String ontologyId, Integer pageSize, boolean narrower){
-        Page<Individual> terms = ontologyIndividualRepository.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
-        List<Individual> listOfTerms = terms.getContent();       
-        Set<String> rootIRIs = new HashSet<String>();
-        List<TreeNode<Individual>> rootIndividuals = new ArrayList<TreeNode<Individual>>();
-        int count = 0;
-        if(!narrower) {
-            for (Individual individual : listOfTerms) {
-    			if (individual.getAnnotation().get("broader") != null) {
-    				for (String iriBroader : (String[]) individual.getAnnotation().get("broader")) {
-    					Individual broaderIndividual = findIndividual(listOfTerms,iriBroader);
-    					if (broaderIndividual.getAnnotation().get("broader") == null) {
-    						rootIRIs.add(iriBroader);
-    					}	
-    				}
-    			}
-            }
-            
-            for (String iri : rootIRIs) {
-            	Individual topConceptIndividual = findIndividual(listOfTerms, iri);
-        		TreeNode<Individual> topConcept = new TreeNode<Individual>(topConceptIndividual);
-        		topConcept.setIndex(String.valueOf(++count));
-    		    populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
-        		rootIndividuals.add(topConcept);
-            }
-            
-        } else {
-        	for (Individual individual : listOfTerms) {
-        		if (individual.getAnnotation().get("narrower") != null) {
-        			boolean root = true;
-        			for (Individual indiv : listOfTerms) {
-        				if (indiv.getAnnotation().get("narrower") != null) {
-        					for (String iriNarrower : (String[]) indiv.getAnnotation().get("narrower")) {
-        						if (individual.getIri().equals(iriNarrower))
-        								root = false;
-        					}
-        				} 
-        			}
-        			
-        			if(root) {
-                		TreeNode<Individual> topConcept = new TreeNode<Individual>(individual);
-                		topConcept.setIndex(String.valueOf(++count));
-        		        populateChildrenandRelatedByNarrower(individual,topConcept,listOfTerms);
-        		        rootIndividuals.add(topConcept);
-        			}
-        		}
-        	}
-        }
-      
-         return rootIndividuals;
-    }
-    
-    public Individual findIndividual(List<Individual> wholeList, String iri) {
-    	for (Individual individual : wholeList)
-    		if(individual.getIri().equals(iri))
-    			return individual;
-    	return new Individual();
-    }
-    
-    public void populateChildrenandRelatedByNarrower(Individual individual, TreeNode<Individual> tree, List<Individual> listOfTerms ) {
-		
-		if (individual.getAnnotation().get("related") != null)
-		for (String iriRelated : (String[]) individual.getAnnotation().get("related")) {
-			TreeNode<Individual> related = new TreeNode<Individual>(findIndividual(listOfTerms,iriRelated));
-			related.setIndex(tree.getIndex()+ ".related");
-			tree.addRelated(related);
-		}
-    	int count = 0;
-    	if (individual.getAnnotation().get("narrower") != null)
-		for (String iriChild : (String[]) individual.getAnnotation().get("narrower")) {
-			Individual childIndividual = findIndividual(listOfTerms,iriChild);
-			TreeNode<Individual> child = new TreeNode<Individual>(childIndividual);
-			child.setIndex(tree.getIndex()+"."+ ++count);			
-			populateChildrenandRelatedByNarrower(childIndividual,child,listOfTerms);
-			tree.addChild(child);
-		}
-    }
-    
-    public void populateChildrenandRelatedByBroader(Individual individual, TreeNode<Individual> tree, List<Individual> listOfTerms) {
-		if (individual.getAnnotation().get("related") != null)
-		for (String iriRelated : (String[]) individual.getAnnotation().get("related")) {
-			TreeNode<Individual> related = new TreeNode<Individual>(findIndividual(listOfTerms,iriRelated));
-			related.setIndex(tree.getIndex()+ ".related");
-			tree.addRelated(related);
-		}
-		int count = 0;
-		for ( Individual indiv : listOfTerms) {
-			if (indiv.getAnnotation().get("broader") != null)
-				for (String iriBroader : (String[]) indiv.getAnnotation().get("broader"))
-					if(individual.getIri() != null)
-						if (individual.getIri().equals(iriBroader)) {
-							TreeNode<Individual> child = new TreeNode<Individual>(indiv);
-							child.setIndex(tree.getIndex()+"."+ ++count);	
-							populateChildrenandRelatedByBroader(indiv,child,listOfTerms);
-							tree.addChild(child);
-						}	
-		}
     }
     
     public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Individual> rootConcept, boolean displayRelated) {
@@ -358,6 +186,11 @@ public class OntologySKOSConceptController {
 	      	     sb.append(generateConceptHierarchyTextByOntology(relatedConcept,displayRelated));
 	       }
         return sb;
+    }
+    
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removeConceptTreeCache")
+    public HttpEntity<String> removeConceptTreeCache() {
+    	return new HttpEntity<String>(ontologyIndividualService.removeConceptTreeCache());
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")

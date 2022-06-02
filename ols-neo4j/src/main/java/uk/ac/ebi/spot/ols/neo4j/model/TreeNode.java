@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.ols.controller.api;
+package uk.ac.ebi.spot.ols.neo4j.model;
 
 import java.util.ArrayList;
 import java.util.Collection;

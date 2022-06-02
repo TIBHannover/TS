@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <defaultCache eternal="true" maxElementsInMemory="100" overflowToDisk="false" />
+    <cache name="termtree" 
+           maxElementsInMemory="100" 
+           maxElementsOnDisk="2000"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="0"
+           overflowToDisk="true"
+           memoryStoreEvictionPolicy="LFU" />
+    <cache name="propertytree" 
+           maxElementsInMemory="100" 
+           maxElementsOnDisk="2000"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="0"
+           overflowToDisk="true"
+           memoryStoreEvictionPolicy="LFU" />
+     <cache name="jstree" 
+           maxElementsInMemory="100" 
+           maxElementsOnDisk="2000"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="0"
+           overflowToDisk="true"
+           memoryStoreEvictionPolicy="LFU" />
+</ehcache>
