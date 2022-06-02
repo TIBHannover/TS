@@ -121,7 +121,6 @@ public class OntologyPropertyGraphService {
     		populateChildren(ontologyId, rootProperty, pageable);	
     		rootProperties.add(rootProperty);
     	}
-    	System.out.println("Kamil!!!");
     	return rootProperties;
     }
     

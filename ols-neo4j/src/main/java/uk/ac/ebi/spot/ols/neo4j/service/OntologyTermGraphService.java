@@ -215,7 +215,6 @@ public class OntologyTermGraphService {
     		populateChildren(ontologyId, rootTerm, pageable);	
     		rootTerms.add(rootTerm);
     	}
-    	System.out.println("Kamil!!!");
     	return rootTerms;
     }
     

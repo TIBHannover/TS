@@ -145,7 +145,6 @@ public abstract class AbstractJsTreeBuilder {
     
     @Cacheable(value="jstree", key="#ontologyId.concat('-').concat('s').concat('-').concat(#id).concat('-').concat(#nodeId)")
     public String writeJSTreeChildrenAsString(String ontologyId, String id, String nodeId) {
-    	System.out.println("Kamil");
     	Object object= getJsTreeChildren(ontologyId, id, nodeId);
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
     	try {
