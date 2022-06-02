@@ -12,6 +12,7 @@ import org.springframework.data.neo4j.annotation.*;
 import org.springframework.data.neo4j.fieldaccess.DynamicProperties;
 import org.springframework.data.neo4j.fieldaccess.DynamicPropertiesContainer;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -24,9 +25,14 @@ import java.util.TreeMap;
 @NodeEntity
 @TypeAlias(value = "Property")
 @ApiModel
-public class Property {
+public class Property implements Serializable {
 
-    @GraphId
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3034262548691487879L;
+
+	@GraphId
     @JsonIgnore
     Long id;
 
