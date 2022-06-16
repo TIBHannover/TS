@@ -1,14 +1,24 @@
 package uk.ac.ebi.spot.ols.controller.api;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONObject;
+import org.nd4j.common.io.ClassPathResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +35,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import io.swagger.annotations.Api;
@@ -37,6 +48,10 @@ import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyPropertyGraphService;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
+import uk.ac.ebi.spot.ols.word2vec.ReverseDictionary;
+import uk.ac.ebi.spot.ols.word2vec.preprocessing.Word2VecPreProc;
+import uk.ac.ebi.spot.ols.word2vec.training.TrainW2V;
+
 
 /**
  * @author Simon Jupp
@@ -62,6 +77,13 @@ public class DataPreparationController {
     
     @Autowired
     PropertyAssembler termAssembler;
+    
+    @Autowired
+    public Word2VecPreProc wpp;
+    @Autowired
+    public TrainW2V tw2v;
+    @Autowired
+    public ReverseDictionary rd;
 
     @RequestMapping(path = "/extendedsearch", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<Object>> getEverythingByOntology(
@@ -228,7 +250,11 @@ public class DataPreparationController {
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
             @ApiParam(value = "Page Size", required = true)
             @RequestParam(value = "page_size", required = false, defaultValue = "20") Integer pageSize){
-    	
+
+    	return new HttpEntity<String>(getRawSentences(ontologies, schemas, classifications, pageSize));
+    }
+    
+    public String getRawSentences(Collection<String> ontologies,Collection<String> schemas,Collection<String> classifications, Integer pageSize) {
     	StringBuilder sb = new StringBuilder();
     	Pageable pageable = new PageRequest(0, pageSize);
     	
@@ -316,8 +342,55 @@ public class DataPreparationController {
 	     	}
 	     	System.out.println("individuals  of "+oid+" finished!");
 	   	 }
+	   	 return sb.toString();
+    }
+    
+    @RequestMapping("/word2vec")
+    @ResponseBody
+    public String word2vec(@RequestParam String word, @RequestParam int count,    		
+    		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
+    		@RequestParam(value = "schema", required = false) Collection<String> schemas,
+    		@RequestParam(value = "classification", required = false) Collection<String> classifications,
+            @ApiParam(value = "Page Size", required = true)
+            @RequestParam(value = "page_size", required = false, defaultValue = "20" ) Integer pageSize) throws IOException {
 
-    	return new HttpEntity<String>(sb.toString());
+    	String sentences = getRawSentences(ontologies, schemas, classifications, pageSize);	
+        String filePath = new ClassPathResource("raw_sentences.txt").getFile().getAbsolutePath();
+        Files.writeString(Paths.get(filePath), sentences, StandardCharsets.UTF_8);
+        wpp.processing(filePath);
+        tw2v.trainSerialise(wpp.getT(), wpp.getIter());
+        Collection<String> results = rd.dict(tw2v.getVec(), word, count);
+
+
+        //Processor p = new Processor();
+        //String result = p.getSentences();
+        //p.processingSentences();
+        //return p.processingSentences();
+
+        Iterator<String> iterator = results.iterator();
+
+        Collection<JSONObject> items = new ArrayList<JSONObject>();
+
+        Integer key = 0;
+
+
+        while (iterator.hasNext()) {
+            key++;
+            JSONObject object = new JSONObject();
+            String currentWord = iterator.next();
+
+            object.put(key.toString(), currentWord);
+            //JSONArray array = new JSONArray();
+            //JSONObject arrayElementOne = new JSONObject();
+            items.add(object);
+        }
+
+        //return object.toJ;
+
+//        System.out.println(items);
+//        Gson gson = new Gson();
+        return items.toString();
+        //return gson.toJson(results);
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
