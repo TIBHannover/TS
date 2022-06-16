@@ -222,12 +222,6 @@
 			<version>${dl4j-master.version}</version>
 		</dependency>
         
-        <dependency>
-          <groupId>nio</groupId>
-          <artifactId>nio</artifactId>
-          <version>1.0.4</version>
-       </dependency>
-        
     </dependencies>
 
     <properties>

@@ -3,6 +3,7 @@ package uk.ac.ebi.spot.ols.controller.api;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -356,7 +357,13 @@ public class DataPreparationController {
 
     	String sentences = getRawSentences(ontologies, schemas, classifications, pageSize);	
         String filePath = new ClassPathResource("raw_sentences.txt").getFile().getAbsolutePath();
-        Files.writeString(Paths.get(filePath), sentences, StandardCharsets.UTF_8);
+        
+        try (PrintWriter out = new PrintWriter(filePath)) {
+            out.println(sentences);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+        
         wpp.processing(filePath);
         tw2v.trainSerialise(wpp.getT(), wpp.getIter());
         Collection<String> results = rd.dict(tw2v.getVec(), word, count);
