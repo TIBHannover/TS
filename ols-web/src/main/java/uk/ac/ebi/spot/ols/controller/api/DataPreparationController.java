@@ -346,8 +346,7 @@ public class DataPreparationController {
 	   	 return sb.toString();
     }
     
-    @RequestMapping("/word2vec")
-    @ResponseBody
+    @RequestMapping(path="/word2vec", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     public String word2vec(@RequestParam String word, @RequestParam int count,    		
     		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
