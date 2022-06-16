@@ -221,6 +221,104 @@ public class DataPreparationController {
 
         return new ResponseEntity<>(everything, HttpStatus.OK);
     }
+    @RequestMapping(path = "/displaysentences", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    public HttpEntity<String> getSentences(            
+    		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
+    		@RequestParam(value = "schema", required = false) Collection<String> schemas,
+    		@RequestParam(value = "classification", required = false) Collection<String> classifications,
+            @ApiParam(value = "Page Size", required = true)
+            @RequestParam(value = "page_size", required = false, defaultValue = "20") Integer pageSize){
+    	
+    	StringBuilder sb = new StringBuilder();
+    	Pageable pageable = new PageRequest(0, pageSize);
+    	
+    	Set<String> tempSet = new HashSet<String>();
+    	if (ontologies != null)
+    	if(ontologies.size()>=1)
+    		for (String ontology : ontologies)
+    	{
+    		ontology = ontology.toLowerCase();
+    		tempSet.add(ontology);
+    	}
+    	
+	    if (classifications != null && schemas != null)	    
+	    if (classifications.size() >= 1 && schemas.size()>=1)
+	   	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+	   		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+	   			for (String schema: schemas)
+	   			    if(classificationSchema.containsKey(schema))
+	   				    for (String classification: classifications) {
+	   				    	if (classificationSchema.get(schema) != null)
+	   				    		if (!classificationSchema.get(schema).isEmpty())
+	   				    	        if (classificationSchema.get(schema).contains(classification)) {
+	   					                tempSet.add(ontologyDocument.getOntologyId());
+	   				  }
+	   				    }
+	   			    
+	   			}
+			} 
+
+    	
+	   	 for (String oid : tempSet ) {
+	   		 oid = oid.toLowerCase();
+	   		 System.out.println("starting ontology: "+oid);
+	         Page<Property> properties = ontologyPropertyGraphService.findAllByOntology(oid, pageable);
+	         
+	 		for (Property property : properties.getContent()) {
+	 			if(property.getDescription() != null)
+		 			for (String description : property.getDescription())
+		 			    sb.append(description).append("\n");
+	 		}
+	     	
+	     	while(properties.hasNext()) {
+	     		properties = ontologyPropertyGraphService.findAllByOntology(oid, pageable);
+	     		
+	     		for (Property property : properties.getContent()) {
+	     			if(property.getDescription() != null)
+			 			for (String description : property.getDescription())
+			 			    sb.append(description).append("\n");
+	     		}
+	
+	     	}
+	     	System.out.println("properties of "+oid+" finished!");
+	         Page<Term> terms = ontologyTermGraphService.findAllByOntology(oid, pageable);
+	         
+	 		for (Term term : terms.getContent()) {
+	 			if(term.getDescription() != null)
+		 			for (String description : term.getDescription())
+		 			    sb.append(description).append("\n");
+	 		}
+	     	
+	     	while(terms.hasNext()) {
+	     		terms = ontologyTermGraphService.findAllByOntology(oid, pageable);
+	     		for (Term term : terms.getContent()) {
+	     			if(term.getDescription() != null)
+			 			for (String description : term.getDescription())
+			 			    sb.append(description).append("\n");
+	     		}
+	     	}
+	     	System.out.println("terms of "+oid+" finished!");
+	         Page<Individual> individuals = ontologyIndividualService.findAllByOntology(oid, pageable);  
+	         
+	 		for (Individual individual : individuals.getContent()) {
+	 			if(individual.getDescription() != null)
+		 			for (String description : individual.getDescription())
+		 			    sb.append(description).append("\n");
+	 		}
+	     	
+	     	while(individuals.hasNext()) {
+	     		individuals = ontologyIndividualService.findAllByOntology(oid, pageable);
+	     		for (Individual individual : individuals.getContent()) {
+	     			if(individual.getDescription() != null)
+			 			for (String description : individual.getDescription())
+			 			    sb.append(description).append("\n");
+	     		}
+	     	}
+	     	System.out.println("individuals  of "+oid+" finished!");
+	   	 }
+
+    	return new HttpEntity<String>(sb.toString());
+    }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
     @ExceptionHandler(ResourceNotFoundException.class)
