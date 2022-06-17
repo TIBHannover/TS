@@ -254,16 +254,19 @@ public class DataPreparationController {
 
     	String sentences = getRawSentences(ontologies, schemas, classifications, pageSize);	
     	StringBuilder sb = new StringBuilder();
+    	if(ontologies != null)
     	for (String ontology : ontologies)
     	    sb.append("_").append(ontology);
+    	if(schemas != null)
     	for (String schema : schemas)
     	    sb.append("_").append(schema);
+    	if(classifications != null)
     	for (String classification : classifications)
     	    sb.append("_").append(classification);
     	    	
-        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
+//        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
         
-        try (PrintWriter out = new PrintWriter(filePath)) {
+        try (PrintWriter out = new PrintWriter("raw_sentences"+sb.toString()+".txt")) {
             out.println(sentences);
         } catch (Exception e) {
         	e.printStackTrace();
@@ -373,16 +376,19 @@ public class DataPreparationController {
             @RequestParam(value = "page_size", required = false, defaultValue = "20" ) Integer pageSize) throws IOException {
        	
     	StringBuilder sb = new StringBuilder();
-        for (String ontology : ontologies)
-            sb.append("_").append(ontology);
-        for (String schema : schemas)
-            sb.append("_").append(schema);
-        for (String classification : classifications)
-            sb.append("_").append(classification);
+    	if(ontologies != null)
+    	for (String ontology : ontologies)
+    	    sb.append("_").append(ontology);
+    	if(schemas != null)
+    	for (String schema : schemas)
+    	    sb.append("_").append(schema);
+    	if(classifications != null)
+    	for (String classification : classifications)
+    	    sb.append("_").append(classification);
 
-        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
+//        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
         
-        wpp.processing(filePath);
+        wpp.processing("raw_sentences"+sb.toString()+".txt");
         tw2v.trainSerialise(wpp.getT(), wpp.getIter());
         Collection<String> results = rd.dict(tw2v.getVec(), word, count);
 
