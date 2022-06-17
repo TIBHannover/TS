@@ -389,7 +389,7 @@ public class DataPreparationController {
 
 //        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
         
-        wpp.processing(File.pathSeparator+"raw_sentences"+sb.toString()+".txt");
+        wpp.processing("raw_sentences"+sb.toString()+".txt");
         tw2v.trainSerialise(wpp.getT(), wpp.getIter());
         Collection<String> results = rd.dict(tw2v.getVec(), word, count);
 
