@@ -1,6 +1,7 @@
 package uk.ac.ebi.spot.ols.controller.api;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -388,7 +389,7 @@ public class DataPreparationController {
 
 //        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
         
-        wpp.processing("raw_sentences"+sb.toString()+".txt");
+        wpp.processing(File.pathSeparator+"raw_sentences"+sb.toString()+".txt");
         tw2v.trainSerialise(wpp.getT(), wpp.getIter());
         Collection<String> results = rd.dict(tw2v.getVec(), word, count);
 
