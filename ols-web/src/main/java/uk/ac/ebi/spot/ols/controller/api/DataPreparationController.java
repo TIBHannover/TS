@@ -250,9 +250,27 @@ public class DataPreparationController {
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
             @ApiParam(value = "Page Size", required = true)
-            @RequestParam(value = "page_size", required = false, defaultValue = "20") Integer pageSize){
+            @RequestParam(value = "page_size", required = false, defaultValue = "20") Integer pageSize) throws IOException{
 
-    	return new HttpEntity<String>(getRawSentences(ontologies, schemas, classifications, pageSize));
+    	String sentences = getRawSentences(ontologies, schemas, classifications, pageSize);	
+    	StringBuilder sb = new StringBuilder();
+    	for (String ontology : ontologies)
+    	    sb.append("_").append(ontology);
+    	for (String schema : schemas)
+    	    sb.append("_").append(schema);
+    	for (String classification : classifications)
+    	    sb.append("_").append(classification);
+    	    	
+        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
+        
+        try (PrintWriter out = new PrintWriter(filePath)) {
+            out.println(sentences);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }
+    	
+    	
+    	return new HttpEntity<String>(sentences);
     }
     
     public String getRawSentences(Collection<String> ontologies,Collection<String> schemas,Collection<String> classifications, Integer pageSize) {
@@ -353,15 +371,16 @@ public class DataPreparationController {
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
             @ApiParam(value = "Page Size", required = true)
             @RequestParam(value = "page_size", required = false, defaultValue = "20" ) Integer pageSize) throws IOException {
+       	
+    	StringBuilder sb = new StringBuilder();
+        for (String ontology : ontologies)
+            sb.append("_").append(ontology);
+        for (String schema : schemas)
+            sb.append("_").append(schema);
+        for (String classification : classifications)
+            sb.append("_").append(classification);
 
-    	String sentences = getRawSentences(ontologies, schemas, classifications, pageSize);	
-        String filePath = new ClassPathResource("raw_sentences.txt").getFile().getAbsolutePath();
-        
-        try (PrintWriter out = new PrintWriter(filePath)) {
-            out.println(sentences);
-        } catch (Exception e) {
-        	e.printStackTrace();
-        }
+        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
         
         wpp.processing(filePath);
         tw2v.trainSerialise(wpp.getT(), wpp.getIter());
