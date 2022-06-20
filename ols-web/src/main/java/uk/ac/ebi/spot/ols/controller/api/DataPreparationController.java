@@ -388,10 +388,13 @@ public class DataPreparationController {
     	    sb.append("_").append(classification);
 
 //        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
-        
+        System.out.println("before processing");
         wpp.processing("raw_sentences"+sb.toString()+".txt");
+        System.out.println("after processing");
         tw2v.trainSerialise(wpp.getT(), wpp.getIter());
+        System.out.println("way after processing");
         Collection<String> results = rd.dict(tw2v.getVec(), word, count);
+        System.out.println("long gone after processing");
 
 
         //Processor p = new Processor();
