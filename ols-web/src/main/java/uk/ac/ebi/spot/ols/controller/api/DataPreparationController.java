@@ -369,7 +369,7 @@ public class DataPreparationController {
     }
     
     @RequestMapping(path="/load", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
-    public String load(@RequestParam String word, @RequestParam int count,    		
+    public HttpEntity<String> load(@RequestParam String word, @RequestParam int count,    		
     		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
@@ -389,11 +389,11 @@ public class DataPreparationController {
 
         wpp.processing("raw_sentences"+sb.toString()+".txt");
 
-        return "raw_sentences"+sb.toString()+".txt";
+        return new HttpEntity<String>("raw_sentences"+sb.toString()+".txt");
     }
     
     @RequestMapping(path="/train", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
-    public String word2vec(@RequestParam String word, @RequestParam int count,    		
+    public HttpEntity<String> word2vec(@RequestParam String word, @RequestParam int count,    		
     		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
@@ -433,7 +433,7 @@ public class DataPreparationController {
             items.add(object);
         }
 
-        return items.toString();
+        return new HttpEntity<String>(items.toString());
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
