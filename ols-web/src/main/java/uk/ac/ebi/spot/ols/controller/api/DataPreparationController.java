@@ -368,7 +368,31 @@ public class DataPreparationController {
 	   	 return sb.toString();
     }
     
-    @RequestMapping(path="/word2vec", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    @RequestMapping(path="/load", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    public String load(@RequestParam String word, @RequestParam int count,    		
+    		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
+    		@RequestParam(value = "schema", required = false) Collection<String> schemas,
+    		@RequestParam(value = "classification", required = false) Collection<String> classifications,
+            @ApiParam(value = "Page Size", required = true)
+            @RequestParam(value = "page_size", required = false, defaultValue = "20" ) Integer pageSize) throws IOException {
+       	
+    	StringBuilder sb = new StringBuilder();
+    	if(ontologies != null)
+    	for (String ontology : ontologies)
+    	    sb.append("_").append(ontology);
+    	if(schemas != null)
+    	for (String schema : schemas)
+    	    sb.append("_").append(schema);
+    	if(classifications != null)
+    	for (String classification : classifications)
+    	    sb.append("_").append(classification);
+
+        wpp.processing("raw_sentences"+sb.toString()+".txt");
+
+        return "raw_sentences"+sb.toString()+".txt";
+    }
+    
+    @RequestMapping(path="/train", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     public String word2vec(@RequestParam String word, @RequestParam int count,    		
     		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
@@ -387,20 +411,11 @@ public class DataPreparationController {
     	for (String classification : classifications)
     	    sb.append("_").append(classification);
 
-//        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
-        System.out.println("before processing");
-        wpp.processing("raw_sentences"+sb.toString()+".txt");
-        System.out.println("after processing");
+        System.out.println("before train");
         tw2v.trainSerialise(wpp.getT(), wpp.getIter());
-        System.out.println("way after processing");
+        System.out.println("after train");
         Collection<String> results = rd.dict(tw2v.getVec(), word, count);
-        System.out.println("long gone after processing");
-
-
-        //Processor p = new Processor();
-        //String result = p.getSentences();
-        //p.processingSentences();
-        //return p.processingSentences();
+        System.out.println("way after train");
 
         Iterator<String> iterator = results.iterator();
 
@@ -415,17 +430,10 @@ public class DataPreparationController {
             String currentWord = iterator.next();
 
             object.put(key.toString(), currentWord);
-            //JSONArray array = new JSONArray();
-            //JSONObject arrayElementOne = new JSONObject();
             items.add(object);
         }
 
-        //return object.toJ;
-
-//        System.out.println(items);
-//        Gson gson = new Gson();
         return items.toString();
-        //return gson.toJson(results);
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
