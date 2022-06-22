@@ -86,6 +86,8 @@ public class DataPreparationController {
     public TrainW2V tw2v;
     @Autowired
     public ReverseDictionary rd;
+    
+    File file;
 
     @RequestMapping(path = "/extendedsearch", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<Object>> getEverythingByOntology(
@@ -266,8 +268,8 @@ public class DataPreparationController {
     	    sb.append("_").append(classification);
     	    	
 //        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
-        
-        try (PrintWriter out = new PrintWriter("raw_sentences"+sb.toString()+".txt")) {
+        file = new File("raw_sentences"+sb.toString()+".txt");
+        try (PrintWriter out = new PrintWriter(file)) {
             out.println(sentences);
         } catch (Exception e) {
         	e.printStackTrace();
@@ -373,7 +375,6 @@ public class DataPreparationController {
     		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
-    		@RequestParam(value = "path", required = false, defaultValue = "") String path,
             @ApiParam(value = "Page Size", required = true)
             @RequestParam(value = "page_size", required = false, defaultValue = "20" ) Integer pageSize) throws IOException {
        	
@@ -388,9 +389,9 @@ public class DataPreparationController {
     	for (String classification : classifications)
     	    sb.append("_").append(classification);
 
-        wpp.processing(path+"raw_sentences"+sb.toString()+".txt");
+        wpp.processing(file.getAbsolutePath());
 
-        return new HttpEntity<String>(path+"raw_sentences"+sb.toString()+".txt");
+        return new HttpEntity<String>(file.getAbsolutePath());
     }
     
     @RequestMapping(path="/train", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
