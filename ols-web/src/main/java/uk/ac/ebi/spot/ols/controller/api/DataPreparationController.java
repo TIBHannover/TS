@@ -373,6 +373,7 @@ public class DataPreparationController {
     		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
+    		@RequestParam(value = "path", required = false, defaultValue = "") String path,
             @ApiParam(value = "Page Size", required = true)
             @RequestParam(value = "page_size", required = false, defaultValue = "20" ) Integer pageSize) throws IOException {
        	
@@ -387,9 +388,10 @@ public class DataPreparationController {
     	for (String classification : classifications)
     	    sb.append("_").append(classification);
 
-        wpp.processing("raw_sentences"+sb.toString()+".txt");
+        wpp.processing(path+"raw_sentences"+sb.toString()+".txt");
+        wpp.getIter()
 
-        return new HttpEntity<String>("raw_sentences"+sb.toString()+".txt");
+        return new HttpEntity<String>(path+"raw_sentences"+sb.toString()+".txt");
     }
     
     @RequestMapping(path="/train", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
