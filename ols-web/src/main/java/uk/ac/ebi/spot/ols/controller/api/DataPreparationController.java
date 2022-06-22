@@ -267,10 +267,10 @@ public class DataPreparationController {
     	for (String classification : classifications)
     	    sb.append("_").append(classification);
     	    	
-//        String filePath = new ClassPathResource("raw_sentences"+sb.toString()+".txt").getFile().getAbsolutePath();
         file = new File("raw_sentences"+sb.toString()+".txt");
         try (PrintWriter out = new PrintWriter(file)) {
             out.println(sentences);
+            out.close();
         } catch (Exception e) {
         	e.printStackTrace();
         }
