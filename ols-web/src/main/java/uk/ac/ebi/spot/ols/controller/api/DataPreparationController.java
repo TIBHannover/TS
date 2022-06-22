@@ -389,7 +389,6 @@ public class DataPreparationController {
     	    sb.append("_").append(classification);
 
         wpp.processing(path+"raw_sentences"+sb.toString()+".txt");
-        wpp.getIter()
 
         return new HttpEntity<String>(path+"raw_sentences"+sb.toString()+".txt");
     }
