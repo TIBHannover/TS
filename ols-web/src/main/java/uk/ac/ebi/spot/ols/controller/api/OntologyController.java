@@ -187,7 +187,7 @@ public class OntologyController implements
     @ApiOperation(value = "Get Whole System Statistics", notes = "Components in all ontologies are taken into consideration")
     @RequestMapping(path = "/getstatistics", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<SummaryInfo> getStatisticsByClassification() throws ResourceNotFoundException { 	        
-       return new ResponseEntity<>( new SummaryInfo(repositoryService.getLastUpdated(),repositoryService.getNumberOfOntologies(), repositoryService.getNumberOfTerms(), repositoryService.getNumberOfProperties(), repositoryService.getNumberOfIndividuals() ), HttpStatus.OK);
+       return new ResponseEntity<>( new SummaryInfo(ontologyRepositoryService.getLastUpdated(),ontologyRepositoryService.getNumberOfOntologies(), ontologyRepositoryService.getNumberOfTerms(), ontologyRepositoryService.getNumberOfProperties(), ontologyRepositoryService.getNumberOfIndividuals(),"" ), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Retrieve a particular ontology")
