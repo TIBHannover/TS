@@ -51,22 +51,46 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
     }
     
     @Override
-    public List<OntologyDocument> getAllDocuments(Collection<String> schemas, Collection<String> classifications) {
+    public List<OntologyDocument> getAllDocuments(Collection<String> schemas, Collection<String> classifications, boolean exclusive) {
        	 Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
-	   	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
-	   		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-	   			for (String schema: schemas)
-	   			    if(classificationSchema.containsKey(schema))
-	   				    for (String classification: classifications) {
-	   				    	if (classificationSchema.get(schema) != null)
-	   				    		if (!classificationSchema.get(schema).isEmpty())
-	   				    	        if (classificationSchema.get(schema).contains(classification)) {
-	   					                tempSet.add(ontologyDocument);
-	   				  }
-	   				    }
-	   			    
-	   			}
-			} 
+         if(!exclusive) {
+        	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+         		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+         			for (String schema: schemas)
+         			    if(classificationSchema.containsKey(schema))
+         				    for (String classification: classifications) {
+         				    	if (classificationSchema.get(schema) != null)
+         				    		if (!classificationSchema.get(schema).isEmpty())
+         				    	        if (classificationSchema.get(schema).contains(classification)) {
+         					                tempSet.add(ontologyDocument);
+         				  }
+         				    }
+         			    
+         			}
+     		} 
+         } else {	 
+        	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+          		boolean toBeAdded = true;
+        		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+          			for (String schema: schemas)
+          			    if(classificationSchema.containsKey(schema)) {
+          				    for (String classification: classifications) {
+          				    	if (classificationSchema.get(schema) != null) {
+          				    		if (!classificationSchema.get(schema).isEmpty()) {
+          				    	        if (!classificationSchema.get(schema).contains(classification)) {
+          				    	        	toBeAdded = false;
+          				    	        }
+          				    		} else toBeAdded = false;
+          				         } else toBeAdded = false;
+          				    }
+          			    } else toBeAdded = false;
+     			    
+          			}
+        		 if(toBeAdded)
+        			 tempSet.add(ontologyDocument); 
+      		} 
+        	 
+         }   
     	
     	return new ArrayList<>(tempSet);
     }
@@ -82,27 +106,51 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
     }
     
     @Override
-    public Page<OntologyDocument> getAllDocuments(Pageable pageable, Collection<String> schemas, Collection<String> classifications) {
+    public Page<OntologyDocument> getAllDocuments(Pageable pageable, Collection<String> schemas, Collection<String> classifications, boolean exclusive) {
     	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
     	Page<OntologyDocument> documents = getAllDocuments(pageable);
      	
      	while(documents.hasNext()) {
      		documents = getAllDocuments(pageable);
      		
-     	   	 for (OntologyDocument ontologyDocument : documents.getContent()) {
-     	   		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-     	   			for (String schema: schemas)
-     	   			    if(classificationSchema.containsKey(schema))
-     	   				    for (String classification: classifications) {
-     	   				    	if (classificationSchema.get(schema) != null)
-     	   				    		if (!classificationSchema.get(schema).isEmpty())
-     	   				    	        if (classificationSchema.get(schema).contains(classification)) {
-     	   					                tempSet.add(ontologyDocument);
-     	   				  }
-     	   				    }
-     	   			    
-     	   			}
-     			} 	
+            if(!exclusive) {
+              	 for (OntologyDocument ontologyDocument : documents.getContent()) {
+               		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+               			for (String schema: schemas)
+               			    if(classificationSchema.containsKey(schema))
+               				    for (String classification: classifications) {
+               				    	if (classificationSchema.get(schema) != null)
+               				    		if (!classificationSchema.get(schema).isEmpty())
+               				    	        if (classificationSchema.get(schema).contains(classification)) {
+               					                tempSet.add(ontologyDocument);
+               				  }
+               				    }
+               			    
+               			}
+           		} 
+               } else {	 
+              	 for (OntologyDocument ontologyDocument : documents.getContent()) {
+                		boolean toBeAdded = true;
+              		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+                			for (String schema: schemas)
+                			    if(classificationSchema.containsKey(schema)) {
+                				    for (String classification: classifications) {
+                				    	if (classificationSchema.get(schema) != null) {
+                				    		if (!classificationSchema.get(schema).isEmpty()) {
+                				    	        if (!classificationSchema.get(schema).contains(classification)) {
+                				    	        	toBeAdded = false;
+                				    	        }
+                				    		} else toBeAdded = false;
+                				         } else toBeAdded = false;
+                				    }
+                			    } else toBeAdded = false;
+           			    
+                			}
+              		 if(toBeAdded)
+              			 tempSet.add(ontologyDocument); 
+            		} 
+              	 
+               }   
      		
      	}
      	
@@ -171,27 +219,51 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
     }
     
     @Override
-    public SummaryInfo getClassificationMetadata(Collection<String> schemas, Collection<String> classifications) {
+    public SummaryInfo getClassificationMetadata(Collection<String> schemas, Collection<String> classifications, boolean exclusive) {
       	int ontologies = 0;
       	int terms = 0;
       	int properties = 0;
       	int individuals = 0;
       	
     	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
-	   	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
-	   		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-	   			for (String schema: schemas)
-	   			    if(classificationSchema.containsKey(schema))
-	   				    for (String classification: classifications) {
-	   				    	if (classificationSchema.get(schema) != null)
-	   				    		if (!classificationSchema.get(schema).isEmpty())
-	   				    	        if (classificationSchema.get(schema).contains(classification)) {
-	   					                tempSet.add(ontologyDocument);
-	   				  }
-	   				    }
-	   			    
-	   			}
-			} 
+        if(!exclusive) {
+       	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+        		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+        			for (String schema: schemas)
+        			    if(classificationSchema.containsKey(schema))
+        				    for (String classification: classifications) {
+        				    	if (classificationSchema.get(schema) != null)
+        				    		if (!classificationSchema.get(schema).isEmpty())
+        				    	        if (classificationSchema.get(schema).contains(classification)) {
+        					                tempSet.add(ontologyDocument);
+        				  }
+        				    }
+        			    
+        			}
+    		} 
+        } else {	 
+       	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+         		boolean toBeAdded = true;
+       		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+         			for (String schema: schemas)
+         			    if(classificationSchema.containsKey(schema)) {
+         				    for (String classification: classifications) {
+         				    	if (classificationSchema.get(schema) != null) {
+         				    		if (!classificationSchema.get(schema).isEmpty()) {
+         				    	        if (!classificationSchema.get(schema).contains(classification)) {
+         				    	        	toBeAdded = false;
+         				    	        }
+         				    		} else toBeAdded = false;
+         				         } else toBeAdded = false;
+         				    }
+         			    } else toBeAdded = false;
+    			    
+         			}
+       		 if(toBeAdded)
+       			 tempSet.add(ontologyDocument); 
+     		} 
+       	 
+        }   
 	   	 Date lastUpdated = new GregorianCalendar(1900, Calendar.JANUARY, 1).getTime();
 	   	 for (OntologyDocument document : tempSet) {
 	   		 ontologies+=1;

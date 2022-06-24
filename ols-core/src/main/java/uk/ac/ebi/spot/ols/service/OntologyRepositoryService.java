@@ -24,13 +24,13 @@ public interface OntologyRepositoryService {
 
     List<OntologyDocument> getAllDocuments();
     
-    List<OntologyDocument> getAllDocuments(Collection<String> schemas, Collection<String> classifications);
+    List<OntologyDocument> getAllDocuments(Collection<String> schemas, Collection<String> classifications, boolean exclusive);
 
     List<OntologyDocument> getAllDocuments(Sort sort);
 
     Page<OntologyDocument> getAllDocuments(Pageable pageable);
     
-    Page<OntologyDocument> getAllDocuments(Pageable pageable, Collection<String> schemas, Collection<String> classifications);
+    Page<OntologyDocument> getAllDocuments(Pageable pageable, Collection<String> schemas, Collection<String> classifications, boolean exclusive);
 
     List<OntologyDocument> getAllDocumentsByStatus(Status status);
 
@@ -48,7 +48,7 @@ public interface OntologyRepositoryService {
 
     int getNumberOfOntologies();
     
-    SummaryInfo getClassificationMetadata(Collection<String> schemas, Collection<String> classifications);
+    SummaryInfo getClassificationMetadata(Collection<String> schemas, Collection<String> classifications, boolean exclusive);
 
     int getNumberOfTerms();
 
