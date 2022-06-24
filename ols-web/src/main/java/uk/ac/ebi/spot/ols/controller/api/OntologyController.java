@@ -145,26 +145,51 @@ public class OntologyController implements
     HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(
     		@RequestParam(value = "schema", required = true) Collection<String> schemas,
     		@RequestParam(value = "classification", required = true) Collection<String> classifications,
+    		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive,
             @PageableDefault(size = 20, page = 0) Pageable pageable,
             PagedResourcesAssembler assembler
     ) throws ResourceNotFoundException { 	
     	
     	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
     	
-    	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-    		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-    			for (String schema: schemas)
-    			    if(classificationSchema.containsKey(schema))
-    				    for (String classification: classifications) {
-    				    	if (classificationSchema.get(schema) != null)
-    				    		if (!classificationSchema.get(schema).isEmpty())
-    				    	        if (classificationSchema.get(schema).contains(classification)) {
-    					                tempSet.add(ontologyDocument);
-    				  }
-    				    }
-    			    
-    			}
-		} 
+         if(!exclusive) {
+        	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+         		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+         			for (String schema: schemas)
+         			    if(classificationSchema.containsKey(schema))
+         				    for (String classification: classifications) {
+         				    	if (classificationSchema.get(schema) != null)
+         				    		if (!classificationSchema.get(schema).isEmpty())
+         				    	        if (classificationSchema.get(schema).contains(classification)) {
+         					                tempSet.add(ontologyDocument);
+         				  }
+         				    }
+         			    
+         			}
+     		} 
+         } else {	 
+        	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+          		boolean toBeAdded = true;
+        		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+          			for (String schema: schemas)
+          			    if(classificationSchema.containsKey(schema)) {
+          				    for (String classification: classifications) {
+          				    	if (classificationSchema.get(schema) != null) {
+          				    		if (!classificationSchema.get(schema).isEmpty()) {
+          				    	        if (!classificationSchema.get(schema).contains(classification)) {
+          				    	        	toBeAdded = false;
+          				    	        }
+          				    		} else toBeAdded = false;
+          				         } else toBeAdded = false;
+          				    }
+          			    } else toBeAdded = false;
+     			    
+          			}
+        		 if(toBeAdded)
+        			 tempSet.add(ontologyDocument); 
+      		} 
+        	 
+         }   		
     	 
     	 List<OntologyDocument> temp = new ArrayList<>(tempSet);
         
