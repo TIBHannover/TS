@@ -198,8 +198,9 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
 	   		 terms+=document.getNumberOfTerms();
 	   		 properties+=document.getNumberOfProperties();
 	   		 individuals+=document.getNumberOfIndividuals();
-	   		 if(document.getLoaded().after(lastUpdated))
-	   			 lastUpdated = document.getLoaded();
+	   		 if(document.getLoaded()!= null)
+	   		     if(document.getLoaded().after(lastUpdated))
+	   			     lastUpdated = document.getLoaded();
 	   	 }
 	   	 
 	   	 return new SummaryInfo(lastUpdated,ontologies,terms,properties,individuals,"");
