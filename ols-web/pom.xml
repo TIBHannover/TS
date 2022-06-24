@@ -177,61 +177,127 @@
 			<groupId>org.nd4j</groupId>
 			<artifactId>nd4j-native</artifactId>
 			<version>1.0.0-M1.1</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 		
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.9.0</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
         
         <dependency>
 			<groupId>org.datavec</groupId>
 			<artifactId>datavec-api</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 		<dependency>
 			<groupId>org.datavec</groupId>
 			<artifactId>datavec-data-image</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 		<dependency>
 			<groupId>org.datavec</groupId>
 			<artifactId>datavec-local</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 		<dependency>
 			<groupId>org.deeplearning4j</groupId>
 			<artifactId>deeplearning4j-datasets</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 		<dependency>
 			<groupId>org.deeplearning4j</groupId>
 			<artifactId>deeplearning4j-core</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 
 		<dependency>
 			<groupId>org.deeplearning4j</groupId>
 			<artifactId>resources</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 
 		<dependency>
 			<groupId>org.deeplearning4j</groupId>
 			<artifactId>deeplearning4j-ui</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 		<dependency>
 			<groupId>org.deeplearning4j</groupId>
 			<artifactId>deeplearning4j-zoo</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 			
 		</dependency>
 		<!-- ParallelWrapper & ParallelInference live here -->
 		<dependency>
 			<groupId>org.deeplearning4j</groupId>
 			<artifactId>deeplearning4j-parallel-wrapper</artifactId>
 			<version>${dl4j-master.version}</version>
+			<exclusions>
+                 <exclusion>  <!-- declare the exclusion here -->
+                     <groupId>com.google.guava</groupId>
+                     <artifactId>guava</artifactId>
+                 </exclusion>
+            </exclusions> 
 		</dependency>
         
     </dependencies>
