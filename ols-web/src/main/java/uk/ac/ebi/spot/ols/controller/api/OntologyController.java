@@ -29,11 +29,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
+import uk.ac.ebi.spot.ols.model.SummaryInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -172,6 +174,17 @@ public class OntologyController implements
        
        return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
+    
+    @ApiOperation(value = "Get Schema and Classifiction based Statistics", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively.")
+    @RequestMapping(path = "/getstatistics", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<SummaryInfo> getStatisticsByClassification(
+    		@RequestParam(value = "schema", required = true) Collection<String> schemas,
+    		@RequestParam(value = "classification", required = true) Collection<String> classifications,
+            @PageableDefault(size = 20, page = 0) Pageable pageable,
+            PagedResourcesAssembler assembler
+    ) throws ResourceNotFoundException { 	    
+       return new ResponseEntity<>( ontologyRepositoryService.getClassificationMetadata(schemas,classifications), HttpStatus.OK);
+    }
 
     @ApiOperation(value = "Retrieve a particular ontology")
     @RequestMapping(path = "/{onto}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
@@ -186,7 +199,6 @@ public class OntologyController implements
     @ExceptionHandler(ResourceNotFoundException.class)
     public void handleError(HttpServletRequest req, Exception exception) {
     }
-
-
-
+    
+    
 }

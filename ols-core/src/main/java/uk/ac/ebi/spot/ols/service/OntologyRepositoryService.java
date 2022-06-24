@@ -6,7 +6,9 @@ import org.springframework.data.domain.Sort;
 import uk.ac.ebi.spot.ols.exception.OntologyRepositoryException;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.model.Status;
+import uk.ac.ebi.spot.ols.model.SummaryInfo;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -21,10 +23,14 @@ import java.util.List;
 public interface OntologyRepositoryService {
 
     List<OntologyDocument> getAllDocuments();
+    
+    List<OntologyDocument> getAllDocuments(Collection<String> schemas, Collection<String> classifications);
 
     List<OntologyDocument> getAllDocuments(Sort sort);
 
     Page<OntologyDocument> getAllDocuments(Pageable pageable);
+    
+    Page<OntologyDocument> getAllDocuments(Pageable pageable, Collection<String> schemas, Collection<String> classifications);
 
     List<OntologyDocument> getAllDocumentsByStatus(Status status);
 
@@ -41,6 +47,8 @@ public interface OntologyRepositoryService {
     Date getLastUpdated();
 
     int getNumberOfOntologies();
+    
+    SummaryInfo getClassificationMetadata(Collection<String> schemas, Collection<String> classifications);
 
     int getNumberOfTerms();
 

@@ -2,6 +2,7 @@ package uk.ac.ebi.spot.ols.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -16,10 +17,17 @@ import com.mongodb.MongoTimeoutException;
 import uk.ac.ebi.spot.ols.exception.OntologyRepositoryException;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.model.Status;
+import uk.ac.ebi.spot.ols.model.SummaryInfo;
 import uk.ac.ebi.spot.ols.repository.mongo.MongoOntologyRepository;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Simon Jupp
@@ -39,6 +47,27 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
     public List<OntologyDocument> getAllDocuments() {
         return repositoryService.findAll();
     }
+    
+    @Override
+    public List<OntologyDocument> getAllDocuments(Collection<String> schemas, Collection<String> classifications) {
+       	 Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
+	   	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+	   		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+	   			for (String schema: schemas)
+	   			    if(classificationSchema.containsKey(schema))
+	   				    for (String classification: classifications) {
+	   				    	if (classificationSchema.get(schema) != null)
+	   				    		if (!classificationSchema.get(schema).isEmpty())
+	   				    	        if (classificationSchema.get(schema).contains(classification)) {
+	   					                tempSet.add(ontologyDocument);
+	   				  }
+	   				    }
+	   			    
+	   			}
+			} 
+    	
+    	return new ArrayList<>(tempSet);
+    }
 
     @Override
     public List<OntologyDocument> getAllDocuments(Sort sort) {
@@ -48,6 +77,40 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
     @Override
     public Page<OntologyDocument> getAllDocuments(Pageable pageable) {
         return repositoryService.findAll(pageable);
+    }
+    
+    @Override
+    public Page<OntologyDocument> getAllDocuments(Pageable pageable, Collection<String> schemas, Collection<String> classifications) {
+    	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
+    	Page<OntologyDocument> documents = getAllDocuments(pageable);
+     	
+     	while(documents.hasNext()) {
+     		documents = getAllDocuments(pageable);
+     		
+     	   	 for (OntologyDocument ontologyDocument : documents.getContent()) {
+     	   		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+     	   			for (String schema: schemas)
+     	   			    if(classificationSchema.containsKey(schema))
+     	   				    for (String classification: classifications) {
+     	   				    	if (classificationSchema.get(schema) != null)
+     	   				    		if (!classificationSchema.get(schema).isEmpty())
+     	   				    	        if (classificationSchema.get(schema).contains(classification)) {
+     	   					                tempSet.add(ontologyDocument);
+     	   				  }
+     	   				    }
+     	   			    
+     	   			}
+     			} 	
+     		
+     	}
+     	
+     	List<OntologyDocument> temp = new ArrayList<>(tempSet);
+     	
+     	final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), temp.size());
+        Page<OntologyDocument> tempDocuments = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
+  	
+        return tempDocuments;
     }
 
     @Override
@@ -104,6 +167,39 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
         AggregateResult result = groupResults.getUniqueMappedResult();
         return result.getTotal();
     }
+    
+    @Override
+    public SummaryInfo getClassificationMetadata(Collection<String> schemas, Collection<String> classifications) {
+      	int ontologies = 0;
+      	int terms = 0;
+      	int properties = 0;
+      	int individuals = 0;
+      	
+    	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
+	   	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+	   		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+	   			for (String schema: schemas)
+	   			    if(classificationSchema.containsKey(schema))
+	   				    for (String classification: classifications) {
+	   				    	if (classificationSchema.get(schema) != null)
+	   				    		if (!classificationSchema.get(schema).isEmpty())
+	   				    	        if (classificationSchema.get(schema).contains(classification)) {
+	   					                tempSet.add(ontologyDocument);
+	   				  }
+	   				    }
+	   			    
+	   			}
+			} 
+	   	 
+	   	 for (OntologyDocument document : tempSet) {
+	   		 ontologies+=1;
+	   		 terms+=document.getNumberOfTerms();
+	   		 properties+=document.getNumberOfProperties();
+	   		 individuals+=document.getNumberOfIndividuals();
+	   	 }
+	   	 
+	   	 return new SummaryInfo(new Date(),ontologies,terms,properties,individuals,"");
+    }
 
     @Override
     public int getNumberOfProperties() {
@@ -141,6 +237,5 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
             return total;
         }
     }
-
 
 }
