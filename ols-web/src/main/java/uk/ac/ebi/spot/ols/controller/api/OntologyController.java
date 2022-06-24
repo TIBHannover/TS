@@ -176,14 +176,18 @@ public class OntologyController implements
     }
     
     @ApiOperation(value = "Get Schema and Classifiction based Statistics", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively.")
-    @RequestMapping(path = "/getstatistics", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    @RequestMapping(path = "/getstatisticsbyclassification", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<SummaryInfo> getStatisticsByClassification(
     		@RequestParam(value = "schema", required = true) Collection<String> schemas,
-    		@RequestParam(value = "classification", required = true) Collection<String> classifications,
-            @PageableDefault(size = 20, page = 0) Pageable pageable,
-            PagedResourcesAssembler assembler
+    		@RequestParam(value = "classification", required = true) Collection<String> classifications
     ) throws ResourceNotFoundException { 	    
        return new ResponseEntity<>( ontologyRepositoryService.getClassificationMetadata(schemas,classifications), HttpStatus.OK);
+    }
+    
+    @ApiOperation(value = "Get Whole System Statistics", notes = "Components in all ontologies are taken into consideration")
+    @RequestMapping(path = "/getstatistics", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<SummaryInfo> getStatisticsByClassification() throws ResourceNotFoundException { 	        
+       return new ResponseEntity<>( new SummaryInfo(repositoryService.getLastUpdated(),repositoryService.getNumberOfOntologies(), repositoryService.getNumberOfTerms(), repositoryService.getNumberOfProperties(), repositoryService.getNumberOfIndividuals() ), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Retrieve a particular ontology")

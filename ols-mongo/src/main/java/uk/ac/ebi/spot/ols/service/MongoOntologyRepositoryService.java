@@ -22,8 +22,10 @@ import uk.ac.ebi.spot.ols.repository.mongo.MongoOntologyRepository;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -190,15 +192,17 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
 	   			    
 	   			}
 			} 
-	   	 
+	   	 Date lastUpdated = new GregorianCalendar(1900, Calendar.JANUARY, 1).getTime();
 	   	 for (OntologyDocument document : tempSet) {
 	   		 ontologies+=1;
 	   		 terms+=document.getNumberOfTerms();
 	   		 properties+=document.getNumberOfProperties();
 	   		 individuals+=document.getNumberOfIndividuals();
+	   		 if(document.getLoaded().after(lastUpdated))
+	   			 lastUpdated = document.getLoaded();
 	   	 }
 	   	 
-	   	 return new SummaryInfo(new Date(),ontologies,terms,properties,individuals,"");
+	   	 return new SummaryInfo(lastUpdated,ontologies,terms,properties,individuals,"");
     }
 
     @Override
