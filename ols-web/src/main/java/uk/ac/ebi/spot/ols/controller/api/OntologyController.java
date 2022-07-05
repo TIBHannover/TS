@@ -151,7 +151,7 @@ public class OntologyController implements
     ) throws ResourceNotFoundException { 	
     	
     	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
-    	
+    	 if(schemas != null && classifications != null)
          if(!exclusive) {
         	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
          		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
@@ -202,7 +202,7 @@ public class OntologyController implements
         final int end = Math.min((start + pageable.getPageSize()), temp.size());
         Page<OntologyDocument> document = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
        
-       return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
+        return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
     
     @ApiOperation(value = "Get Schema and Classifiction based Statistics", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively.")
