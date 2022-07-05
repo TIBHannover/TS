@@ -22,8 +22,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,17 +32,14 @@ import uk.ac.ebi.spot.ols.model.SummaryInfo;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Simon Jupp
- * @date 19/08/2015
- * Samples, Phenotypes and Ontologies Team, EMBL-EBI
+ * @author Erhun Giray TUNCAY 
+ * @date 05/07/2022
+ * NFDI4ING Terminology Service Team, TIB
  */
 @Controller
 @RequestMapping("/api/ontologies")

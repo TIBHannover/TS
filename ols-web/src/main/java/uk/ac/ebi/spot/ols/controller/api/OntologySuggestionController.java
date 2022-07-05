@@ -43,6 +43,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+/**
+ * @author Erhun Giray TUNCAY 
+ * @date 03/05/2022
+ * NFDI4ING Terminology Service Team, TIB
+ */
 @RestController
 @RequestMapping("/api/ontology-suggestion")
 public class OntologySuggestionController {

@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Simon Jupp
- * @date 04/03/2015
- * Samples, Phenotypes and Ontologies Team, EMBL-EBI
+ * @author Erhun Giray TUNCAY 
+ * @date 05/07/2022
+ * NFDI4ING Terminology Service Team, TIB
  */
 @Component
 public class MongoOntologyRepositoryService implements OntologyRepositoryService {

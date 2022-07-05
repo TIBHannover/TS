@@ -2,6 +2,11 @@ package uk.ac.ebi.spot.ols.model;
 
 import java.util.Date;
 
+/**
+ * @author Erhun Giray TUNCAY 
+ * @date 05/07/2022
+ * NFDI4ING Terminology Service Team, TIB
+ */
 public class SummaryInfo {
     Date lastUpdated;
     int numberOfOntologies;
