@@ -150,57 +150,7 @@ public class OntologyController implements
             PagedResourcesAssembler assembler
     ) throws ResourceNotFoundException { 	
     	
-    	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
-    	 if(schemas != null && classifications != null)
-         if(!exclusive) {
-        	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-         		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-         			for (String schema: schemas)
-         			    if(classificationSchema.containsKey(schema))
-         				    for (String classification: classifications) {
-         				    	if (classificationSchema.get(schema) != null)
-         				    		if (!classificationSchema.get(schema).isEmpty())
-         				    	        if (classificationSchema.get(schema).contains(classification)) {
-         					                tempSet.add(ontologyDocument);
-         				  }
-         				    }
-         			    
-         			}
-     		} 
-         } else {	 
-        	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-          		boolean toBeAdded = true;
-          		if(ontologyDocument.getConfig().getClassifications() == null)
-          			toBeAdded = false;
-          		else if (ontologyDocument.getConfig().getClassifications().isEmpty())
-          			toBeAdded = false; 
-          		else
-	        		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-	          			for (String schema: schemas)
-	          			    if(classificationSchema.containsKey(schema)) {
-	          				    for (String classification: classifications) {
-	          				    	if (classificationSchema.get(schema) != null) {
-	          				    		if (!classificationSchema.get(schema).isEmpty()) {
-	          				    	        if (!classificationSchema.get(schema).contains(classification)) {
-	          				    	        	toBeAdded = false;
-	          				    	        }
-	          				    		} else toBeAdded = false;
-	          				         } else toBeAdded = false;
-	          				    }
-	          			    } else toBeAdded = false;
-	     			    
-	          			}
-        		 if(toBeAdded)
-        			 tempSet.add(ontologyDocument); 
-      		} 
-        	 
-         }   		
-    	 
-    	 List<OntologyDocument> temp = new ArrayList<>(tempSet);
-        
-        final int start = (int)pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), temp.size());
-        Page<OntologyDocument> document = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
+        Page<OntologyDocument> document = ontologyRepositoryService.getAllDocuments(pageable, schemas, classifications, exclusive);
        
         return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
     }
