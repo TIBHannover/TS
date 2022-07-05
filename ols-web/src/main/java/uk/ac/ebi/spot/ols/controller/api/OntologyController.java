@@ -22,27 +22,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
+import uk.ac.ebi.spot.ols.model.SummaryInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Simon Jupp
- * @date 19/08/2015
- * Samples, Phenotypes and Ontologies Team, EMBL-EBI
+ * @author Erhun Giray TUNCAY 
+ * @date 05/07/2022
+ * NFDI4ING Terminology Service Team, TIB
  */
 @Controller
 @RequestMapping("/api/ontologies")
@@ -143,34 +140,32 @@ public class OntologyController implements
     HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(
     		@RequestParam(value = "schema", required = true) Collection<String> schemas,
     		@RequestParam(value = "classification", required = true) Collection<String> classifications,
+    		@ApiParam(value = "Set to true (default setting is false) for intersection (default behavior is union) of classifications.")
+    		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive,
             @PageableDefault(size = 20, page = 0) Pageable pageable,
             PagedResourcesAssembler assembler
     ) throws ResourceNotFoundException { 	
     	
-    	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
-    	
-    	 for (OntologyDocument ontologyDocument : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-    		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-    			for (String schema: schemas)
-    			    if(classificationSchema.containsKey(schema))
-    				    for (String classification: classifications) {
-    				    	if (classificationSchema.get(schema) != null)
-    				    		if (!classificationSchema.get(schema).isEmpty())
-    				    	        if (classificationSchema.get(schema).contains(classification)) {
-    					                tempSet.add(ontologyDocument);
-    				  }
-    				    }
-    			    
-    			}
-		} 
-    	 
-    	 List<OntologyDocument> temp = new ArrayList<>(tempSet);
-        
-        final int start = (int)pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), temp.size());
-        Page<OntologyDocument> document = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
+        Page<OntologyDocument> document = ontologyRepositoryService.getAllDocuments(pageable, schemas, classifications, exclusive);
        
-       return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
+        return new ResponseEntity<>( assembler.toResource(document, documentAssembler), HttpStatus.OK);
+    }
+    
+    @ApiOperation(value = "Get Schema and Classifiction based Statistics", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively.")
+    @RequestMapping(path = "/getstatisticsbyclassification", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<SummaryInfo> getStatisticsByClassification(
+    		@RequestParam(value = "schema", required = true) Collection<String> schemas,
+    		@RequestParam(value = "classification", required = true) Collection<String> classifications,
+    		@ApiParam(value = "Set to true (default setting is false) for intersection (default behavior is union) of classifications.")
+    		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive
+    ) throws ResourceNotFoundException { 	    
+       return new ResponseEntity<>( ontologyRepositoryService.getClassificationMetadata(schemas,classifications, exclusive), HttpStatus.OK);
+    }
+    
+    @ApiOperation(value = "Get Whole System Statistics", notes = "Components in all ontologies are taken into consideration")
+    @RequestMapping(path = "/getstatistics", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<SummaryInfo> getStatistics() throws ResourceNotFoundException { 	        
+       return new ResponseEntity<>( new SummaryInfo(ontologyRepositoryService.getLastUpdated(),ontologyRepositoryService.getNumberOfOntologies(), ontologyRepositoryService.getNumberOfTerms(), ontologyRepositoryService.getNumberOfProperties(), ontologyRepositoryService.getNumberOfIndividuals(),"" ), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Retrieve a particular ontology")
@@ -186,7 +181,6 @@ public class OntologyController implements
     @ExceptionHandler(ResourceNotFoundException.class)
     public void handleError(HttpServletRequest req, Exception exception) {
     }
-
-
-
+    
+    
 }

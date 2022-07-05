@@ -2,29 +2,35 @@ package uk.ac.ebi.spot.ols.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
-
-import com.mongodb.MongoTimeoutException;
 
 import uk.ac.ebi.spot.ols.exception.OntologyRepositoryException;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.model.Status;
+import uk.ac.ebi.spot.ols.model.SummaryInfo;
 import uk.ac.ebi.spot.ols.repository.mongo.MongoOntologyRepository;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * @author Simon Jupp
- * @date 04/03/2015
- * Samples, Phenotypes and Ontologies Team, EMBL-EBI
+ * @author Erhun Giray TUNCAY 
+ * @date 05/07/2022
+ * NFDI4ING Terminology Service Team, TIB
  */
 @Component
 public class MongoOntologyRepositoryService implements OntologyRepositoryService {
@@ -34,10 +40,65 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
 
     @Autowired
     MongoTemplate mongoTemplate;
+    
+    private Set<OntologyDocument> filter(Collection<String> schemas, Collection<String> classifications, boolean exclusive){
+    	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
+    	if(schemas != null && classifications != null)
+	    	if(!exclusive) {
+	       	    for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+	        		for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+	        			for (String schema: schemas)
+	        			    if(classificationSchema.containsKey(schema))
+	        				    for (String classification: classifications) {
+	        				    	if (classificationSchema.get(schema) != null)
+	        				    		if (!classificationSchema.get(schema).isEmpty())
+	        				    	        if (classificationSchema.get(schema).contains(classification)) {
+	        					                tempSet.add(ontologyDocument);
+	        				  }
+	        				    }
+	        			    
+	        			}
+	    		} 
+	        } else {	 
+	       	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+	         		boolean toBeAdded = true;
+	         		if(ontologyDocument.getConfig().getClassifications() == null)
+	         			toBeAdded = false;
+	         		else if (ontologyDocument.getConfig().getClassifications().isEmpty())
+	         			toBeAdded = false;
+	         		else
+		        		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+		          			for (String schema: schemas)
+		          			    if(classificationSchema.containsKey(schema)) {
+		          				    for (String classification: classifications) {
+		          				    	if (classificationSchema.get(schema) != null) {
+		          				    		if (!classificationSchema.get(schema).isEmpty()) {
+		          				    	        if (!classificationSchema.get(schema).contains(classification)) {
+		          				    	        	toBeAdded = false;
+		          				    	        }
+		          				    		} else toBeAdded = false;
+		          				         } else toBeAdded = false;
+		          				    }
+		          			    } else toBeAdded = false;
+		     			    
+		          			}
+	       		 if(toBeAdded)
+	       			 tempSet.add(ontologyDocument); 
+	     		} 
+	       	 
+	        }   
+    	
+    	return tempSet; 	
+    }
 
     @Override
     public List<OntologyDocument> getAllDocuments() {
         return repositoryService.findAll();
+    }
+    
+    @Override
+    public List<OntologyDocument> getAllDocuments(Collection<String> schemas, Collection<String> classifications, boolean exclusive) {   	
+    	return new ArrayList<OntologyDocument>(filter(schemas,classifications,exclusive));
     }
 
     @Override
@@ -48,6 +109,17 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
     @Override
     public Page<OntologyDocument> getAllDocuments(Pageable pageable) {
         return repositoryService.findAll(pageable);
+    }
+    
+    @Override
+    public Page<OntologyDocument> getAllDocuments(Pageable pageable, Collection<String> schemas, Collection<String> classifications, boolean exclusive) {
+    	List<OntologyDocument> temp = new ArrayList<OntologyDocument>(filter(schemas,classifications,exclusive));
+	
+     	final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), temp.size());
+        Page<OntologyDocument> tempDocuments = new PageImpl<>(temp.subList(start, end), pageable, temp.size());
+  	
+        return tempDocuments;
     }
 
     @Override
@@ -104,6 +176,31 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
         AggregateResult result = groupResults.getUniqueMappedResult();
         return result.getTotal();
     }
+    
+    @Override
+    public SummaryInfo getClassificationMetadata(Collection<String> schemas, Collection<String> classifications, boolean exclusive) {
+      	int ontologies = 0;
+      	int terms = 0;
+      	int properties = 0;
+      	int individuals = 0;
+      	
+      	if(schemas == null || classifications == null)
+      		return new SummaryInfo(new GregorianCalendar(1900, Calendar.JANUARY, 1).getTime(),ontologies,terms,properties,individuals,"");      		
+      	
+    	Set<OntologyDocument> tempSet = filter(schemas,classifications,exclusive);  
+	   	 Date lastUpdated = new GregorianCalendar(1900, Calendar.JANUARY, 1).getTime();
+	   	 for (OntologyDocument document : tempSet) {
+	   		 ontologies+=1;
+	   		 terms+=document.getNumberOfTerms();
+	   		 properties+=document.getNumberOfProperties();
+	   		 individuals+=document.getNumberOfIndividuals();
+	   		 if(document.getLoaded()!= null)
+	   		     if(document.getLoaded().after(lastUpdated))
+	   			     lastUpdated = document.getLoaded();
+	   	 }
+	   	 
+	   	 return new SummaryInfo(lastUpdated,ontologies,terms,properties,individuals,"");
+    }
 
     @Override
     public int getNumberOfProperties() {
@@ -141,6 +238,5 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
             return total;
         }
     }
-
 
 }
