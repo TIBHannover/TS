@@ -145,6 +145,7 @@ public class OntologyController implements
     HttpEntity<PagedResources<OntologyDocument>> filterOntologiesByClassification(
     		@RequestParam(value = "schema", required = true) Collection<String> schemas,
     		@RequestParam(value = "classification", required = true) Collection<String> classifications,
+    		@ApiParam(value = "Set to true (default setting is false) for intersection (default behavior is union) of classifications.")
     		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive,
             @PageableDefault(size = 20, page = 0) Pageable pageable,
             PagedResourcesAssembler assembler
@@ -160,6 +161,7 @@ public class OntologyController implements
     HttpEntity<SummaryInfo> getStatisticsByClassification(
     		@RequestParam(value = "schema", required = true) Collection<String> schemas,
     		@RequestParam(value = "classification", required = true) Collection<String> classifications,
+    		@ApiParam(value = "Set to true (default setting is false) for intersection (default behavior is union) of classifications.")
     		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive
     ) throws ResourceNotFoundException { 	    
        return new ResponseEntity<>( ontologyRepositoryService.getClassificationMetadata(schemas,classifications, exclusive), HttpStatus.OK);
