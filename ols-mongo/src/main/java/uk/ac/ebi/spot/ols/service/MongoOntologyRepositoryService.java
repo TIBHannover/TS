@@ -41,7 +41,8 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
     @Autowired
     MongoTemplate mongoTemplate;
     
-    private Set<OntologyDocument> filter(Collection<String> schemas, Collection<String> classifications, boolean exclusive){
+    @Override
+    public Set<OntologyDocument> filter(Collection<String> schemas, Collection<String> classifications, boolean exclusive){
     	Set<OntologyDocument> tempSet = new HashSet<OntologyDocument>();
     	if(schemas != null && classifications != null)
 	    	if(!exclusive) {

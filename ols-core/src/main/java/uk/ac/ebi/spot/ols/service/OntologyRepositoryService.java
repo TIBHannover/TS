@@ -11,6 +11,7 @@ import uk.ac.ebi.spot.ols.model.SummaryInfo;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Erhun Giray TUNCAY 
@@ -18,6 +19,8 @@ import java.util.List;
  * NFDI4ING Terminology Service Team, TIB
  */
 public interface OntologyRepositoryService {
+	
+	Set<OntologyDocument> filter(Collection<String> schemas, Collection<String> classifications, boolean exclusive);
 
     List<OntologyDocument> getAllDocuments();
     
