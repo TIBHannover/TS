@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
@@ -63,6 +64,7 @@ public class DataPreparationController {
     @Autowired
     PropertyAssembler termAssembler;
 
+    @ApiOperation(value = "Retrieves all terms, properties and individuals in JSON format.", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively. If no ontology, schema and classification is specified, everything is retrieved without any filter.")
     @RequestMapping(path = "/extendedsearch", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<Object>> getEverythingByOntology(
             @RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
@@ -76,14 +78,19 @@ public class DataPreparationController {
     	Pageable pageable = new PageRequest(0, pageSize);
     	List<Object> everything = new ArrayList<Object>();
     	
-    	Set<OntologyDocument> tempSet = ontologyRepositoryService.filter(schemas, classifications, exclusive);
+    	Set<OntologyDocument> tempSet;
+    	if (ontologies == null && schemas == null && classifications == null) {
+    		tempSet = new HashSet<OntologyDocument>(ontologyRepositoryService.getAllDocuments());
+    	} else {
+        	tempSet = ontologyRepositoryService.filter(schemas, classifications, exclusive);
 
-    	if (ontologies != null)
-    	if(ontologies.size()>=1)
-    		for (String ontology : ontologies)
-    	{
-    		ontology = ontology.toLowerCase();
-    		tempSet.add(ontologyRepositoryService.get(ontology));
+        	if (ontologies != null)
+        	if(ontologies.size()>=1)
+        		for (String ontology : ontologies)
+        	{
+        		ontology = ontology.toLowerCase();
+        		tempSet.add(ontologyRepositoryService.get(ontology));
+        	}	
     	}	
 
 	  	 for (OntologyDocument document : tempSet ) {
@@ -120,6 +127,7 @@ public class DataPreparationController {
     	return new ResponseEntity<>(everything, HttpStatus.OK);
     }
     
+    @ApiOperation(value = "Retrieves basic information about all terms, properties and individuals including their annotations in JSON format.", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively. If no ontology, schema and classification is specified, everything is retrieved without any filter.")
     @RequestMapping(path = "/basictermsearch", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<BasicTerm>> getBasicTermsByOntology(
             @RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
@@ -132,15 +140,19 @@ public class DataPreparationController {
     	
     	Pageable pageable = new PageRequest(0, pageSize);
     	List<BasicTerm> everything = new ArrayList<BasicTerm>();
-    	
-    	Set<OntologyDocument> tempSet = ontologyRepositoryService.filter(schemas, classifications, exclusive);
+    	Set<OntologyDocument> tempSet;
+    	if (ontologies == null && schemas == null && classifications == null) {
+    		tempSet = new HashSet<OntologyDocument>(ontologyRepositoryService.getAllDocuments());
+    	} else {
+        	tempSet = ontologyRepositoryService.filter(schemas, classifications, exclusive);
 
-    	if (ontologies != null)
-    	if(ontologies.size()>=1)
-    		for (String ontology : ontologies)
-    	{
-    		ontology = ontology.toLowerCase();
-    		tempSet.add(ontologyRepositoryService.get(ontology));
+        	if (ontologies != null)
+        	if(ontologies.size()>=1)
+        		for (String ontology : ontologies)
+        	{
+        		ontology = ontology.toLowerCase();
+        		tempSet.add(ontologyRepositoryService.get(ontology));
+        	}	
     	}	
     	
 	   	 for (OntologyDocument document : tempSet ) {
@@ -190,6 +202,8 @@ public class DataPreparationController {
 
         return new ResponseEntity<>(everything, HttpStatus.OK);
     }
+    
+    @ApiOperation(value = "Retrieves definitions of all terms, properties and individuals as subsequent sentences of a corpus.", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively. If no ontology, schema and classification is specified, everything is retrieved without any filter.")
     @RequestMapping(path = "/displaysentences", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     public HttpEntity<String> getSentences(            
     		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
@@ -197,6 +211,7 @@ public class DataPreparationController {
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
     		@ApiParam(value = "Set to true (default setting is false) for intersection (default behavior is union) of classifications.")
     		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive,
+    		@ApiParam(value = "The specified annotations are added as extra sentences to the corpus.")
     		@RequestParam(value = "annotation", required = false) Collection<String> annotations,
             @ApiParam(value = "Page Size", required = true)
             @RequestParam(value = "page_size", required = false, defaultValue = "20") Integer pageSize) {
@@ -210,14 +225,19 @@ public class DataPreparationController {
     	StringBuilder sb = new StringBuilder();
     	Pageable pageable = new PageRequest(0, pageSize);
     	
-    	Set<OntologyDocument> tempSet = ontologyRepositoryService.filter(schemas, classifications, exclusive);
+    	Set<OntologyDocument> tempSet;
+    	if (ontologies == null && schemas == null && classifications == null) {
+    		tempSet = new HashSet<OntologyDocument>(ontologyRepositoryService.getAllDocuments());
+    	} else {
+        	tempSet = ontologyRepositoryService.filter(schemas, classifications, exclusive);
 
-    	if (ontologies != null)
-    	if(ontologies.size()>=1)
-    		for (String ontology : ontologies)
-    	{
-    		ontology = ontology.toLowerCase();
-    		tempSet.add(ontologyRepositoryService.get(ontology));
+        	if (ontologies != null)
+        	if(ontologies.size()>=1)
+        		for (String ontology : ontologies)
+        	{
+        		ontology = ontology.toLowerCase();
+        		tempSet.add(ontologyRepositoryService.get(ontology));
+        	}	
     	}	
     	
     	if (annotations == null)
