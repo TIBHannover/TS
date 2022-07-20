@@ -83,6 +83,7 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             populateAllowDownload(builder);
             populateClassification(builder);
             populateLicense(builder);
+            populateRepoUrl(builder);
 
             return builder.build();
         }
@@ -303,6 +304,14 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             builder.setLicense(license);
         } else {
             builder.setLicense(new License());
+        }
+    } 
+    
+    private void populateRepoUrl(OntologyResourceConfig.OntologyResourceConfigBuilder builder) {
+        if (ontology.containsKey(REPO_URL.getPropertyName())) {
+            builder.setRepoUrl((String) ontology.get(REPO_URL.getPropertyName()));
+        } else {
+            builder.setRepoUrl("");
         }
     } 
 }

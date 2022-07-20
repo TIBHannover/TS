@@ -1,5 +1,9 @@
 package uk.ac.ebi.spot.ols.controller.ui;
 
+import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -10,9 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Sort;
 
-import uk.ac.ebi.spot.ols.entities.UserOntology;
-import uk.ac.ebi.spot.ols.entities.UserOntologyUtilities;
-import uk.ac.ebi.spot.ols.entities.YamlBasedPersistence;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
@@ -22,10 +23,12 @@ import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +92,14 @@ public class OntologyControllerUI {
     	 
     	 return temp;
     }
+    
+    public static String removePrefix(String s, String prefix)
+    {
+        if (s != null && prefix != null && s.startsWith(prefix)) {
+            return s.substring(prefix.length());
+        }
+        return s;
+    }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
     String getAll(
@@ -131,7 +142,9 @@ public class OntologyControllerUI {
             }
             model.addAttribute("contact", contact);
 
-            model.addAttribute("ontologyDocument", document);
+            model.addAttribute("ontologyDocument", document);          
+            
+            model.addAttribute("releaseUrls", new GitHubMetadata().releaseUrls2(document.getConfig().getRepoUrl()));
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);

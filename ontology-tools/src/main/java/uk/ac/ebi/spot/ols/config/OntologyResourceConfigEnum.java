@@ -23,7 +23,8 @@ public enum OntologyResourceConfigEnum {
     PREFERRED_ROOT_TERM("preferred_root_term"),
     ALLOW_DOWNLOAD("allow_download"),
     CLASSIFICATION("classification"),
-    LICENSE("license");
+    LICENSE("license"),
+    REPO_URL("repo_url");
 
     private final String propertyName;
 

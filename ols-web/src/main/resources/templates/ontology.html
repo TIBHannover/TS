@@ -197,6 +197,10 @@
                            <p style="margin-left:27px;margin-bottom: 0rem;" th:each="schemavalue : ${classification.get(schema)}" th:text="${schemavalue}">NCBI_9606</p>
                        </div>
                     </div>
+                    <b>Releases: </b>
+                    <div th:each="releaseUrl : ${releaseUrls.entrySet()}">
+                        <a th:href="${releaseUrl.value}" th:text="${releaseUrl.key}">Release URL</a>
+                    </div>
                     
                     <div th:unless="${ontologyDocument.getConfig().getReasonerType() == T(uk.ac.ebi.spot.ols.util.ReasonerType).NONE}">
                         <b>Reasoner: </b> <span th:text="${ontologyDocument.getConfig().getReasonerType()}">NCBI_9606</span>
