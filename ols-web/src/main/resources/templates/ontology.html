@@ -20,6 +20,44 @@
     <!- - When this content is no longer relevant -->
 </head>
 
+<style>
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  border-style: groove;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.collapsible:after {
+  content: '\002B';
+  color: white;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2212";
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
+</style>
 
 <body>
 
@@ -197,10 +235,6 @@
                            <p style="margin-left:27px;margin-bottom: 0rem;" th:each="schemavalue : ${classification.get(schema)}" th:text="${schemavalue}">NCBI_9606</p>
                        </div>
                     </div>
-                    <b>Releases: </b>
-                    <div th:each="releaseUrl : ${releaseUrls.entrySet()}">
-                        <a th:href="${releaseUrl.value}" th:text="${releaseUrl.key}">Release URL</a>
-                    </div>
                     
                     <div th:unless="${ontologyDocument.getConfig().getReasonerType() == T(uk.ac.ebi.spot.ols.util.ReasonerType).NONE}">
                         <b>Reasoner: </b> <span th:text="${ontologyDocument.getConfig().getReasonerType()}">NCBI_9606</span>
@@ -219,6 +253,14 @@
                         <b>License URL: </b>
                         <a th:href="${ontologyDocument.getConfig().getLicense().getUrl()}" th:text="${ontologyDocument.getConfig().getLicense().getUrl()}">License URL</a>
                     </div>
+                                                 
+                    <button th:if="${releaseUrls.size() > 0}" class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #00827c;'">Releases</button>
+                    <div th:if="${releaseUrls.size() > 0}" class="content">
+                        <div th:each="releaseUrl : ${releaseUrls}">
+                            <a th:href="${releaseUrl.getHtmlUrl()}" th:text="${releaseUrl.getName()}">Release URL</a>
+                        </div>
+                    </div> 
+                    
                 </div>
             </div>
             
@@ -251,7 +293,7 @@
 
 <th:block th:include="fragments/footer :: footer"></th:block>
 
-
+<script type="text/javascript" src="../static/js/user.js" th:src="@{../js/user.js}"></script>
 <!-- <script type="text/javascript" src="/js/oxo.js" th:src="@{/js/oxo.js}"></script> -->
 <script type="text/javascript" src="https://cdn.datatables.net/r/zf-5.5.2/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
 <script type="text/javascript" src="../static/js/typeahead/typeahead.bundle.js" th:src="@{../js/typeahead/typeahead.bundle.js}"></script>

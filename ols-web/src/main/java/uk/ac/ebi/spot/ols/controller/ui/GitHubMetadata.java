@@ -1,7 +1,9 @@
 package uk.ac.ebi.spot.ols.controller.ui;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -50,8 +52,8 @@ public class GitHubMetadata {
 		return releaseUrls;
 	}
 	
-	public Map<String, String> releaseUrls2(String repoUrl){
-		Map<String, String> releaseUrls = new HashMap<String,String>();
+	public List<Release> releaseUrls2(String repoUrl){
+		List<Release> releaseUrls = new ArrayList<Release>();
 		
         String[] parsedRepoUrl = repoUrl.split("/");
         StringBuilder sb = new StringBuilder();
@@ -89,7 +91,7 @@ public class GitHubMetadata {
             
             for (int i = 0; i< items.length();i++) {
                 final JSONObject item = items.getJSONObject(i);
-                releaseUrls.put(item.getString("name"), item.getString("html_url"));	
+                releaseUrls.add(new Release(item.getString("name"), item.getString("html_url"), item.getString("created_at")));	
             }
             httpclient.close();        
             } catch(IOException ioe){
@@ -97,5 +99,35 @@ public class GitHubMetadata {
         }
         return releaseUrls;
 	}
-
+	
+	private class Release {
+		String name;
+		String htmlUrl;
+		String createdAt;
+		public Release(String name, String htmlUrl, String createdAt) {
+			super();
+			this.name = name;
+			this.htmlUrl = htmlUrl;
+			this.createdAt = createdAt;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getHtmlUrl() {
+			return htmlUrl;
+		}
+		public void setHtmlUrl(String htmlUrl) {
+			this.htmlUrl = htmlUrl;
+		}
+		public String getCreatedAt() {
+			return createdAt;
+		}
+		public void setCreatedAt(String createdAt) {
+			this.createdAt = createdAt;
+		}
+		
+	}
 }
