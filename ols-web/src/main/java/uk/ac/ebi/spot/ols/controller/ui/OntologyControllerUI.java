@@ -144,7 +144,7 @@ public class OntologyControllerUI {
 
             model.addAttribute("ontologyDocument", document);          
             
-            model.addAttribute("releaseUrls", new GitHubMetadata().releaseUrls2(document.getConfig().getRepoUrl()));
+            model.addAttribute("releaseUrls", new GitHubMetadata().releasesWithRawUrls(document.getConfig().getRepoUrl(),ontologyId));
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);
