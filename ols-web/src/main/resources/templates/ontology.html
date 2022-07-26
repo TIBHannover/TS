@@ -254,8 +254,8 @@
                         <a th:href="${ontologyDocument.getConfig().getLicense().getUrl()}" th:text="${ontologyDocument.getConfig().getLicense().getUrl()}">License URL</a>
                     </div>
                                                  
-                    <button th:if="${releaseUrls.size() > 0}" class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #00827c;'">Releases</button>
-                    <div th:if="${releaseUrls.size() > 0}" class="content">
+                    <button th:if="${releaseUrls}" class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #00827c;'">Releases</button>
+                    <div th:if="${releaseUrls}" class="content">
                         <div th:each="releaseUrl : ${releaseUrls}">
                             <br>
                             <b th:text="${releaseUrl.getName()} + ' : '">Release Name</b>

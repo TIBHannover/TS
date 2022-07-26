@@ -142,9 +142,10 @@ public class OntologyControllerUI {
             }
             model.addAttribute("contact", contact);
 
-            model.addAttribute("ontologyDocument", document);          
-            
-            model.addAttribute("releaseUrls", new GitHubMetadata().releasesWithRawUrls(document.getConfig().getRepoUrl(),ontologyId));
+            model.addAttribute("ontologyDocument", document); 
+            if(document.getConfig().getRepoUrl() != null)
+                if(document.getConfig().getRepoUrl().startsWith("http"))
+            	    model.addAttribute("releaseUrls", new GitHubMetadata().releasesREST(document.getConfig().getRepoUrl(),ontologyId));             
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);

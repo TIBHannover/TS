@@ -59,7 +59,7 @@ public class GitHubMetadata {
 		 return null;	 
 	 }
 
-	public List<Release> releasesWithRawUrls(String repoUrl,String keyword) {
+	public List<Release> releasesKohsuke(String repoUrl,String keyword) {
 		List<Release> releasesWithRawUrls = new ArrayList<Release>();
 		try {
 			GitHub github = new GitHubBuilder().build();
@@ -92,16 +92,22 @@ public class GitHubMetadata {
 		return releasesWithRawUrls;
 	}
 	
-	public List<Release> releases(String repoUrl){
+	public List<Release> releasesREST(String repoUrl,String keyword){
 		List<Release> releases = new ArrayList<Release>();
 		
         String[] parsedRepoUrl = repoUrl.split("/");
         StringBuilder sb = new StringBuilder();
+        String institution = "";
+        String user = "";
         for (int i = 0;i<parsedRepoUrl.length;i++) {  	
         	if(i == 2)
         		sb.append("api.");
-        	if (i == 3)
+        	if (i == 3) {
         		sb.append("repos").append("/");
+        		institution = parsedRepoUrl[i];
+        	}
+        	if (i ==4)
+        		user = parsedRepoUrl[i];
         	sb.append(parsedRepoUrl[i]).append("/");
         }   
         sb.append("releases");
@@ -131,7 +137,31 @@ public class GitHubMetadata {
             
             for (int i = 0; i< items.length();i++) {
                 final JSONObject item = items.getJSONObject(i);
-                releases.add(new Release(item.getString("name"), item.getString("html_url"), item.getString("created_at")));	
+                
+                StringBuilder sbShaUrl = new StringBuilder();
+                sbShaUrl.append("https://api.github.com/repos/"+institution+"/"+user+"/git/ref/tags/");
+                sbShaUrl.append(item.getString("html_url").split("/")[item.getString("html_url").split("/").length - 1]);
+                
+                HttpGet httpgetSha = new HttpGet(sbShaUrl.toString());
+                
+                String responseBodySha = httpclient.execute(httpgetSha, responseHandler);
+                
+                JSONObject shaObject = new JSONObject(responseBodySha);
+                String sha  =shaObject.getJSONObject("object").getString("sha");
+                HttpGet httpgetFileList = new HttpGet("https://api.github.com/repos/"+institution+"/"+user+"/git/trees/"+sha+"?recursive=1");
+                
+                String responseBodyFileList = httpclient.execute(httpgetFileList, responseHandler);
+                
+                JSONObject fileListObject = new JSONObject(responseBodyFileList);
+                JSONArray tree = fileListObject.getJSONArray("tree");
+                Set<String> downloadUrls = new HashSet<String>();
+                for (int j = 0;j < tree.length() ; j++) {
+                	final JSONObject node = tree.getJSONObject(j);
+                	if(node.getString("path").toLowerCase().contains(keyword) && (node.getString("path").toLowerCase().contains(".owl") || node.getString("path").toLowerCase().contains(".ttl") || node.getString("path").toLowerCase().contains(".obo")))
+                	    downloadUrls.add("https://raw.githubusercontent.com/"+institution+"/"+user+"/"+sha+"/"+node.getString("path"));
+                }
+        
+                releases.add(new Release(item.getString("name"), item.getString("html_url"), item.getString("created_at"),downloadUrls));	
             }
             httpclient.close();        
             } catch(IOException ioe){
