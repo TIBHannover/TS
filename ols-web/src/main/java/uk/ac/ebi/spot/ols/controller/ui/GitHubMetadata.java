@@ -1,11 +1,13 @@
 package uk.ac.ebi.spot.ols.controller.ui;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.http.HttpEntity;
@@ -60,9 +62,32 @@ public class GitHubMetadata {
 	 }
 
 	public List<Release> releasesKohsuke(String repoUrl,String keyword) {
+	    String userName = "";
+	    String personalAccessToken = "";
+        try {
+        	String line;
+			File file = new File("githubpersonalaccesstoken.txt");
+		    BufferedReader br = new BufferedReader(new FileReader(file));
+            int count = 0;
+		    while ((line = br.readLine()) != null) {
+		    	if (count == 0)
+		    		userName = line;
+		    	else if (count == 1)
+		    		personalAccessToken = line;
+		    	count++;
+		    }
+		    br.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		List<Release> releasesWithRawUrls = new ArrayList<Release>();
 		try {
-			GitHub github = new GitHubBuilder().build();
+			GitHub github = new GitHubBuilder().withOAuthToken(personalAccessToken, userName).build();
 			GHRepository repo = null;
 			if(repoUrl.startsWith("https://github.com/"))
 				repo = github.getRepository(removePrefix(repoUrl,"https://github.com/"));
@@ -93,6 +118,23 @@ public class GitHubMetadata {
 	}
 	
 	public List<Release> releasesREST(String repoUrl,String keyword){
+	    StringBuilder basicToken = new StringBuilder();
+        try {
+        	String line;
+			File file = new File("basicgithubauthentication.txt");
+		    BufferedReader br = new BufferedReader(new FileReader(file));
+
+		    while ((line = br.readLine()) != null)
+		        basicToken.append(line);
+		    br.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		List<Release> releases = new ArrayList<Release>();
 		
         String[] parsedRepoUrl = repoUrl.split("/");
@@ -114,6 +156,7 @@ public class GitHubMetadata {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             HttpGet httpget = new HttpGet(sb.toString());
+            httpget.addHeader("Authorization", "Basic "+basicToken.toString());
             // Create a custom response handler
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 
@@ -143,12 +186,14 @@ public class GitHubMetadata {
                 sbShaUrl.append(item.getString("html_url").split("/")[item.getString("html_url").split("/").length - 1]);
                 
                 HttpGet httpgetSha = new HttpGet(sbShaUrl.toString());
+                httpgetSha.addHeader("Authorization", "Basic "+basicToken.toString());
                 
                 String responseBodySha = httpclient.execute(httpgetSha, responseHandler);
                 
                 JSONObject shaObject = new JSONObject(responseBodySha);
                 String sha  =shaObject.getJSONObject("object").getString("sha");
                 HttpGet httpgetFileList = new HttpGet("https://api.github.com/repos/"+institution+"/"+user+"/git/trees/"+sha+"?recursive=1");
+                httpgetFileList.addHeader("Authorization", "Basic "+basicToken.toString());
                 
                 String responseBodyFileList = httpclient.execute(httpgetFileList, responseHandler);
                 

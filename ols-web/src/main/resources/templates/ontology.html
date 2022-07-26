@@ -260,7 +260,7 @@
                             <br>
                             <b th:text="${releaseUrl.getName()} + ' : '">Release Name</b>
                             <br>
-                            <a th:href="${releaseUrl.getHtmlUrl()}" th:text="${releaseUrl.getName()}">Release URL</a>
+                            <a th:href="${releaseUrl.getHtmlUrl()}">Release Page</a>
 <!--                             <button class ="button secondary icon icon-functional" role="button" data-icon ="=" th:onclick="'javascript:goTo(\'' + @{__${releaseUrl.extractRawUrl( '__(${ontologyDocument.getOntologyId()})__' + '.owl')}__} + '\')'">Raw File</button> -->
                          <div th:each="downloadUrl : ${releaseUrl.getDownloadUrls()}">
                             <a th:href="${downloadUrl}" th:text="${downloadUrl.split('/')[downloadUrl.split('/').length - 1]}">Release URL</a>
