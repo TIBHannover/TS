@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +28,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTag;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.springframework.cache.annotation.Cacheable;
 
 public class GitHubMetadata {
 	
@@ -60,7 +63,8 @@ public class GitHubMetadata {
 		 
 		 return null;	 
 	 }
-
+	 
+	 @Cacheable(value = "releases", key="#repoUrl.concat('-').concat('kohsuke').concat('-').concat(#keyword)")
 	public List<Release> releasesKohsuke(String repoUrl,String keyword) {
 	    String userName = "";
 	    String personalAccessToken = "";
@@ -117,6 +121,7 @@ public class GitHubMetadata {
 		return releasesWithRawUrls;
 	}
 	
+	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('rest').concat('-').concat(#keyword)")
 	public List<Release> releasesREST(String repoUrl,String keyword){
 	    StringBuilder basicToken = new StringBuilder();
         try {
@@ -215,96 +220,4 @@ public class GitHubMetadata {
         return releases;
 	}
 	
-	private class Release {
-		String name;
-		String htmlUrl;
-		String createdAt;
-		Set<String> downloadUrls;
-		
-		public Release(String name, String htmlUrl, String createdAt) {
-			super();
-			this.name = name;
-			this.htmlUrl = htmlUrl;
-			this.createdAt = createdAt;
-			this.downloadUrls = new HashSet<String>();
-		}
-		
-		public Release(String name, String htmlUrl, String createdAt, Set<String> downloadUrls) {
-			super();
-			this.name = name;
-			this.htmlUrl = htmlUrl;
-			this.createdAt = createdAt;
-			this.downloadUrls = downloadUrls;
-		}
-
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		public String getHtmlUrl() {
-			return htmlUrl;
-		}
-		public void setHtmlUrl(String htmlUrl) {
-			this.htmlUrl = htmlUrl;
-		}
-		public String getCreatedAt() {
-			return createdAt;
-		}
-		public void setCreatedAt(String createdAt) {
-			this.createdAt = createdAt;
-		}
-		
-		public Set<String> getDownloadUrls() {
-			return downloadUrls;
-		}
-		public void setDownloadUrls(Set<String> downloadUrls) {
-			this.downloadUrls = downloadUrls;
-		}
-		
-		public String extractRawUrl2(String path) {
-			
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			
-	        ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-
-	            @Override
-	            public String handleResponse(
-	                    final HttpResponse response) throws ClientProtocolException, IOException {
-	                int status = response.getStatusLine().getStatusCode();
-	                if (status >= 200 && status < 300) {
-	                    HttpEntity entity = response.getEntity();
-	                    return entity != null ? EntityUtils.toString(entity) : null;
-	                } else {
-	                    throw new ClientProtocolException("Unexpected response status: " + status);
-	                }
-	            }
-
-	        };  
-			
-	        StringBuilder sbShaUrl = new StringBuilder();
-	        sbShaUrl.append("https://api.github.com/repos/tibonto/aeon/git/ref/tags/");
-	        sbShaUrl.append(htmlUrl.split("/")[htmlUrl.split("/").length - 1]);
-	        
-	        HttpGet httpgetSha = new HttpGet(sbShaUrl.toString());
-	        
-	        String responseBodySha;
-			try {
-				responseBodySha = httpclient.execute(httpgetSha, responseHandler);
-				JSONObject shaObject = new JSONObject(responseBodySha);
-		        String sha  =shaObject.getJSONObject("object").getString("sha");
-		        return "https://raw.githubusercontent.com/tibonto/aeon/"+sha+"/"+path;
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        return "";
-	        
-		}
-		
-	}
 }
