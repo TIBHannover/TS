@@ -25,8 +25,8 @@
      <cache name="releases" 
            maxElementsInMemory="100" 
            maxElementsOnDisk="2000"
-           timeToIdleSeconds="0"
-           timeToLiveSeconds="0"
+           timeToIdleSeconds="1209600"
+           timeToLiveSeconds="1209600"
            overflowToDisk="true"
            memoryStoreEvictionPolicy="LFU" />
 </ehcache>
