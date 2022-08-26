@@ -1,13 +1,9 @@
-package uk.ac.ebi.spot.ols.controller.ui;
+package uk.ac.ebi.spot.ols.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,8 +25,14 @@ import org.kohsuke.github.GHTag;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 
-public class GitHubMetadata {
+import uk.ac.ebi.spot.ols.entities.Release;
+
+@Service
+public class GitHubMetadataService {
 	
     public static String removePrefix(String s, String prefix)
     {
@@ -64,30 +66,31 @@ public class GitHubMetadata {
 		 return null;	 
 	 }
 	 
-	 @Cacheable(value = "releases", key="#repoUrl.concat('-').concat('kohsuke').concat('-').concat(#keyword)")
+	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('kohsuke').concat('-').concat(#keyword)")
 	public List<Release> releasesKohsuke(String repoUrl,String keyword) {
 	    String userName = "";
 	    String personalAccessToken = "";
+        
         try {
-        	String line;
-			File file = new File("githubpersonalaccesstoken.txt");
-		    BufferedReader br = new BufferedReader(new FileReader(file));
-            int count = 0;
-		    while ((line = br.readLine()) != null) {
-		    	if (count == 0)
-		    		userName = line;
-		    	else if (count == 1)
-		    		personalAccessToken = line;
-		    	count++;
-		    }
-		    br.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	// reads from src/main/resource
+			InputStream is = new ClassPathResource("/githubpersonalaccesstoken.txt").getInputStream();
+			try {
+			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
+			    System.out.println(contents);
+			    userName = contents.split("\n")[0];
+			    personalAccessToken = contents.split("\n")[1];
+			} catch (IOException e) {
+			    e.printStackTrace();
+			} finally {
+			    if (is != null) {
+			        is.close();
+			    }
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        
 		
 		List<Release> releasesWithRawUrls = new ArrayList<Release>();
 		try {
@@ -110,7 +113,7 @@ public class GitHubMetadata {
 							}
 						}
 					}		
-					releasesWithRawUrls.add(new Release(ghr.getName(), ghr.getHtmlUrl().toString(), ghr.getCreatedAt().toString(),downloadUrls));				
+					releasesWithRawUrls.add(addRelease(ghr.getName(), ghr.getHtmlUrl().toString(), ghr.getCreatedAt().toString(),downloadUrls));				
 				} 
 			}	
 			
@@ -124,17 +127,21 @@ public class GitHubMetadata {
 	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('rest').concat('-').concat(#keyword)")
 	public List<Release> releasesREST(String repoUrl,String keyword){
 	    StringBuilder basicToken = new StringBuilder();
+        
         try {
-        	String line;
-			File file = new File("basicgithubauthentication.txt");
-		    BufferedReader br = new BufferedReader(new FileReader(file));
-
-		    while ((line = br.readLine()) != null)
-		        basicToken.append(line);
-		    br.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+        	// reads from src/main/resource
+			InputStream is = new ClassPathResource("/basicgithubauthentication.txt").getInputStream();
+			try {
+			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
+			    System.out.println(contents);
+			    basicToken.append(contents.split("\n")[0]);
+			} catch (IOException e) {
+			    e.printStackTrace();
+			} finally {
+			    if (is != null) {
+			        is.close();
+			    }
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -210,14 +217,19 @@ public class GitHubMetadata {
                 	if(node.getString("path").toLowerCase().contains(keyword) && (node.getString("path").toLowerCase().contains(".owl") || node.getString("path").toLowerCase().contains(".ttl") || node.getString("path").toLowerCase().contains(".obo")))
                 	    downloadUrls.add("https://raw.githubusercontent.com/"+institution+"/"+user+"/"+sha+"/"+node.getString("path"));
                 }
-        
-                releases.add(new Release(item.getString("name"), item.getString("html_url"), item.getString("created_at"),downloadUrls));	
+                
+                releases.add(addRelease(item.getString("name"), item.getString("html_url"), item.getString("created_at"),downloadUrls));	
             }
             httpclient.close();        
             } catch(IOException ioe){
         	ioe.printStackTrace();
         }
+        
         return releases;
+	}
+	
+	public Release addRelease(String name, String htmlUrl, String createdAt, Set<String> downloadUrls) {
+		return new Release(name, htmlUrl, createdAt,downloadUrls);
 	}
 	
 }

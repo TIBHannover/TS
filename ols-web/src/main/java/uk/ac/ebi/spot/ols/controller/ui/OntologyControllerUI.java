@@ -1,9 +1,5 @@
 package uk.ac.ebi.spot.ols.controller.ui;
 
-import org.kohsuke.github.GHRelease;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -16,6 +12,7 @@ import org.springframework.data.domain.Sort;
 
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
+import uk.ac.ebi.spot.ols.service.GitHubMetadataService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import uk.ac.ebi.spot.ols.util.OLSEnv;
 
@@ -23,12 +20,10 @@ import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +41,9 @@ public class OntologyControllerUI {
 
     @Autowired
     private HomeController homeController;
+    
+    @Autowired
+    GitHubMetadataService gitHubMetadataService;
 
     @Autowired
     OntologyRepositoryService repositoryService;
@@ -145,7 +143,7 @@ public class OntologyControllerUI {
             model.addAttribute("ontologyDocument", document); 
             if(document.getConfig().getRepoUrl() != null)
                 if(document.getConfig().getRepoUrl().startsWith("http"))
-            	    model.addAttribute("releaseUrls", new GitHubMetadata().releasesREST(document.getConfig().getRepoUrl(),ontologyId));             
+            	    model.addAttribute("releaseUrls", gitHubMetadataService.releasesREST(document.getConfig().getRepoUrl(),ontologyId));             
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);

@@ -1,4 +1,4 @@
-package uk.ac.ebi.spot.ols.controller.ui;
+package uk.ac.ebi.spot.ols.entities;
 
 import java.io.Serializable;
 import java.util.HashSet;
