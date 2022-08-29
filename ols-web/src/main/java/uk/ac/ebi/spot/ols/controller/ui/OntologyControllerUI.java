@@ -142,8 +142,11 @@ public class OntologyControllerUI {
 
             model.addAttribute("ontologyDocument", document); 
             if(document.getConfig().getRepoUrl() != null)
-                if(document.getConfig().getRepoUrl().startsWith("http"))
-            	    model.addAttribute("releaseUrls", gitHubMetadataService.releasesREST(document.getConfig().getRepoUrl(),ontologyId));             
+                if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
+                	model.addAttribute("releaseUrls", gitHubMetadataService.releasesREST(document.getConfig().getRepoUrl(),ontologyId));	
+                } else if (document.getConfig().getRepoUrl().startsWith("http"))
+                	model.addAttribute("releaseUrls", gitHubMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(),ontologyId));
+                
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);
