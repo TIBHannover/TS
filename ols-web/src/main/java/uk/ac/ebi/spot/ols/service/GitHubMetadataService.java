@@ -1,7 +1,11 @@
 package uk.ac.ebi.spot.ols.service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -73,7 +77,7 @@ public class GitHubMetadataService {
         
         try {
         	// reads from src/main/resource
-			InputStream is = new ClassPathResource("/githubpersonalaccesstoken.txt").getInputStream();
+			InputStream is = new ClassPathResource("/githubtoken.txt").getInputStream();
 			try {
 			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
 			    System.out.println(contents);
@@ -124,8 +128,8 @@ public class GitHubMetadataService {
 		return releasesWithRawUrls;
 	}
 	
-	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('rest').concat('-').concat(#keyword)")
-	public List<Release> releasesREST(String repoUrl,String keyword){
+	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('github').concat('-').concat('rest').concat('-').concat(#keyword)")
+	public List<Release> releasesGithubREST(String repoUrl,String keyword){
 	    StringBuilder basicToken = new StringBuilder();
         
         try {
@@ -227,28 +231,8 @@ public class GitHubMetadataService {
         
         return releases;
 	}
-	
+	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('gitlab').concat('-').concat('rest').concat('-').concat(#keyword)")
 	public List<Release> releasesGitlabREST(String repoUrl,String keyword){
-	    StringBuilder basicToken = new StringBuilder();
-        
-        try {
-        	// reads from src/main/resource
-			InputStream is = new ClassPathResource("/basicgitlabauthentication.txt").getInputStream();
-			try {
-			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
-			    System.out.println(contents);
-			    basicToken.append(contents.split("\n")[0]);
-			} catch (IOException e) {
-			    e.printStackTrace();
-			} finally {
-			    if (is != null) {
-			        is.close();
-			    }
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		List<Release> releases = new ArrayList<Release>();
 		
@@ -269,40 +253,11 @@ public class GitHubMetadataService {
         	sb.append("%2F");
         	
         }   
-        
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        try {
-            HttpGet httpget = new HttpGet(sb.toString());
-            httpget.addHeader("Authorization", "Basic "+basicToken.toString());
-            // Create a custom response handler
-            ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-
-                @Override
-                public String handleResponse(
-                        final HttpResponse response) throws ClientProtocolException, IOException {
-                    int status = response.getStatusLine().getStatusCode();
-                    if (status >= 200 && status < 300) {
-                        HttpEntity entity = response.getEntity();
-                        return entity != null ? EntityUtils.toString(entity) : null;
-                    } else {
-                        throw new ClientProtocolException("Unexpected response status: " + status);
-                    }
-                }
-
-            };         
-            
-            String responseBody = httpclient.execute(httpget, responseHandler);
-            
+            String responseBody = runCall(sb.toString(),gitlabInstance);            
             JSONObject project = new JSONObject(responseBody);
             Long id = project.getLong("id");
-            
-            String releasesUrl = "https://"+gitlabInstance+"/api/v4/projects/"+id+"/releases";         
-            
-            HttpGet httpgetReleases = new HttpGet(releasesUrl.toString());
-            httpgetReleases.addHeader("Authorization", "Basic "+basicToken.toString());
-            
-            String responseBodyReleases = httpclient.execute(httpgetReleases, responseHandler);
-            
+            String releasesUrl = "https://"+gitlabInstance+"/api/v4/projects/"+id+"/releases"; 
+            String responseBodyReleases = runCall(releasesUrl,gitlabInstance);
             JSONArray items = new JSONArray(responseBodyReleases);
             
             for (int i = 0; i< items.length();i++) {
@@ -311,29 +266,65 @@ public class GitHubMetadataService {
                 String commitId = item.getJSONObject("commit").getString("id");
                 
                 String treeUrl = "https://"+gitlabInstance+"/api/v4/projects/"+id+"/repository/tree?ref="+commitId;
-                
-                HttpGet httpgetTree = new HttpGet(treeUrl);
-                httpgetTree.addHeader("Authorization", "Basic "+basicToken.toString());
-                String responseBodyTree = httpclient.execute(httpgetTree, responseHandler);
+                String responseBodyTree = runCall(treeUrl,gitlabInstance);
                 
                 JSONArray treeFiles = new JSONArray(responseBodyTree);
                 Set<String> downloadUrls = new HashSet<String>();
                 for (int j = 0;j < treeFiles.length() ; j++) {
                 	final JSONObject node = treeFiles.getJSONObject(j);
                 	if(node.getString("path").toLowerCase().contains(keyword) && (node.getString("path").toLowerCase().contains(".owl") || node.getString("path").toLowerCase().contains(".ttl") || node.getString("path").toLowerCase().contains(".obo"))) {
-                		downloadUrls.add("https://"+gitlabInstance+"/api/v4/projects/"+id+"/repository/blobs/"+node.getString("id")+"/raw");
+                		downloadUrls.add(repoUrl+"/-/raw/"+commitId+"/"+node.getString("path"));
                 	}	    
                 }
                                 
                 releases.add(addRelease(item.getString("name"), item.getJSONObject("_links").getString("self"), item.getString("created_at"),downloadUrls));	
             }
-            httpclient.close();        
-            } catch(IOException ioe){
-        	ioe.printStackTrace();
-        }
         
         return releases;
 	}
+
+    public String runCall(String callUrl, String gitInstance) {
+    	
+	    StringBuilder token = new StringBuilder();
+        
+        try {
+        	// reads from src/main/resource
+        	// github requires basic authentication
+			InputStream is = new ClassPathResource("/"+gitInstance+".token.txt").getInputStream();
+			try {
+			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
+			    System.out.println(contents);
+			    token.append(contents.split("\n")[0]);
+			} catch (IOException e) {
+			    e.printStackTrace();
+			} finally {
+			    if (is != null) {
+			        is.close();
+			    }
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+        StringBuilder responseBody = new StringBuilder();
+        try {
+			URL url = new URL(callUrl);
+			HttpURLConnection http = (HttpURLConnection)url.openConnection();
+			http.setRequestProperty("PRIVATE-TOKEN", token.toString());
+		      try (BufferedReader reader = new BufferedReader(
+	                  new InputStreamReader(http.getInputStream()))) {
+	          for (String line; (line = reader.readLine()) != null; ) {
+	              responseBody.append(line);
+	          }
+	      }
+			http.disconnect();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return responseBody.toString();
+    }
 	
 	public Release addRelease(String name, String htmlUrl, String createdAt, Set<String> downloadUrls) {
 		return new Release(name, htmlUrl, createdAt,downloadUrls);
