@@ -25,8 +25,10 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import uk.ac.ebi.spot.ols.entities.Release;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
+import uk.ac.ebi.spot.ols.service.RepoMetadataService;
 import uk.ac.ebi.spot.ols.model.SummaryInfo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +58,9 @@ public class OntologyController implements
 
     @Autowired
     private OntologyRepositoryService ontologyRepositoryService;
+    
+    @Autowired
+    RepoMetadataService repoMetadataService;
 
     @Autowired DocumentAssembler documentAssembler;
 
@@ -175,6 +180,21 @@ public class OntologyController implements
         OntologyDocument document = ontologyRepositoryService.get(ontologyId);
         if (document == null) throw new ResourceNotFoundException();
         return new ResponseEntity<>( documentAssembler.toResource(document), HttpStatus.OK);
+    }
+    
+    @ApiOperation(value = "Retrieve the releases from the repo metadata of a particular ontology")
+    @RequestMapping(path = "/{onto}/releases", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<List<Release>> getOntologyReleases(@ApiParam(value = "The ontology id in this service", required = true) @PathVariable("onto") String ontologyId) throws ResourceNotFoundException {
+        ontologyId = ontologyId.toLowerCase();
+        OntologyDocument document = ontologyRepositoryService.get(ontologyId);
+        if (document == null) throw new ResourceNotFoundException();
+        
+        if(document.getConfig().getRepoUrl() != null)
+            if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
+            	return new ResponseEntity<>( repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),ontologyId), HttpStatus.OK);	
+            } else if (document.getConfig().getRepoUrl().startsWith("http"))
+            	return new ResponseEntity<>( repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(),ontologyId), HttpStatus.OK);
+        return new ResponseEntity<>( new ArrayList<Release>(), HttpStatus.OK);        
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
