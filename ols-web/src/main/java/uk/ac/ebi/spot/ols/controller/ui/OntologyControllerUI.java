@@ -12,7 +12,7 @@ import org.springframework.data.domain.Sort;
 
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
-import uk.ac.ebi.spot.ols.service.GitHubMetadataService;
+import uk.ac.ebi.spot.ols.service.RepoMetadataService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import uk.ac.ebi.spot.ols.util.OLSEnv;
 
@@ -43,7 +43,7 @@ public class OntologyControllerUI {
     private HomeController homeController;
     
     @Autowired
-    GitHubMetadataService gitHubMetadataService;
+    RepoMetadataService repoMetadataService;
 
     @Autowired
     OntologyRepositoryService repositoryService;
@@ -143,9 +143,9 @@ public class OntologyControllerUI {
             model.addAttribute("ontologyDocument", document); 
             if(document.getConfig().getRepoUrl() != null)
                 if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
-                	model.addAttribute("releaseUrls", gitHubMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),ontologyId));	
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),ontologyId));	
                 } else if (document.getConfig().getRepoUrl().startsWith("http"))
-                	model.addAttribute("releaseUrls", gitHubMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(),ontologyId));
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(),ontologyId));
                 
 
             customisationProperties.setCustomisationModelAttributes(model);

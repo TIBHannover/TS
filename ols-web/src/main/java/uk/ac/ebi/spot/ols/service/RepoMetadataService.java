@@ -36,7 +36,24 @@ import org.springframework.util.FileCopyUtils;
 import uk.ac.ebi.spot.ols.entities.Release;
 
 @Service
-public class GitHubMetadataService {
+public class RepoMetadataService {
+	
+    // Create a custom response handler
+    ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+
+        @Override
+        public String handleResponse(
+                final HttpResponse response) throws ClientProtocolException, IOException {
+            int status = response.getStatusLine().getStatusCode();
+            if (status >= 200 && status < 300) {
+                HttpEntity entity = response.getEntity();
+                return entity != null ? EntityUtils.toString(entity) : null;
+            } else {
+                throw new ClientProtocolException("Unexpected response status: " + status);
+            }
+        }
+
+    };     
 	
     public static String removePrefix(String s, String prefix)
     {
@@ -77,7 +94,7 @@ public class GitHubMetadataService {
         
         try {
         	// reads from src/main/resource
-			InputStream is = new ClassPathResource("/githubtoken.txt").getInputStream();
+			InputStream is = new ClassPathResource("/githubusertoken.txt").getInputStream();
 			try {
 			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
 			    System.out.println(contents);
@@ -130,15 +147,14 @@ public class GitHubMetadataService {
 	
 	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('github').concat('-').concat('rest').concat('-').concat(#keyword)")
 	public List<Release> releasesGithubREST(String repoUrl,String keyword){
-	    StringBuilder basicToken = new StringBuilder();
+	    StringBuilder token = new StringBuilder();
         
         try {
         	// reads from src/main/resource
-			InputStream is = new ClassPathResource("/basicgithubauthentication.txt").getInputStream();
+			InputStream is = new ClassPathResource("/github.com.token.txt").getInputStream();
 			try {
 			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
-			    System.out.println(contents);
-			    basicToken.append(contents.split("\n")[0]);
+			    token.append(contents.split("\n")[0]);
 			} catch (IOException e) {
 			    e.printStackTrace();
 			} finally {
@@ -169,28 +185,9 @@ public class GitHubMetadataService {
         	sb.append(parsedRepoUrl[i]).append("/");
         }   
         sb.append("releases");
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        try {
-            HttpGet httpget = new HttpGet(sb.toString());
-            httpget.addHeader("Authorization", "Basic "+basicToken.toString());
-            // Create a custom response handler
-            ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-
-                @Override
-                public String handleResponse(
-                        final HttpResponse response) throws ClientProtocolException, IOException {
-                    int status = response.getStatusLine().getStatusCode();
-                    if (status >= 200 && status < 300) {
-                        HttpEntity entity = response.getEntity();
-                        return entity != null ? EntityUtils.toString(entity) : null;
-                    } else {
-                        throw new ClientProtocolException("Unexpected response status: " + status);
-                    }
-                }
-
-            };         
+     
             
-            String responseBody = httpclient.execute(httpget, responseHandler);
+            String responseBody = runCallGithub(sb.toString(),token.toString());
             
             JSONArray items = new JSONArray(responseBody);
             
@@ -200,18 +197,11 @@ public class GitHubMetadataService {
                 StringBuilder sbShaUrl = new StringBuilder();
                 sbShaUrl.append("https://api.github.com/repos/"+institution+"/"+user+"/git/ref/tags/");
                 sbShaUrl.append(item.getString("html_url").split("/")[item.getString("html_url").split("/").length - 1]);
-                
-                HttpGet httpgetSha = new HttpGet(sbShaUrl.toString());
-                httpgetSha.addHeader("Authorization", "Basic "+basicToken.toString());
-                
-                String responseBodySha = httpclient.execute(httpgetSha, responseHandler);
+                String responseBodySha = runCallGithub(sbShaUrl.toString(),token.toString());
                 
                 JSONObject shaObject = new JSONObject(responseBodySha);
                 String sha  =shaObject.getJSONObject("object").getString("sha");
-                HttpGet httpgetFileList = new HttpGet("https://api.github.com/repos/"+institution+"/"+user+"/git/trees/"+sha+"?recursive=1");
-                httpgetFileList.addHeader("Authorization", "Basic "+basicToken.toString());
-                
-                String responseBodyFileList = httpclient.execute(httpgetFileList, responseHandler);
+                String responseBodyFileList = runCallGithub("https://api.github.com/repos/"+institution+"/"+user+"/git/trees/"+sha+"?recursive=1",token.toString());
                 
                 JSONObject fileListObject = new JSONObject(responseBodyFileList);
                 JSONArray tree = fileListObject.getJSONArray("tree");
@@ -224,10 +214,7 @@ public class GitHubMetadataService {
                 
                 releases.add(addRelease(item.getString("name"), item.getString("html_url"), item.getString("created_at"),downloadUrls));	
             }
-            httpclient.close();        
-            } catch(IOException ioe){
-        	ioe.printStackTrace();
-        }
+
         
         return releases;
 	}
@@ -252,12 +239,32 @@ public class GitHubMetadataService {
         	if (i > 2 && i <parsedRepoUrl.length - 1)
         	sb.append("%2F");
         	
-        }   
-            String responseBody = runCall(sb.toString(),gitlabInstance);            
+        } 
+        
+	    StringBuilder token = new StringBuilder();
+        
+        try {
+        	// reads from src/main/resource
+			InputStream is = new ClassPathResource("/"+gitlabInstance+".token.txt").getInputStream();
+			try {
+			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
+			    token.append(contents.split("\n")[0]);
+			} catch (IOException e) {
+			    e.printStackTrace();
+			} finally {
+			    if (is != null) {
+			        is.close();
+			    }
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+            String responseBody = runCallGitlab(sb.toString(),token.toString());            
             JSONObject project = new JSONObject(responseBody);
             Long id = project.getLong("id");
             String releasesUrl = "https://"+gitlabInstance+"/api/v4/projects/"+id+"/releases"; 
-            String responseBodyReleases = runCall(releasesUrl,gitlabInstance);
+            String responseBodyReleases = runCallGitlab(releasesUrl,token.toString());
             JSONArray items = new JSONArray(responseBodyReleases);
             
             for (int i = 0; i< items.length();i++) {
@@ -266,7 +273,7 @@ public class GitHubMetadataService {
                 String commitId = item.getJSONObject("commit").getString("id");
                 
                 String treeUrl = "https://"+gitlabInstance+"/api/v4/projects/"+id+"/repository/tree?ref="+commitId;
-                String responseBodyTree = runCall(treeUrl,gitlabInstance);
+                String responseBodyTree = runCallGitlab(treeUrl,token.toString());
                 
                 JSONArray treeFiles = new JSONArray(responseBodyTree);
                 Set<String> downloadUrls = new HashSet<String>();
@@ -282,36 +289,31 @@ public class GitHubMetadataService {
         
         return releases;
 	}
-
-    public String runCall(String callUrl, String gitInstance) {
+	
+    public String runCallGithub(String callUrl, String token) {
     	
-	    StringBuilder token = new StringBuilder();
-        
-        try {
-        	// reads from src/main/resource
-        	// github requires basic authentication
-			InputStream is = new ClassPathResource("/"+gitInstance+".token.txt").getInputStream();
-			try {
-			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
-			    System.out.println(contents);
-			    token.append(contents.split("\n")[0]);
-			} catch (IOException e) {
-			    e.printStackTrace();
-			} finally {
-			    if (is != null) {
-			        is.close();
-			    }
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+      CloseableHttpClient httpclient = HttpClients.createDefault();
+      HttpGet httpget = new HttpGet(callUrl);
+//      httpget.addHeader("Authorization", "Basic "+token.toString());
+      httpget.addHeader("Authorization", "Bearer "+token.toString());    
+      try {
+		String responseBody = httpclient.execute(httpget, responseHandler);
+		return responseBody;
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+      
+      return "";
+    }
+
+    public String runCallGitlab(String callUrl, String token) {
     	
         StringBuilder responseBody = new StringBuilder();
         try {
 			URL url = new URL(callUrl);
 			HttpURLConnection http = (HttpURLConnection)url.openConnection();
-			http.setRequestProperty("PRIVATE-TOKEN", token.toString());
+			http.setRequestProperty("PRIVATE-TOKEN", token);
 		      try (BufferedReader reader = new BufferedReader(
 	                  new InputStreamReader(http.getInputStream()))) {
 	          for (String line; (line = reader.readLine()) != null; ) {
