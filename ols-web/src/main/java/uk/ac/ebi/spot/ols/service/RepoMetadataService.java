@@ -94,12 +94,12 @@ public class RepoMetadataService {
         
         try {
         	// reads from src/main/resource
-			InputStream is = new ClassPathResource("/githubusertoken.txt").getInputStream();
+			InputStream is = new ClassPathResource("/github.com.token.txt").getInputStream();
 			try {
 			    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
 			    System.out.println(contents);
-			    userName = contents.split("\n")[0];
-			    personalAccessToken = contents.split("\n")[1];
+			    personalAccessToken = contents.split("\n")[0];
+			    userName = contents.split("\n")[1];
 			} catch (IOException e) {
 			    e.printStackTrace();
 			} finally {
