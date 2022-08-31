@@ -65,8 +65,10 @@ public class RepoMetadataService {
     
 	 public static GHContent traverse (GHContent ghc, String keyword, GHTag tag, GHRepository repo, GHRelease ghr, Set<String> downloadUrls) {
 		 
-		 if (ghc.isFile()) {
-			 if(ghc.getPath().toLowerCase().contains(keyword) && (ghc.getPath().toLowerCase().contains(".owl") || ghc.getPath().toLowerCase().contains(".ttl") || ghc.getPath().toLowerCase().contains(".obo")))
+		 if (ghc.isFile()) {			 
+			 if((ghc.getPath().toLowerCase().contains(keyword) || 
+					 ghc.getPath().toLowerCase().replace("-", "_").contains(keyword) || 
+					 ghc.getPath().toLowerCase().replace("-", "").contains(keyword)) && (ghc.getPath().toLowerCase().contains(".owl") || ghc.getPath().toLowerCase().contains(".ttl") || ghc.getPath().toLowerCase().contains(".obo")))
 					try {
 						downloadUrls.add(repo.getFileContent(ghc.getPath(), tag.getCommit().getSHA1()).getDownloadUrl());  ;
 					} catch (IOException e) {
@@ -208,7 +210,12 @@ public class RepoMetadataService {
                 Set<String> downloadUrls = new HashSet<String>();
                 for (int j = 0;j < tree.length() ; j++) {
                 	final JSONObject node = tree.getJSONObject(j);
-                	if(node.getString("path").toLowerCase().contains(keyword) && (node.getString("path").toLowerCase().contains(".owl") || node.getString("path").toLowerCase().contains(".ttl") || node.getString("path").toLowerCase().contains(".obo")))
+                	if((node.getString("path").toLowerCase().contains(keyword.toLowerCase()) || 
+                			node.getString("path").toLowerCase().replace("-", "_").contains(keyword.toLowerCase()) || 
+                			node.getString("path").toLowerCase().replace("-", "").contains(keyword.toLowerCase())) && 
+                			(node.getString("path").toLowerCase().contains(".owl") || 
+                					node.getString("path").toLowerCase().contains(".ttl") || 
+                					node.getString("path").toLowerCase().contains(".obo")))
                 	    downloadUrls.add("https://raw.githubusercontent.com/"+institution+"/"+user+"/"+sha+"/"+node.getString("path"));
                 }
                 
@@ -279,7 +286,12 @@ public class RepoMetadataService {
                 Set<String> downloadUrls = new HashSet<String>();
                 for (int j = 0;j < treeFiles.length() ; j++) {
                 	final JSONObject node = treeFiles.getJSONObject(j);
-                	if(node.getString("path").toLowerCase().contains(keyword) && (node.getString("path").toLowerCase().contains(".owl") || node.getString("path").toLowerCase().contains(".ttl") || node.getString("path").toLowerCase().contains(".obo"))) {
+                	if((node.getString("path").toLowerCase().contains(keyword.toLowerCase()) || 
+                			node.getString("path").toLowerCase().replace("-", "_").contains(keyword.toLowerCase()) || 
+                			node.getString("path").toLowerCase().replace("-", "").contains(keyword.toLowerCase())) && 
+                			(node.getString("path").toLowerCase().contains(".owl") || 
+                					node.getString("path").toLowerCase().contains(".ttl") || 
+                					node.getString("path").toLowerCase().contains(".obo"))) {
                 		downloadUrls.add(repoUrl+"/-/raw/"+commitId+"/"+node.getString("path"));
                 	}	    
                 }
