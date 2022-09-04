@@ -10,11 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Sort;
 
-import uk.ac.ebi.spot.ols.entities.UserOntology;
-import uk.ac.ebi.spot.ols.entities.UserOntologyUtilities;
-import uk.ac.ebi.spot.ols.entities.YamlBasedPersistence;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
+import uk.ac.ebi.spot.ols.service.RepoMetadataService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import uk.ac.ebi.spot.ols.util.OLSEnv;
 
@@ -43,6 +41,9 @@ public class OntologyControllerUI {
 
     @Autowired
     private HomeController homeController;
+    
+    @Autowired
+    RepoMetadataService repoMetadataService;
 
     @Autowired
     OntologyRepositoryService repositoryService;
@@ -89,6 +90,14 @@ public class OntologyControllerUI {
     	 
     	 return temp;
     }
+    
+    public static String removePrefix(String s, String prefix)
+    {
+        if (s != null && prefix != null && s.startsWith(prefix)) {
+            return s.substring(prefix.length());
+        }
+        return s;
+    }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
     String getAll(
@@ -131,7 +140,13 @@ public class OntologyControllerUI {
             }
             model.addAttribute("contact", contact);
 
-            model.addAttribute("ontologyDocument", document);
+            model.addAttribute("ontologyDocument", document); 
+            if(document.getConfig().getRepoUrl() != null)
+                if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),ontologyId));	
+                } else if (document.getConfig().getRepoUrl().startsWith("http"))
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(),ontologyId));
+                
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);
