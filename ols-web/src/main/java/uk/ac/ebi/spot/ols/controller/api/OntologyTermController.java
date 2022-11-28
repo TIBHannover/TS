@@ -31,9 +31,12 @@ import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Simon Jupp
@@ -182,6 +185,36 @@ public class OntologyTermController {
             throw new ResourceNotFoundException();
         }
     }
+    
+    @RequestMapping(path = "/{onto}/terms/{id}/equivalents", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+        HttpEntity<PagedResources<String>> getEquivalents(@PathVariable("onto") String ontologyId, 
+            @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
+          
+            ontologyId = ontologyId.toLowerCase();
+
+            try {
+            	Set<String> equivalents = new HashSet<String>();
+                String decoded = UriUtils.decode(termId, "UTF-8");
+                Term term = ontologyTermGraphService.findByOntologyAndIri(ontologyId, decoded);
+                if (term == null) throw  new ResourceNotFoundException("No term with id " + decoded + 
+                        " in " + ontologyId);
+                else
+                	equivalents.addAll(term.getEquivalentClassDescription());
+                
+                List<String> tempList = new ArrayList<String>();
+                tempList.addAll(equivalents);
+                
+                final int start = (int)pageable.getOffset();
+                final int end = Math.min((start + pageable.getPageSize()), equivalents.size());
+                Page<String> equivalentStrings = new PageImpl<>(tempList.subList(start, end), pageable, equivalents.size());
+                
+                return new ResponseEntity<>( assembler.toResource(equivalentStrings), HttpStatus.OK);
+            }
+            catch (UnsupportedEncodingException e) {
+                throw new ResourceNotFoundException();
+            }
+        }
 
     @RequestMapping(path = "/{onto}/terms/{id}/parents", produces = {MediaType.APPLICATION_JSON_VALUE, 
         MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
