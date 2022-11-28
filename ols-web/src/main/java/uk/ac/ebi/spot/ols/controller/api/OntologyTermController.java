@@ -189,9 +189,9 @@ public class OntologyTermController {
         }
     }
     
-    @RequestMapping(path = "/{onto}/terms/{id}/equivalents", produces = {MediaType.APPLICATION_JSON_VALUE, 
+    @RequestMapping(path = "/{onto}/terms/{id}/equivalentclassdescription", produces = {MediaType.APPLICATION_JSON_VALUE, 
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-        HttpEntity<PagedResources<String>> getEquivalents(@PathVariable("onto") String ontologyId, 
+        HttpEntity<PagedResources<String>> getEquivalentClassDescription(@PathVariable("onto") String ontologyId, 
             @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
           
             ontologyId = ontologyId.toLowerCase();
@@ -202,7 +202,7 @@ public class OntologyTermController {
                 Term term = ontologyTermGraphService.findByOntologyAndIri(ontologyId, decoded);
                 if (term == null) throw  new ResourceNotFoundException("No term with id " + decoded + 
                         " in " + ontologyId);
-                else
+                else if (term.getEquivalentClassDescription() != null)
                 	equivalents.addAll(term.getEquivalentClassDescription());
                 
                 List<String> tempList = new ArrayList<String>();
@@ -219,8 +219,38 @@ public class OntologyTermController {
             }
         }
     
+    @RequestMapping(path = "/{onto}/terms/{id}/superclassdescription", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+        HttpEntity<PagedResources<String>> getSuperClassDescription(@PathVariable("onto") String ontologyId, 
+            @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
+          
+            ontologyId = ontologyId.toLowerCase();
+
+            try {
+            	Set<String> superClasses = new HashSet<String>();
+                String decoded = UriUtils.decode(termId, "UTF-8");
+                Term term = ontologyTermGraphService.findByOntologyAndIri(ontologyId, decoded);
+                if (term == null) throw  new ResourceNotFoundException("No term with id " + decoded + 
+                        " in " + ontologyId);
+                else if (term.getSuperClassDescription() != null)
+                	superClasses.addAll(term.getSuperClassDescription());
+                
+                List<String> tempList = new ArrayList<String>();
+                tempList.addAll(superClasses);
+                
+                final int start = (int)pageable.getOffset();
+                final int end = Math.min((start + pageable.getPageSize()), superClasses.size());
+                Page<String> superClassStrings = new PageImpl<>(tempList.subList(start, end), pageable, superClasses.size());
+                
+                return new ResponseEntity<>( assembler.toResource(superClassStrings), HttpStatus.OK);
+            }
+            catch (UnsupportedEncodingException e) {
+                throw new ResourceNotFoundException();
+            }
+        }
     
-    @RequestMapping(path = "/{onto}/terms/{id}/relateds", produces = {MediaType.APPLICATION_JSON_VALUE, 
+    
+    @RequestMapping(path = "/{onto}/terms/{id}/relatedfroms", produces = {MediaType.APPLICATION_JSON_VALUE, 
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
         HttpEntity<Map<String, Collection<Map<String, String>>>> getRelatedFroms(@PathVariable("onto") String ontologyId, 
             @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
@@ -233,7 +263,7 @@ public class OntologyTermController {
                 Term term = ontologyTermGraphService.findByOntologyAndIri(ontologyId, decoded);
                 if (term == null) throw  new ResourceNotFoundException("No term with id " + decoded + 
                         " in " + ontologyId);
-                else
+                else if (ontologyTermGraphService.getRelatedFrom(ontologyId, term.getIri()) != null)
                 	relatedFroms = ontologyTermGraphService.getRelatedFrom(ontologyId, term.getIri());
                 
                 return new ResponseEntity<>( relatedFroms, HttpStatus.OK);
