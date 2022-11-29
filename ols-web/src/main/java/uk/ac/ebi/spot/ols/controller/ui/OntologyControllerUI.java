@@ -141,6 +141,11 @@ public class OntologyControllerUI {
               // only thrown if not valid e-mail, so contact must be URL of some sort
             }
             model.addAttribute("contact", contact);
+            List<String> filters = new ArrayList<String>();
+            for (RepoFilterEnum filterOption : RepoFilterEnum.values())
+                filters.add(filterOption.toString());
+            Collections.sort(filters);
+            model.addAttribute("filterValues", filters);
 
             model.addAttribute("ontologyDocument", document); 
             if(document.getConfig().getRepoUrl() != null)
