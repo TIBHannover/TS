@@ -122,7 +122,8 @@ public class OntologyControllerUI {
 
     @RequestMapping(path = "/{onto}", method = RequestMethod.GET)
     String getTerm(
-            @PathVariable("onto") String ontologyId,
+            @PathVariable("onto") String ontologyId, 
+            @RequestParam(value = "filter", required = true, defaultValue = "MAPPING_ONTOLOGIES") RepoFilterEnum filter,
             Model model) throws ResourceNotFoundException {
 
         ontologyId = ontologyId.toLowerCase();
@@ -144,9 +145,9 @@ public class OntologyControllerUI {
             model.addAttribute("ontologyDocument", document); 
             if(document.getConfig().getRepoUrl() != null)
                 if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
-                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),RepoFilterEnum.MAPPING_ONTOLOGIES, ontologyId));	
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),filter, ontologyId));	
                 } else if (document.getConfig().getRepoUrl().startsWith("http"))
-                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(), RepoFilterEnum.MAPPING_ONTOLOGIES, ontologyId));
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(), filter, ontologyId));
                 
 
             customisationProperties.setCustomisationModelAttributes(model);
