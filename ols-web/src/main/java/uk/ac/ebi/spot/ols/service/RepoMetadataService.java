@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
 import uk.ac.ebi.spot.ols.entities.Release;
+import uk.ac.ebi.spot.ols.entities.RepoFilterEnum;
 
 @Service
 public class RepoMetadataService {
@@ -66,9 +67,6 @@ public class RepoMetadataService {
 	 public static GHContent traverse (GHContent ghc, String keyword, GHTag tag, GHRepository repo, GHRelease ghr, Set<String> downloadUrls) {
 		 
 		 if (ghc.isFile()) {			 
-			 if((ghc.getPath().toLowerCase().contains(keyword) || 
-					 ghc.getPath().toLowerCase().replace("-", "_").contains(keyword) || 
-					 ghc.getPath().toLowerCase().replace("-", "").contains(keyword)) && (ghc.getPath().toLowerCase().contains(".owl") || ghc.getPath().toLowerCase().contains(".ttl") || ghc.getPath().toLowerCase().contains(".obo")))
 					try {
 						downloadUrls.add(repo.getFileContent(ghc.getPath(), tag.getCommit().getSHA1()).getDownloadUrl());  ;
 					} catch (IOException e) {
@@ -89,8 +87,8 @@ public class RepoMetadataService {
 		 return null;	 
 	 }
 	 
-	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('kohsuke').concat('-').concat(#keyword)")
-	public List<Release> releasesKohsuke(String repoUrl,String keyword) {
+	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('kohsuke').concat('-').concat(#filter).concat('-').concat(#keyword)")
+	public List<Release> releasesKohsuke(String repoUrl, RepoFilterEnum filter, String keyword) {
 	    String userName = "";
 	    String personalAccessToken = "";
         
@@ -136,7 +134,7 @@ public class RepoMetadataService {
 							}
 						}
 					}		
-					releasesWithRawUrls.add(addRelease(ghr.getName(), ghr.getHtmlUrl().toString(), ghr.getCreatedAt().toString(),downloadUrls));				
+					releasesWithRawUrls.add(addRelease(ghr.getName(), ghr.getHtmlUrl().toString(), ghr.getCreatedAt().toString(),downloadUrls,  filter, keyword));				
 				} 
 			}	
 			
@@ -147,8 +145,8 @@ public class RepoMetadataService {
 		return releasesWithRawUrls;
 	}
 	
-	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('github').concat('-').concat('rest').concat('-').concat(#keyword)")
-	public List<Release> releasesGithubREST(String repoUrl,String keyword){
+	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('github').concat('-').concat('rest').concat('-').concat(#filter).concat('-').concat(#keyword)")
+	public List<Release> releasesGithubREST(String repoUrl, RepoFilterEnum filter, String keyword){
 	    StringBuilder token = new StringBuilder();
         
         try {
@@ -210,23 +208,17 @@ public class RepoMetadataService {
                 Set<String> downloadUrls = new HashSet<String>();
                 for (int j = 0;j < tree.length() ; j++) {
                 	final JSONObject node = tree.getJSONObject(j);
-                	if((node.getString("path").toLowerCase().contains(keyword.toLowerCase()) || 
-                			node.getString("path").toLowerCase().replace("-", "_").contains(keyword.toLowerCase()) || 
-                			node.getString("path").toLowerCase().replace("-", "").contains(keyword.toLowerCase())) && 
-                			(node.getString("path").toLowerCase().contains(".owl") || 
-                					node.getString("path").toLowerCase().contains(".ttl") || 
-                					node.getString("path").toLowerCase().contains(".obo")))
-                	    downloadUrls.add("https://raw.githubusercontent.com/"+institution+"/"+user+"/"+sha+"/"+node.getString("path"));
+                	downloadUrls.add("https://raw.githubusercontent.com/"+institution+"/"+user+"/"+sha+"/"+node.getString("path"));
                 }
                 
-                releases.add(addRelease(item.getString("name"), item.getString("html_url"), item.getString("created_at"),downloadUrls));	
+                releases.add(addRelease(item.getString("name"), item.getString("html_url"), item.getString("created_at"),downloadUrls, filter, keyword));	
             }
 
         
         return releases;
 	}
-	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('gitlab').concat('-').concat('rest').concat('-').concat(#keyword)")
-	public List<Release> releasesGitlabREST(String repoUrl,String keyword){
+	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('gitlab').concat('-').concat('rest').concat('-').concat(#filter).concat('-').concat(#keyword)")
+	public List<Release> releasesGitlabREST(String repoUrl, RepoFilterEnum filter, String keyword){
 
 		List<Release> releases = new ArrayList<Release>();
 		
@@ -286,17 +278,11 @@ public class RepoMetadataService {
                 Set<String> downloadUrls = new HashSet<String>();
                 for (int j = 0;j < treeFiles.length() ; j++) {
                 	final JSONObject node = treeFiles.getJSONObject(j);
-                	if((node.getString("path").toLowerCase().contains(keyword.toLowerCase()) || 
-                			node.getString("path").toLowerCase().replace("-", "_").contains(keyword.toLowerCase()) || 
-                			node.getString("path").toLowerCase().replace("-", "").contains(keyword.toLowerCase())) && 
-                			(node.getString("path").toLowerCase().contains(".owl") || 
-                					node.getString("path").toLowerCase().contains(".ttl") || 
-                					node.getString("path").toLowerCase().contains(".obo"))) {
-                		downloadUrls.add(repoUrl+"/-/raw/"+commitId+"/"+node.getString("path"));
-                	}	    
+                	downloadUrls.add(repoUrl+"/-/raw/"+commitId+"/"+node.getString("path"));
+                		    
                 }
                                 
-                releases.add(addRelease(item.getString("name"), item.getJSONObject("_links").getString("self"), item.getString("created_at"),downloadUrls));	
+                releases.add(addRelease(item.getString("name"), item.getJSONObject("_links").getString("self"), item.getString("created_at"),downloadUrls, filter, keyword));	
             }
         
         return releases;
@@ -340,8 +326,10 @@ public class RepoMetadataService {
         return responseBody.toString();
     }
 	
-	public Release addRelease(String name, String htmlUrl, String createdAt, Set<String> downloadUrls) {
-		return new Release(name, htmlUrl, createdAt,downloadUrls);
+	public Release addRelease(String name, String htmlUrl, String createdAt, Set<String> downloadUrls, RepoFilterEnum filter, String keyword) {
+		Release release = new Release(name, htmlUrl, createdAt,downloadUrls);
+		release.filterDownloadUrls(filter, keyword);
+		return release;
 	}
 	
 }

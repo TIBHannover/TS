@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Sort;
 
+import uk.ac.ebi.spot.ols.entities.RepoFilterEnum;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.service.RepoMetadataService;
@@ -143,9 +144,9 @@ public class OntologyControllerUI {
             model.addAttribute("ontologyDocument", document); 
             if(document.getConfig().getRepoUrl() != null)
                 if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
-                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),ontologyId));	
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),RepoFilterEnum.MAPPING_ONTOLOGIES, ontologyId));	
                 } else if (document.getConfig().getRepoUrl().startsWith("http"))
-                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(),ontologyId));
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(), RepoFilterEnum.MAPPING_ONTOLOGIES, ontologyId));
                 
 
             customisationProperties.setCustomisationModelAttributes(model);
