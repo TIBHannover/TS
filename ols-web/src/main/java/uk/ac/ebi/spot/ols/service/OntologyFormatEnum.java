@@ -8,5 +8,8 @@ public enum OntologyFormatEnum {
     ofn,
     obo,
     rdf,
-    xml
+    xml,
+    n3,
+    nt,
+    json
 }
