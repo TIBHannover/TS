@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import uk.ac.ebi.spot.ols.service.OntologyFormatEnum;
+
 public class Release implements Serializable {
 	/**
 	 * 
@@ -54,6 +56,44 @@ public class Release implements Serializable {
 	}
 	public void setDownloadUrls(Set<String> downloadUrls) {
 		this.downloadUrls = downloadUrls;
+	}
+	
+	public void filterDownloadUrls(RepoFilterEnum filter, String keyword) {
+		if (filter == RepoFilterEnum.ALL_FILES)
+			return;
+		if (filter == RepoFilterEnum.ALL_ONTOLOGIES) {
+			Set<String> tempDownloadUrls = new HashSet<String>();
+			for (String downloadUrl : this.getDownloadUrls()) {
+				for (OntologyFormatEnum format : OntologyFormatEnum.values()) {
+					if (downloadUrl.endsWith("."+format.toString()))
+						tempDownloadUrls.add(downloadUrl);
+				}
+			}
+			this.setDownloadUrls(tempDownloadUrls);
+			
+		}
+		
+		if (filter == RepoFilterEnum.MAPPING_FILES) {
+			Set<String> tempDownloadUrls = new HashSet<String>();
+			for (String downloadUrl : this.getDownloadUrls()) {
+				if (downloadUrl.split("/")[downloadUrl.split("/").length -1].toLowerCase().replaceAll("[^a-zA-Z0-9]", "").contains(keyword.toLowerCase().replaceAll("[^a-zA-Z0-9]", "")))
+					tempDownloadUrls.add(downloadUrl);
+			}
+			this.setDownloadUrls(tempDownloadUrls);
+		}
+		
+		if (filter == RepoFilterEnum.MAPPING_ONTOLOGIES) {
+			Set<String> tempDownloadUrls = new HashSet<String>();
+			for (String downloadUrl : this.getDownloadUrls()) {
+				for (OntologyFormatEnum format : OntologyFormatEnum.values()) {
+				    if (downloadUrl.split("/")[downloadUrl.split("/").length -1].toLowerCase().replaceAll("[^a-zA-Z0-9]", "").contains(keyword.toLowerCase().replaceAll("[^a-zA-Z0-9]", "")))
+					    if (downloadUrl.endsWith("."+format.toString()))
+					        tempDownloadUrls.add(downloadUrl);
+				}
+			}
+			this.setDownloadUrls(tempDownloadUrls);
+		}
+		
 	}
 	
 }

@@ -252,10 +252,23 @@
                     <div th:unless="${ontologyDocument.getConfig().getAnnotations().containsKey('license') or ontologyDocument.getConfig().getAnnotations().containsKey('rights') or ontologyDocument.getConfig().getLicense().getUrl() == null}">
                         <b>License URL: </b>
                         <a th:href="${ontologyDocument.getConfig().getLicense().getUrl()}" th:text="${ontologyDocument.getConfig().getLicense().getUrl()}">License URL</a>
-                    </div>
+                    </div> 
                                                  
                     <button th:if="${releaseUrls}" class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #00827c;'">Releases</button>
                     <div th:if="${releaseUrls}" class="content">
+                    
+                   <b>File Filter</b>
+			       <select th:onchange="'window.location.href =  this.value '" style="width:100%">
+			               <option disabled selected value="0">-- select a filter --</option>
+			               <option
+			                       th:value="${urlBuilder.replaceQueryParam('filter', '__(${filter})__').toUriString()}"
+			                       th:each="filter : ${filterValues}"
+			                       th:text="${filter.replace('_',' ')}"
+			                       th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+			               >
+			               </option>
+			        </select> 
+                    
                         <div th:each="releaseUrl : ${releaseUrls}">
                             <br>
                             <b th:text="${releaseUrl.getName()} + ' : '">Release Name</b>
