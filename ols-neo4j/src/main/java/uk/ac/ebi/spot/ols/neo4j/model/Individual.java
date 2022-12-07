@@ -35,18 +35,21 @@ public class Individual {
     @JsonIgnore
     private String olsId;
 
-    @GraphProperty(propertyName="iri")
+    @GraphProperty(propertyName = IRI)
     @ApiModelProperty(value = "IRI of the individual", name = "iri", dataType = "String", example = "https://spec.edmcouncil.org/fibo/ontology/FBC/FunctionalEntities/MarketsIndividuals/MIC-24EX")
     private String iri;
 
-    @GraphProperty(propertyName = "label")
+    @GraphProperty(propertyName = LABEL)
     private String label;
 
-    @GraphProperty(propertyName = "synonym")
+    @GraphProperty(propertyName = SYNONYM)
     private Set<String> synonym;
 
-    @GraphProperty(propertyName = "description")
+    @GraphProperty(propertyName = DESCRIPTION)
     private Set<String> description;
+
+    @GraphProperty(propertyName = ANONYMOUS_TYPE)
+    private Set<String> anonymousType;
 
     @GraphProperty(propertyName = LOCALIZED_LABELS)
     @JsonProperty(value = LOCALIZED_LABELS)
@@ -60,32 +63,32 @@ public class Individual {
     @JsonProperty(value = LOCALIZED_DESCRIPTIONS)
     private DynamicProperties localizedDescriptions = new DynamicPropertiesContainer();
 
-    @GraphProperty(propertyName = "ontology_name")
-    @JsonProperty(value = "ontology_name")
+    @GraphProperty(propertyName = ONTOLOGY_NAME)
+    @JsonProperty(value = ONTOLOGY_NAME)
     private String ontologyName;
 
-    @GraphProperty(propertyName = "ontology_prefix")
-    @JsonProperty(value = "ontology_prefix")
+    @GraphProperty(propertyName = ONTOLOGY_PREFIX)
+    @JsonProperty(value = ONTOLOGY_PREFIX)
     private String ontologyPrefix;
 
-    @GraphProperty(propertyName = "ontology_iri")
-    @JsonProperty(value = "ontology_iri")
+    @GraphProperty(propertyName = ONTOLOGY_IRI)
+    @JsonProperty(value = ONTOLOGY_IRI)
     private String ontologyIri;
 
-    @GraphProperty(propertyName = "is_obsolete")
-    @JsonProperty(value = "is_obsolete")
+    @GraphProperty(propertyName = IS_OBSOLETE)
+    @JsonProperty(value = IS_OBSOLETE)
     private boolean isObsolete;
 
-    @GraphProperty(propertyName = "is_defining_ontology")
-    @JsonProperty(value = "is_defining_ontology")
+    @GraphProperty(propertyName = IS_DEFINING_ONTOLOGY)
+    @JsonProperty(value = IS_DEFINING_ONTOLOGY)
     private boolean isLocal;
 
-    @GraphProperty(propertyName = "short_form")
-    @JsonProperty(value = "short_form")
+    @GraphProperty(propertyName = SHORT_FORM)
+    @JsonProperty(value = SHORT_FORM)
     private String shortForm;
 
-    @GraphProperty(propertyName = "obo_id")
-    @JsonProperty(value = "obo_id")
+    @GraphProperty(propertyName = OBO_ID)
+    @JsonProperty(value = OBO_ID)
     private String oboId;
 
     private DynamicProperties annotation = new DynamicPropertiesContainer();
@@ -169,6 +172,10 @@ public class Individual {
         return description;
     }
 
+    public Set<String> getAnonymousType() {
+        return anonymousType;
+    }
+
     @JsonProperty(value = "ontology_name")
     public String getOntologyName() {
         return ontologyName;
@@ -216,10 +223,10 @@ public class Individual {
 
         for (String k : localizedAnnotations.keySet()) {
 
-		int n = lang.lastIndexOf('-');
+		int n = k.lastIndexOf('-');
 
 		if(n != -1) {
-			String annoLang = lang.substring(0, n);
+			String annoLang = k.substring(0, n);
 
 			if (annoLang.equalsIgnoreCase(lang)) {
 				res.put(k.substring(n + 1), localizedAnnotations.get(k));
