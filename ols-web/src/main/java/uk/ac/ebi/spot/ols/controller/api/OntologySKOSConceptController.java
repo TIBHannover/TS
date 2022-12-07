@@ -47,13 +47,15 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
+            @ApiParam(value = "Extract the whole tree with childrem or only the top concepts", required = true)
+            @RequestParam(value = "with_children", required = true, defaultValue = "false") boolean withChildren,
             @ApiParam(value = "Page size to retrieve individuals", required = true)
             @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
     	ontologyId = ontologyId.toLowerCase();
     	if (TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		return new ResponseEntity<>(ontologyIndividualService.conceptTreeWithoutTop(ontologyId,pageSize, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(ontologyIndividualService.conceptTreeWithoutTop(ontologyId,pageSize, narrower, withChildren), HttpStatus.OK);
     	else
-    		return new ResponseEntity<>(ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower), HttpStatus.OK);
+    		return new ResponseEntity<>(ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower, withChildren), HttpStatus.OK);
     } 
     
     @RequestMapping(path = "/{onto}/displayconcepthierarchy", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
@@ -65,6 +67,8 @@ public class OntologySKOSConceptController {
     	    @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
+            @ApiParam(value = "Extract the whole tree with childrem or only the top concepts", required = true)
+            @RequestParam(value = "with_children", required = true, defaultValue = "false") boolean withChildren,
             @ApiParam(value = "display related concepts", required = true)
             @RequestParam(value = "display_related", required = true, defaultValue = "false") boolean displayRelated,
             @ApiParam(value = "Page size to retrieve individuals", required = true)
@@ -72,9 +76,9 @@ public class OntologySKOSConceptController {
     	 ontologyId = ontologyId.toLowerCase();
      	 List<TreeNode<Individual>> rootIndividuals = null;
     	 if(TopConceptEnum.RELATIONSHIPS == topConceptIdentification)
-    		 rootIndividuals = ontologyIndividualService.conceptTreeWithoutTop(ontologyId,pageSize, narrower);
+    		 rootIndividuals = ontologyIndividualService.conceptTreeWithoutTop(ontologyId,pageSize, narrower, withChildren);
     	 else
-    		 rootIndividuals = ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification,narrower);
+    		 rootIndividuals = ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification,narrower, withChildren);
          StringBuilder sb = new StringBuilder();
          for (TreeNode<Individual> root : rootIndividuals) {
         	 sb.append(root.getIndex() + " , "+ root.getData().getLabel() + " , " + root.getData().getIri()).append("\n");

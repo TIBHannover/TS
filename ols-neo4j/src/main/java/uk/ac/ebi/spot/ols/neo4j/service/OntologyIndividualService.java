@@ -90,8 +90,8 @@ public class OntologyIndividualService {
         return individualRepository.findByOntologyAndOboId(ontologyId, oboId);
     }
     
-    @Cacheable(value = "concepttree", key="#ontologyId.concat('-').concat(#schema).concat('-').concat(#narrower)")   
-    public List<TreeNode<Individual>> conceptTree (String ontologyId, Integer pageSize, boolean schema, boolean narrower){
+    @Cacheable(value = "concepttree", key="#ontologyId.concat('-').concat(#schema).concat('-').concat(#narrower).concat('-').concat(#withChildren)")   
+    public List<TreeNode<Individual>> conceptTree (String ontologyId, Integer pageSize, boolean schema, boolean narrower, boolean withChildren){
         Page<Individual> terms = this.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
         List<Individual> listOfTerms = new ArrayList<Individual>();
         listOfTerms.addAll(terms.getContent()); 
@@ -111,10 +111,12 @@ public class OntologyIndividualService {
         			 Individual topConceptIndividual = findIndividual(listOfTerms,iriTopConcept);
         			 TreeNode<Individual> topConcept =  new TreeNode<Individual>(topConceptIndividual);
         		     topConcept.setIndex(String.valueOf(++count));
-        		     if(narrower)
-        		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
-        		     else
-        		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
+        		     if(withChildren) {
+            		     if(narrower)
+            		         populateChildrenandRelatedByNarrower(topConceptIndividual,topConcept,listOfTerms);
+            		     else
+            		    	 populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
+        		     }
         			 rootIndividuals.add(topConcept);
         		 }
            	    }  
@@ -123,20 +125,21 @@ public class OntologyIndividualService {
         	 
         	 if (tree.isRoot() && individual.getAnnotation().get("topConceptOf") != null) {
 				tree.setIndex(String.valueOf(++count));
-				if(narrower)
-                    populateChildrenandRelatedByNarrower(individual,tree,listOfTerms);
-				else
-					populateChildrenandRelatedByBroader(individual,tree,listOfTerms);
+				if(withChildren) {
+					if(narrower)
+	                    populateChildrenandRelatedByNarrower(individual,tree,listOfTerms);
+					else
+						populateChildrenandRelatedByBroader(individual,tree,listOfTerms);
+				}
 				rootIndividuals.add(tree);
 			}
 		}    
-        
-            
+             
          return rootIndividuals;
     }
     
-    @Cacheable(value = "concepttree", key="#ontologyId.concat('-').concat(#narrower)")
-    public List<TreeNode<Individual>> conceptTreeWithoutTop (String ontologyId, Integer pageSize, boolean narrower){
+    @Cacheable(value = "concepttree", key="#ontologyId.concat('-').concat(#narrower).concat('-').concat(#withChildren)")
+    public List<TreeNode<Individual>> conceptTreeWithoutTop (String ontologyId, Integer pageSize, boolean narrower, boolean withChildren){
         Page<Individual> terms = this.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
         List<Individual> listOfTerms = new ArrayList<Individual>();
         listOfTerms.addAll(terms.getContent()); 
@@ -165,7 +168,8 @@ public class OntologyIndividualService {
             	Individual topConceptIndividual = findIndividual(listOfTerms, iri);
         		TreeNode<Individual> topConcept = new TreeNode<Individual>(topConceptIndividual);
         		topConcept.setIndex(String.valueOf(++count));
-    		    populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
+        		if(withChildren)
+    		        populateChildrenandRelatedByBroader(topConceptIndividual,topConcept,listOfTerms);
         		rootIndividuals.add(topConcept);
             }
             
@@ -185,7 +189,8 @@ public class OntologyIndividualService {
         			if(root) {
                 		TreeNode<Individual> topConcept = new TreeNode<Individual>(individual);
                 		topConcept.setIndex(String.valueOf(++count));
-        		        populateChildrenandRelatedByNarrower(individual,topConcept,listOfTerms);
+                		if(withChildren)
+        		            populateChildrenandRelatedByNarrower(individual,topConcept,listOfTerms);
         		        rootIndividuals.add(topConcept);
         			}
         		}
