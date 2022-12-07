@@ -178,6 +178,39 @@ public class OntologySKOSConceptController {
 
     }
     
+    @RequestMapping(path = "/{onto}/displayconceptrelations/{iri}", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    @ResponseBody
+    public HttpEntity<String> displayRelatedConcepts(
+    		@ApiParam(value = "ontology ID", required = true)
+    		@PathVariable("onto") String ontologyId,
+            @ApiParam(value = "encoded concept IRI", required = true)
+            @PathVariable("iri") String iri,
+            @ApiParam(value = "skos based concept relation type", required = true, allowableValues = "broader, narrower, related")
+            @RequestParam(value = "relation_type", required = true, defaultValue = "broader") String relationType,
+            Pageable pageable,
+            PagedResourcesAssembler assembler) {
+    	StringBuilder sb = new StringBuilder();
+    	ontologyId = ontologyId.toLowerCase();
+    	List<Individual> related = new ArrayList<Individual>();
+    	try {
+			String decodedIri = UriUtils.decode(iri, "UTF-8");
+			related = ontologyIndividualService.findRelated(ontologyId, decodedIri, relationType);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), related.size());
+        Page<Individual> conceptPage = new PageImpl<>(related.subList(start, end), pageable, related.size());
+        int count = 0;
+        for (Individual individual : conceptPage.getContent())
+        	sb.append(count++).append(" , ").append(individual.getLabel()).append(" , ").append(individual.getIri()).append("\n");
+              
+        return new HttpEntity<>( sb.toString());    	
+
+    }
+    
     public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Individual> rootConcept, boolean displayRelated) {
     	StringBuilder sb = new StringBuilder();
         for (TreeNode<Individual> childConcept : rootConcept.getChildren()) {
