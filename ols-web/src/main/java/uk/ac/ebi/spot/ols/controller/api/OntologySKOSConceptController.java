@@ -205,7 +205,7 @@ public class OntologySKOSConceptController {
         Page<Individual> conceptPage = new PageImpl<>(related.subList(start, end), pageable, related.size());
         int count = 0;
         for (Individual individual : conceptPage.getContent())
-        	sb.append(count++).append(" , ").append(individual.getLabel()).append(" , ").append(individual.getIri()).append("\n");
+        	sb.append(++count).append(" , ").append(individual.getLabel()).append(" , ").append(individual.getIri()).append("\n");
               
         return new HttpEntity<>( sb.toString());    	
 
