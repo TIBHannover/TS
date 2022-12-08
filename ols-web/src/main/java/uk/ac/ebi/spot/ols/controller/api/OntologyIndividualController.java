@@ -3,6 +3,9 @@ package uk.ac.ebi.spot.ols.controller.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import io.swagger.annotations.Api;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,6 +39,7 @@ import java.util.Arrays;
  */
 @Controller
 @RequestMapping("/api/ontologies")
+@Api(value = "ontologyindividuals", description = "The Individuals resources are used to list ontology individuals (instances) from a particular ontology in this service")
 public class OntologyIndividualController {
 
     @Autowired

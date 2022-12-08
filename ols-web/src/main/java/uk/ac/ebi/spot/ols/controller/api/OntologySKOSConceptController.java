@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
@@ -34,11 +36,13 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/api/ontologies")
+@Api(value = "ontologyskos", description = "SKOS concept hierarchies and relations extracted from individuals (instances) from a particular ontology in this service")
 public class OntologySKOSConceptController {
 
     @Autowired
     private OntologyIndividualService ontologyIndividualService;
     
+    @ApiOperation(value = "Get complete SKOS concept hierarchy or only top concepts based on alternative top concept identification methods and concept relations", notes = "If only top concepts are identified, they can be used to extract the following levels of the concept tree one by one using the /{onto}/conceptrelations/{iri} method with broader or narrower concept relations.")
     @RequestMapping(path = "/{onto}/concepthierarchy", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<TreeNode<Individual>>> getSKOSConceptHierarchyByOntology(
     	    @ApiParam(value = "ontology ID", required = true)
@@ -47,7 +51,7 @@ public class OntologySKOSConceptController {
             @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "Extract the whole tree with childrem or only the top concepts", required = true)
+            @ApiParam(value = "Extract the whole tree with children or only the top concepts", required = true)
             @RequestParam(value = "with_children", required = true, defaultValue = "false") boolean withChildren,
             @ApiParam(value = "Page size to retrieve individuals", required = true)
             @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize) {
@@ -58,6 +62,7 @@ public class OntologySKOSConceptController {
     		return new ResponseEntity<>(ontologyIndividualService.conceptTree(ontologyId,pageSize,TopConceptEnum.SCHEMA == topConceptIdentification, narrower, withChildren), HttpStatus.OK);
     } 
     
+    @ApiOperation(value = "Display complete SKOS concept hierarchy or only top concepts based on alternative top concept identification methods and concept relations", notes = "If only top concepts are identified, they can be used to extract the following levels of the concept tree one by one using the /{onto}/displayconceptrelations/{iri} method with broader or narrower concept relations.")
     @RequestMapping(path = "/{onto}/displayconcepthierarchy", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     @ResponseBody
     HttpEntity<String> displaySKOSConceptHierarchyByOntology(
@@ -67,7 +72,7 @@ public class OntologySKOSConceptController {
     	    @RequestParam(value = "find_roots", required = true, defaultValue = "SCHEMA") TopConceptEnum topConceptIdentification,
             @ApiParam(value = "infer from narrower or broader relationships", required = true)
             @RequestParam(value = "narrower", required = true, defaultValue = "false") boolean narrower,
-            @ApiParam(value = "Extract the whole tree with childrem or only the top concepts", required = true)
+            @ApiParam(value = "Extract the whole tree with children or only the top concepts", required = true)
             @RequestParam(value = "with_children", required = true, defaultValue = "false") boolean withChildren,
             @ApiParam(value = "display related concepts", required = true)
             @RequestParam(value = "display_related", required = true, defaultValue = "false") boolean displayRelated,
@@ -88,6 +93,7 @@ public class OntologySKOSConceptController {
          return new HttpEntity<String>(sb.toString());
     }  
     
+    @ApiOperation(value = "Get partial SKOS concept hierarchy based on the encoded iri of the designated top concept")
     @RequestMapping(path = "/{onto}/concepthierarchy/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<TreeNode<Individual>> getSKOSConceptHierarchyByOntologyAndIri(
     	    @ApiParam(value = "ontology ID", required = true)
@@ -116,6 +122,7 @@ public class OntologySKOSConceptController {
         return new ResponseEntity<>(topConcept, HttpStatus.OK);
     } 
     
+    @ApiOperation(value = "Display partial SKOS concept hierarchy based on the encoded iri of the designated top concept")
     @RequestMapping(path = "/{onto}/displayconcepthierarchy/{iri}", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     @ResponseBody
     HttpEntity<String> displaySKOSConceptHierarchyByOntologyAndIri(
@@ -149,6 +156,7 @@ public class OntologySKOSConceptController {
             return new HttpEntity<String>(sb.toString());
     } 
     
+    @ApiOperation(value = "Broader, Narrower and Related concept relations of a concept are listed in JSON if the concept iri is provided in encoded format.")
     @RequestMapping(path = "/{onto}/conceptrelations/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     public HttpEntity<PagedResources<Individual>> findRelatedConcepts(
     		@ApiParam(value = "ontology ID", required = true)
@@ -177,7 +185,7 @@ public class OntologySKOSConceptController {
         return new ResponseEntity<>( assembler.toResource(conceptPage), HttpStatus.OK);    	
 
     }
-    
+    @ApiOperation(value = "Broader, Narrower and Related concept relations of a concept are displayed as text if the concept iri is provided in encoded format.")
     @RequestMapping(path = "/{onto}/displayconceptrelations/{iri}", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     @ResponseBody
     public HttpEntity<String> displayRelatedConcepts(

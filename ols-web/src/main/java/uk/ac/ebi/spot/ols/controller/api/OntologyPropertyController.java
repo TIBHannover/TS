@@ -1,5 +1,6 @@
 package uk.ac.ebi.spot.ols.controller.api;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/api/ontologies")
+@Api(value = "ontologyproperties", description = "The Properties resources are used to list ontology properties (relationships) from a particular ontology in this service")
 public class OntologyPropertyController {
 
     @Autowired

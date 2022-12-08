@@ -1,13 +1,11 @@
 package uk.ac.ebi.spot.ols.controller.api;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -30,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
@@ -42,6 +41,7 @@ import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 @RestController
 @RequestMapping("/api/terms")
 @ExposesResourceFor(Term.class)
+@Api(value = "terms", description = "The Terms resources are used to list terms (or classes) without a reference ontology.")
 public class TermController implements
         ResourceProcessor<RepositoryLinksResource> {
 
