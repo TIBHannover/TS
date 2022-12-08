@@ -8,14 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriUtils;
 
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 import uk.ac.ebi.spot.ols.neo4j.repository.OntologyIndividualRepository;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -237,6 +235,35 @@ public class OntologyIndividualService {
 				for (String iriBroader : (String[]) individual.getAnnotation().get(relationType)) 
 					related.add(this.findByOntologyAndIri(ontologyId, iriBroader));
     	
+    	return related;
+    }
+    
+    public List<Individual>findRelatedIndirectly(String ontologyId, String iri, String relationType,  Integer pageSize){
+    	List<Individual> related = new ArrayList<Individual>();	
+    	
+    	Individual individual = this.findByOntologyAndIri(ontologyId, iri);
+    	if(individual == null)
+    		return related;
+    	if(individual.getIri() != null)
+    		return related;
+    	
+        Page<Individual> terms = this.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
+        List<Individual> listOfTerms = new ArrayList<Individual>();
+        listOfTerms.addAll(terms.getContent()); 
+        
+    	while(terms.hasNext()) {
+    		terms = this.findAllByOntology(ontologyId, terms.nextPageable());
+    		listOfTerms.addAll(terms.getContent());
+    	}   
+    		
+    	for (Individual term : listOfTerms) {
+    		if (term != null)
+    			if (term.getAnnotation().get(relationType) != null)
+    				for (String iriRelated : (String[]) term.getAnnotation().get(relationType)) 
+    					if(iriRelated.equals(iri))
+    					    related.add(term);
+    	}
+    	    	
     	return related;
     }
     
