@@ -48,7 +48,7 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/api/ontologies")
-@Api(value = "terms", description = "The Terms resources are used to list terms (or classes) from a particular ontology in this service")
+@Api(value = "ontologyterms", description = "The Terms resources are used to list terms (or classes) from a particular ontology in this service")
 public class OntologyTermController {
 
     @Autowired

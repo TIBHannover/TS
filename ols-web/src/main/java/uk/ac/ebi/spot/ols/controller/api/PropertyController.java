@@ -41,7 +41,7 @@ import uk.ac.ebi.spot.ols.neo4j.service.OntologyPropertyGraphService;
 @Controller
 @RequestMapping("/api/properties")
 @ExposesResourceFor(Property.class)
-@Api(value = "properties", description = "The Properties resources are used to list ontology properties (relationships) from a particular ontology in this service")
+@Api(value = "properties", description = "The Properties resources are used to list ontology properties (relationships) without a reference ontology.")
 public class PropertyController implements
         ResourceProcessor<RepositoryLinksResource> {
 
