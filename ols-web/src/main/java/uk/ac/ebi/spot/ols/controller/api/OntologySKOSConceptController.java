@@ -219,6 +219,66 @@ public class OntologySKOSConceptController {
 
     }
     
+    @ApiOperation(value = "Broader, Narrower and Related concept relations of a concept are listed in JSON if the concept iri is provided in encoded format.")
+    @RequestMapping(path = "/{onto}/conceptrelationsindirectly/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    public HttpEntity<List<Individual>> findRelatedConceptsIndirectly(
+    		@ApiParam(value = "ontology ID", required = true)
+    		@PathVariable("onto") String ontologyId,
+            @ApiParam(value = "encoded concept IRI", required = true)
+            @PathVariable("iri") String iri,
+            @ApiParam(value = "skos based concept relation type", required = true, allowableValues = "broader, narrower, related")
+            @RequestParam(value = "relation_type", required = true, defaultValue = "broader") String relationType,
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+            PagedResourcesAssembler assembler) {
+    	
+    	ontologyId = ontologyId.toLowerCase();
+    	List<Individual> related = new ArrayList<Individual>();
+    	try {
+			String decodedIri = UriUtils.decode(iri, "UTF-8");
+			related = ontologyIndividualService.findRelatedIndirectly(ontologyId, decodedIri, relationType, pageSize);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+       
+        return new ResponseEntity<>( related, HttpStatus.OK);    	
+
+    }
+    
+    @ApiOperation(value = "Broader, Narrower and Related concept relations of a concept are listed in JSON if the concept iri is provided in encoded format.")
+    @RequestMapping(path = "/{onto}/displayconceptrelationsindirectly/{iri}", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    @ResponseBody
+    public HttpEntity<String> displayRelatedConceptsIndirectly(
+    		@ApiParam(value = "ontology ID", required = true)
+    		@PathVariable("onto") String ontologyId,
+            @ApiParam(value = "encoded concept IRI", required = true)
+            @PathVariable("iri") String iri,
+            @ApiParam(value = "skos based concept relation type", required = true, allowableValues = "broader, narrower, related")
+            @RequestParam(value = "relation_type", required = true, defaultValue = "broader") String relationType,
+            @ApiParam(value = "Page size to retrieve individuals", required = true)
+            @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+            PagedResourcesAssembler assembler) {
+    	StringBuilder sb = new StringBuilder();
+    	ontologyId = ontologyId.toLowerCase();
+    	List<Individual> related = new ArrayList<Individual>();
+    	try {
+			String decodedIri = UriUtils.decode(iri, "UTF-8");
+			related = ontologyIndividualService.findRelatedIndirectly(ontologyId, decodedIri, relationType, pageSize);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	int count = 0;
+        for (Individual individual : related)
+        	sb.append(++count).append(" , ").append(individual.getLabel()).append(" , ").append(individual.getIri()).append("\n");
+
+       
+        return new ResponseEntity<>( sb.toString(), HttpStatus.OK);    	
+
+    }
+    
     public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Individual> rootConcept, boolean displayRelated) {
     	StringBuilder sb = new StringBuilder();
         for (TreeNode<Individual> childConcept : rootConcept.getChildren()) {

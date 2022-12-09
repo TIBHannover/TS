@@ -244,7 +244,7 @@ public class OntologyIndividualService {
     	Individual individual = this.findByOntologyAndIri(ontologyId, iri);
     	if(individual == null)
     		return related;
-    	if(individual.getIri() != null)
+    	if(individual.getIri() == null)
     		return related;
     	
         Page<Individual> terms = this.findAllByOntology(ontologyId, new PageRequest(0, pageSize));
