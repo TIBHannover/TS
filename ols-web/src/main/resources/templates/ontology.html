@@ -348,7 +348,14 @@
                         </div>
                         </div>
                     </div>
-
+                    
+                    </div>
+                    
+                                    <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).isEmpty()}" id="ontology_info_box2" class="panel">
+                    <div class="panel-heading">
+                        <h4 th:inline="text">Original [[${ontologyAlias}]] information</h4>
+                     </div>
+                   <div class="panel-body">
 
                     <div th:each="annotations: ${ontologyDocument.getConfig().getLocalizedAnnotations(lang)}">
                         <b>
@@ -365,6 +372,7 @@
                             <p th:if="${annovalue.split(' ').length > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>
                          </div>
                         </div>
+                      </div>
                     </div>
                 </div>
             </div>
