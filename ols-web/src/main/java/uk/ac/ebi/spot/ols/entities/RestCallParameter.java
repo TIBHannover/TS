@@ -2,26 +2,13 @@ package uk.ac.ebi.spot.ols.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import javax.persistence.Transient;
 import java.util.Objects;
 
-@Entity
-@Table(name = "rest_call_parameter")
 public class RestCallParameter {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column(name = "name", nullable = false)
     private String name;
     private String value;
-
-    @Enumerated(EnumType.STRING)
     private RestCallParameterType parameterType;
-
-    @ManyToOne
-    @JoinColumn(name = "rest_call_id")
-    private RestCall restCall;
 
     public RestCallParameter() {
     }
@@ -32,20 +19,10 @@ public class RestCallParameter {
         this.parameterType = parameterType;
     }
 
-    public RestCallParameter(Long id, String name, String value, RestCallParameterType parameterType, RestCall restCall) {
-        this.id = id;
+    public RestCallParameter(String name, String value, RestCallParameterType parameterType, RestCall restCall) {
         this.name = name;
         this.value = value;
         this.parameterType = parameterType;
-        this.restCall = restCall;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -64,14 +41,6 @@ public class RestCallParameter {
         this.value = value;
     }
 
-    public RestCall getRestCall() {
-        return restCall;
-    }
-
-    public void setRestCall(RestCall restCall) {
-        this.restCall = restCall;
-    }
-
     public RestCallParameterType getParameterType() {
         return parameterType;
     }
@@ -83,7 +52,6 @@ public class RestCallParameter {
     @Override
     public String toString() {
         return "RestCallParameter{" +
-            "id='" + id + '\'' +
             ", parameterType='" + parameterType + '\'' +
             ", name='" + name + '\'' +
             ", value='" + value + '\'' +
@@ -95,12 +63,12 @@ public class RestCallParameter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RestCallParameter that = (RestCallParameter) o;
-        return id.equals(that.id) && name.equals(that.name) && Objects.equals(value, that.value) && parameterType == that.parameterType;
+        return name.equals(that.name) && value.equals(that.value) && parameterType == that.parameterType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, value, parameterType);
+        return Objects.hash(name, value, parameterType);
     }
 
     @Transient

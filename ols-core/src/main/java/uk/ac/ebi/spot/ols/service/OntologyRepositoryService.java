@@ -6,25 +6,31 @@ import org.springframework.data.domain.Sort;
 import uk.ac.ebi.spot.ols.exception.OntologyRepositoryException;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.model.Status;
+import uk.ac.ebi.spot.ols.model.SummaryInfo;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
- * @author Simon Jupp
- * @date 29/01/2015
- * Samples, Phenotypes and Ontologies Team, EMBL-EBI
- *
- * Provides access to a repository of ontology documents
- *
+ * @author Erhun Giray TUNCAY 
+ * @date 05/07/2022
+ * NFDI4ING Terminology Service Team, TIB
  */
 public interface OntologyRepositoryService {
+	
+	Set<OntologyDocument> filter(Collection<String> schemas, Collection<String> classifications, boolean exclusive);
 
     List<OntologyDocument> getAllDocuments();
+    
+    List<OntologyDocument> getAllDocuments(Collection<String> schemas, Collection<String> classifications, boolean exclusive);
 
     List<OntologyDocument> getAllDocuments(Sort sort);
 
     Page<OntologyDocument> getAllDocuments(Pageable pageable);
+    
+    Page<OntologyDocument> getAllDocuments(Pageable pageable, Collection<String> schemas, Collection<String> classifications, boolean exclusive);
 
     List<OntologyDocument> getAllDocumentsByStatus(Status status);
 
@@ -41,6 +47,8 @@ public interface OntologyRepositoryService {
     Date getLastUpdated();
 
     int getNumberOfOntologies();
+    
+    SummaryInfo getClassificationMetadata(Collection<String> schemas, Collection<String> classifications, boolean exclusive);
 
     int getNumberOfTerms();
 

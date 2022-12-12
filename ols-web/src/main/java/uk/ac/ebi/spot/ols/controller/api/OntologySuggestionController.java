@@ -43,6 +43,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+/**
+ * @author Erhun Giray TUNCAY 
+ * @date 03/05/2022
+ * NFDI4ING Terminology Service Team, TIB
+ */
 @RestController
 @RequestMapping("/api/ontology-suggestion")
 public class OntologySuggestionController {
@@ -132,6 +137,7 @@ public class OntologySuggestionController {
     		@RequestParam(value = "preferredRootTerm", required = false) List<String> preferredRootTerm,
     		@RequestParam(value = "logo", required = false) String logo,
     		@RequestParam(value = "foundary", required = false) boolean foundary,
+    		@RequestParam(value = "versionInfo", required = false) String versionInfo,
 //    		@RequestParam(value = "approval", required = false) ApprovalEnum approval,
 //    		@RequestParam(value = "addedBy", required = false, defaultValue = "") String addedBy
     		@RequestParam(value = "extractMetaData", required = false) boolean extractMetaData
@@ -161,6 +167,7 @@ public class OntologySuggestionController {
     	userOntology.setPreferredRootTerm(preferredRootTerm);
     	userOntology.setLogo(logo);
     	userOntology.setFoundary(foundary);
+    	userOntology.setVersionInfo(versionInfo);
 //    	userOntology.setApproval(approval);
 //    	userOntology.setAddedBy(addedBy);    
     	
@@ -174,7 +181,7 @@ public class OntologySuggestionController {
 		userOntologyRepository.findAll().forEach(x ->  {if (x.getName().equals(name)) error.put("Existing name",x.getName());if (x.getPreferredPrefix().equals(preferredPrefix)) error.put("Existing preferredPrefix",x.getPreferredPrefix());} );
 			
 		if(error.isEmpty() && validator.validate(userOntology).isEmpty()) {
-		    userOntologyRepository.saveAndFlush(userOntology);
+		    userOntologyRepository.save(userOntology);
 			return YamlBasedPersistence.singleSuggestionDumpWriter(userOntology, false);
 		} 	
 		
@@ -251,7 +258,7 @@ public class OntologySuggestionController {
 
   	  for (UserOntology uo : temp) {
   		  if (!recordExists(uo.getName(), uo.getPreferredPrefix(), userOntologyRepository)) {
-  			  userOntologyRepository.saveAndFlush(uo);
+  			  userOntologyRepository.save(uo);
   		  } else {
   			  System.out.println(uo.getName()+" is not added due to an existing record with the same id or same preferred prefix.");
   			  System.out.println("A record exists with either id: "+uo.getName()+" or preferredPrefix: "+uo.getPreferredPrefix());

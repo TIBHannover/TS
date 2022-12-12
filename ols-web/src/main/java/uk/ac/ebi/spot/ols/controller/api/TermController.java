@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriUtils;
 
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
@@ -43,6 +44,7 @@ import uk.ac.ebi.spot.ols.controller.api.localization.LocalizedTerm;
 @RestController
 @RequestMapping("/api/terms")
 @ExposesResourceFor(Term.class)
+@Api(value = "terms", description = "The Terms resources are used to list terms (or classes) without a reference ontology.")
 public class TermController implements
         ResourceProcessor<RepositoryLinksResource> {
 

@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.neo4j.config.EnableNeo4jRepositories;
 
@@ -13,9 +14,10 @@ import org.springframework.data.neo4j.config.EnableNeo4jRepositories;
  * Samples, Phenotypes and Ontologies Team, EMBL-EBI
  */
 @SpringBootApplication
+@EnableCaching
 @EnableAutoConfiguration
 @EnableNeo4jRepositories(basePackages = "uk.ac.ebi.spot.ols.neo4j.repository")
-@EnableMongoRepositories(basePackages = "uk.ac.ebi.spot.ols.repository.mongo")
+@EnableMongoRepositories(basePackages = {"uk.ac.ebi.spot.ols.repository.mongo", "uk.ac.ebi.spot.ols.repositories"})
 //@EnableSolrRepositories(basePackages = "uk.ac.ebi.spot.ols.indexer")
 public class OlsWebApp extends SpringBootServletInitializer {
 

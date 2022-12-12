@@ -3,6 +3,9 @@ package uk.ac.ebi.spot.ols.controller.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import io.swagger.annotations.Api;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,7 +26,6 @@ import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Property;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.IndividualJsTreeBuilder;
-import uk.ac.ebi.spot.ols.neo4j.service.JsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +42,7 @@ import uk.ac.ebi.spot.ols.controller.api.localization.LocalizedTerm;
  */
 @Controller
 @RequestMapping("/api/ontologies")
+@Api(value = "ontologyindividuals", description = "The Individuals resources are used to list ontology individuals (instances) from a particular ontology in this service")
 public class OntologyIndividualController {
 
     @Autowired
@@ -91,7 +94,7 @@ public class OntologyIndividualController {
 
         return new ResponseEntity<>(assembler.toResource(terms, individualAssembler), HttpStatus.OK);
     }
-
+    
     @RequestMapping(path = "/{onto}/individuals/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<Resource<LocalizedIndividual>> getIndividual(@PathVariable("onto") String ontologyId, 
             @RequestParam(value = "lang", defaultValue = "en", required = false) String lang,

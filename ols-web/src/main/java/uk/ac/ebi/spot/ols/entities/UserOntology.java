@@ -1,24 +1,27 @@
 package uk.ac.ebi.spot.ols.entities;
 
 import java.util.List;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import org.hibernate.validator.constraints.Length;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 @UniqueField(message = "The id or preferredPrefix exists in previous records")
-@Entity
+@Document(collection = "user_ontology")
 @ApiModel
 public class UserOntology {
+	
+    @Transient
+    public static final String SEQUENCE_NAME = "users_sequence";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,11 +48,9 @@ public class UserOntology {
     private String licenseLabel;
     
     private String title;
-    @Length(max = 2500)
+    
     private String description;
 
-    @ElementCollection
-    @Column(length=3000)
     private List<String> creator;
     
     private String homePage;
@@ -61,7 +62,7 @@ public class UserOntology {
     @NotNull(message = "Preferred Prefix is mandatory")
     @Size(min=1, max=30,message = "Enter a string with max 30 characters")
     @Column(unique=true)
-    @ApiModelProperty(value = "Preferred Prefiy of the Ontology Suggestion", name = "preferredPrefix", dataType = "String", example = "iao")
+    @ApiModelProperty(value = "Preferred Prefix of the Ontology Suggestion", name = "preferredPrefix", dataType = "String", example = "iao")
     private String preferredPrefix;
     
     private String baseURI;
@@ -69,18 +70,18 @@ public class UserOntology {
     private ReasonerEnum reasoner;
     
     private String labelProperty;
-    @ElementCollection
+    
     private List<String> definitionProperty;
-    @ElementCollection
+    
     private List<String> synonymProperty;
-    @ElementCollection
+    
     private List<String> hierarchicalProperty;
-    @ElementCollection
+    
     private List<String> hiddenProperty;
     
     @NotNull(message = "oboSlims is mandatory")
     private boolean oboSlims;
-    @ElementCollection
+    
     private List<String> preferredRootTerm;
     
     private String logo;
@@ -88,12 +89,20 @@ public class UserOntology {
     @NotNull(message = "isFoundary is mandatory")
     private boolean foundary;
     
-    private ApprovalEnum approval;
+    private String versionInfo;
+
+	private ApprovalEnum approval;
     
     private String addedBy;
     
 
     public UserOntology() {}
+    
+    public UserOntology(String name, String permanenturl, String preferredPrefix) {
+    	this.name = name;
+    	this.permanenturl = permanenturl;
+    	this.preferredPrefix = preferredPrefix;
+    	}
 
 	public UserOntology(long id, @NotNull(message = "Name is mandatory") String name,
 			@NotNull(message = "PURL is mandatory") String permanenturl, String URI, String licenseURL, String licenseLogo,
@@ -102,7 +111,7 @@ public class UserOntology {
 			String baseURI, ReasonerEnum reasoner, String labelProperty, List<String> definitionProperty, List<String> synonymProperty,
 			List<String> hierarchicalProperty, List<String> hiddenProperty,
 			@NotNull(message = "oboSlims is mandatory") boolean oboSlims, List<String> preferredRootTerm, String logo,
-			@NotNull(message = "isFoundary is mandatory") boolean foundary, ApprovalEnum approval, String addedBy) {
+			@NotNull(message = "isFoundary is mandatory") boolean foundary, String versionInfo, ApprovalEnum approval, String addedBy) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -129,6 +138,7 @@ public class UserOntology {
 		this.preferredRootTerm = preferredRootTerm;
 		this.logo = logo;
 		this.foundary = foundary;
+		this.versionInfo = versionInfo;
 		this.approval = approval;
 		this.addedBy = addedBy;
 	}
@@ -331,6 +341,14 @@ public class UserOntology {
 
 	public void setFoundary(boolean foundary) {
 		this.foundary = foundary;
+	}
+	
+    public String getVersionInfo() {
+		return versionInfo;
+	}
+
+	public void setVersionInfo(String versionInfo) {
+		this.versionInfo = versionInfo;
 	}
 
 	public ApprovalEnum getApproval() {

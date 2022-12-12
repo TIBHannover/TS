@@ -1,11 +1,16 @@
 package uk.ac.ebi.spot.ols.neo4j.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.io.IOException;
 import java.util.*;
@@ -124,6 +129,41 @@ public abstract class AbstractJsTreeBuilder {
         logger.debug("Return treeObjects = " + treeObjects);
         return treeObjects;
     }
+    
+    @Cacheable(value="jstree", key="#lang.concat('-').concat('ontologyId').concat('-').concat(#id).concat('-').concat(#siblings).concat(#viewMode.toString())")
+    public String writeJSTreeAsString(String lang, String ontologyId, String id, boolean siblings, ViewMode viewMode) {
+    	System.out.println("Kamil: "+viewMode.toString());
+    	Object object= getJsTree(lang, ontologyId, id, siblings, viewMode);
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    	try {
+			return ow.writeValueAsString(object);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return "";
+    }
+    
+    @Cacheable(value="jstree", key="#lang.concat('-').concat('ontologyId').concat('-').concat('s').concat('-').concat(#id).concat('-').concat(#nodeId)")
+    public String writeJSTreeChildrenAsString(String lang, String ontologyId, String id, String nodeId) {
+    	Object object= getJsTreeChildren(lang, ontologyId, id, nodeId);
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+    	try {
+			return ow.writeValueAsString(object);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return "";
+    }
+    
+    @CacheEvict(value="jstree", allEntries=true)
+    public String removeJSTreeCache() {
+    	return "All term tree cache removed!";
+    }
+
 
     private void cacheRoots(String lang, String ontologyName, ViewMode viewMode) {
         switch (viewMode){

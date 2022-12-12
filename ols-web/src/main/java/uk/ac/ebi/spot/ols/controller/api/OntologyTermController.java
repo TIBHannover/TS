@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,11 +28,19 @@ import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.ClassJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
 import uk.ac.ebi.spot.ols.neo4j.service.ViewMode;
+import uk.ac.ebi.spot.ols.neo4j.model.TreeNode;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Simon Jupp
@@ -40,7 +49,7 @@ import java.util.Collections;
  */
 @RestController
 @RequestMapping("/api/ontologies")
-@Api(value = "terms", description = "The Terms resources are used to list terms (or classes) from a particular ontology in this service")
+@Api(value = "ontologyterms", description = "The Terms resources are used to list terms (or classes) from a particular ontology in this service")
 public class OntologyTermController {
 
     @Autowired
@@ -54,7 +63,6 @@ public class OntologyTermController {
     
     @Autowired
     ClassJsTreeBuilder jsTreeBuilder;
-
 
     @RequestMapping(path = "/{onto}/terms", produces = {MediaType.APPLICATION_JSON_VALUE, 
         MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
@@ -193,6 +201,90 @@ public class OntologyTermController {
             throw new ResourceNotFoundException();
         }
     }
+    
+    @RequestMapping(path = "/{onto}/terms/{id}/equivalentclassdescription", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+        HttpEntity<PagedResources<String>> getEquivalentClassDescription(@PathVariable("onto") String ontologyId, 
+            @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
+          
+            ontologyId = ontologyId.toLowerCase();
+
+            try {
+            	Set<String> equivalents = new HashSet<String>();
+                String decoded = UriUtils.decode(termId, "UTF-8");
+                Term term = ontologyTermGraphService.findByOntologyAndIri(ontologyId, decoded);
+                if (term == null) throw  new ResourceNotFoundException("No term with id " + decoded + 
+                        " in " + ontologyId);
+                else if (term.getEquivalentClassDescription() != null)
+                	equivalents.addAll(term.getEquivalentClassDescription());
+                
+                List<String> tempList = new ArrayList<String>();
+                tempList.addAll(equivalents);
+                
+                final int start = (int)pageable.getOffset();
+                final int end = Math.min((start + pageable.getPageSize()), equivalents.size());
+                Page<String> equivalentStrings = new PageImpl<>(tempList.subList(start, end), pageable, equivalents.size());
+                
+                return new ResponseEntity<>( assembler.toResource(equivalentStrings), HttpStatus.OK);
+            }
+            catch (UnsupportedEncodingException e) {
+                throw new ResourceNotFoundException();
+            }
+        }
+    
+    @RequestMapping(path = "/{onto}/terms/{id}/superclassdescription", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+        HttpEntity<PagedResources<String>> getSuperClassDescription(@PathVariable("onto") String ontologyId, 
+            @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
+          
+            ontologyId = ontologyId.toLowerCase();
+
+            try {
+            	Set<String> superClasses = new HashSet<String>();
+                String decoded = UriUtils.decode(termId, "UTF-8");
+                Term term = ontologyTermGraphService.findByOntologyAndIri(ontologyId, decoded);
+                if (term == null) throw  new ResourceNotFoundException("No term with id " + decoded + 
+                        " in " + ontologyId);
+                else if (term.getSuperClassDescription() != null)
+                	superClasses.addAll(term.getSuperClassDescription());
+                
+                List<String> tempList = new ArrayList<String>();
+                tempList.addAll(superClasses);
+                
+                final int start = (int)pageable.getOffset();
+                final int end = Math.min((start + pageable.getPageSize()), superClasses.size());
+                Page<String> superClassStrings = new PageImpl<>(tempList.subList(start, end), pageable, superClasses.size());
+                
+                return new ResponseEntity<>( assembler.toResource(superClassStrings), HttpStatus.OK);
+            }
+            catch (UnsupportedEncodingException e) {
+                throw new ResourceNotFoundException();
+            }
+        }
+    
+    
+    @RequestMapping(path = "/{onto}/terms/{id}/relatedfroms", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+        HttpEntity<Map<String, Collection<Map<String, String>>>> getRelatedFroms(@PathVariable("onto") String ontologyId, 
+            @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
+          
+            ontologyId = ontologyId.toLowerCase();
+
+            try {
+            	Map<String, Collection<Map<String, String>>> relatedFroms = new HashMap<>();
+                String decoded = UriUtils.decode(termId, "UTF-8");
+                Term term = ontologyTermGraphService.findByOntologyAndIri(ontologyId, decoded);
+                if (term == null) throw  new ResourceNotFoundException("No term with id " + decoded + 
+                        " in " + ontologyId);
+                else if (ontologyTermGraphService.getRelatedFrom(ontologyId, term.getIri()) != null)
+                	relatedFroms = ontologyTermGraphService.getRelatedFrom(ontologyId, term.getIri());
+                
+                return new ResponseEntity<>( relatedFroms, HttpStatus.OK);
+            }
+            catch (UnsupportedEncodingException e) {
+                throw new ResourceNotFoundException();
+            }
+        }
 
     @RequestMapping(path = "/{onto}/terms/{id}/parents", produces = {MediaType.APPLICATION_JSON_VALUE, 
         MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
@@ -658,7 +750,111 @@ public class OntologyTermController {
 
         return new ResponseEntity<>( assembler.toResource(localized, termAssembler), HttpStatus.OK);
     }
+    @RequestMapping(path = "/{onto}/termtree", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<List<TreeNode<Term>>> getTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes, 
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+    	List<TreeNode<Term>> termTree = ontologyTermGraphService.populateTermTree(ontologyId, includeObsoletes, pageSize);
+    	
+        if (termTree == null) 
+            throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
+          return new ResponseEntity<>( termTree, HttpStatus.OK);
+    }
+    
+    @RequestMapping(path = "/{onto}/displaytermtree", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    HttpEntity<String> displayTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes, 
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+	    StringBuilder sb = new StringBuilder();
+	    List<TreeNode<Term>> termTree = ontologyTermGraphService.populateTermTree(ontologyId, includeObsoletes, pageSize);
+	    	
+	   	 for (TreeNode<Term> root : termTree) {
+			 sb.append(root.getIndex() + " , "+ root.getData().getLabelByLang("en") + " , " + root.getData().getIri()).append("\n");
+		     sb.append(generateConceptHierarchyTextByOntology(root)); 
+		 }
+	    	
+	     return new HttpEntity<String>(sb.toString());
+    }
+    
+    @RequestMapping(path = "/{onto}/termtree/{iri}", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<TreeNode<Term>> getSubTermHierarchyByOntology(  
+    @PathVariable("onto") String ontologyId, 
+    @PathVariable("iri") String iri,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes,
+    @ApiParam(value = "index value for the root term", required = true)
+    @RequestParam(value = "index", required = true, defaultValue = "1") String index,
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+    	ontologyId = ontologyId.toLowerCase();
+    	TreeNode<Term> termTree = new TreeNode<Term>(new Term());
+    	
+    	try {
+			String decoded = UriUtils.decode(iri, "UTF-8");
+			termTree = ontologyTermGraphService.populateTermSubTree(ontologyId, decoded,includeObsoletes, index, pageSize);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        if (termTree.getData().getIri() == null) 
+            throw new ResourceNotFoundException("No roots could be found for " + ontologyId );
+          return new ResponseEntity<>( termTree, HttpStatus.OK);
+    }
+    
+    @RequestMapping(path = "/{onto}/displaytermtree/{iri}", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
+    HttpEntity<String> displaySubTermHierarchyByOntology(  
+    @PathVariable("onto") String ontologyId, 
+    @PathVariable("iri") String iri,
+    @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes,
+    @ApiParam(value = "index value for the root term", required = true)
+    @RequestParam(value = "index", required = true, defaultValue = "1") String index,
+    @ApiParam(value = "Page Size", required = true)
+    @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
+    PagedResourcesAssembler assembler){
+    	ontologyId = ontologyId.toLowerCase();
+    	StringBuilder sb = new StringBuilder();
+    	TreeNode<Term> termTree = new TreeNode<Term>(new Term());
+    	
+    	try {
+			String decoded = UriUtils.decode(iri, "UTF-8");
+			termTree = ontologyTermGraphService.populateTermSubTree(ontologyId, decoded,includeObsoletes, index, pageSize);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+		 sb.append(termTree.getIndex() + " , "+ termTree.getData().getLabelByLang("en") + " , " + termTree.getData().getIri()).append("\n");
+	     sb.append(generateConceptHierarchyTextByOntology(termTree));  
 
+         return new HttpEntity<String>(sb.toString());
+    }
+    
+    public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Term> rootConcept) {
+    	StringBuilder sb = new StringBuilder();
+        for (TreeNode<Term> childProperty : rootConcept.getChildren()) {
+       	     sb.append(childProperty.getIndex() + " , "+ childProperty.getData().getLabelByLang("en") + " , " + childProperty.getData().getIri()).append("\n");
+       	     sb.append(generateConceptHierarchyTextByOntology(childProperty));
+        }
+
+        return sb;
+    }
+  
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removeJSTreeCache")
+    public HttpEntity<String> removeJSTreeCache() {
+    	return new HttpEntity<String>(jsTreeBuilder.removeJSTreeCache());
+    }
+    
+    @RequestMapping(method = RequestMethod.GET, produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/removeTermTreeCache")
+    public HttpEntity<String> removeTermTreeCache() {
+    	return new HttpEntity<String>(ontologyTermGraphService.removeTermTreeCache());
+    }
+    
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
     @ExceptionHandler(ResourceNotFoundException.class)
     public void handleError(HttpServletRequest req, Exception exception) {

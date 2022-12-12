@@ -62,6 +62,7 @@ public class OntologyResourceConfig  {
     private boolean allowDownload;
     private Collection<Map<String, Collection<String>>> classifications;
     private License license;
+    private String repoUrl;
 
     // these are any metadata properties for the ontology, such as title or definition that are included in the ontology as OWL ontology annotation
     private Collection<String> internalMetadataProperties;
@@ -73,7 +74,7 @@ public class OntologyResourceConfig  {
                                   Collection<URI> synonymProperties, Collection<URI> hierarchicalProperties,
                                   Collection<String> baseUris, Collection<URI> hiddenProperties, boolean isSkos,
                                   Collection<String> internalMetadataProperties, Collection<URI> preferredRootTerms,
-                                  boolean allowDownload, Collection<Map<String, Collection<String>>> classifications, License license) {
+                                  boolean allowDownload, Collection<Map<String, Collection<String>>> classifications, License license, String repoUrl) {
         this.id = id;
         this.versionIri = versionIri;
         this.title = title;
@@ -101,6 +102,7 @@ public class OntologyResourceConfig  {
         this.allowDownload = allowDownload;
         this.classifications = classifications;
         this.license = license;
+        this.repoUrl = repoUrl;
     }
 
     private  Collection<String> languages;
@@ -140,6 +142,7 @@ public class OntologyResourceConfig  {
         this.allowDownload = builder.allowDownload;
         this.classifications = builder.classifications;
         this.license = builder.license;
+        this.repoUrl = builder.repoUrl;
     }
 
     public void setId(String id) {
@@ -425,6 +428,14 @@ public class OntologyResourceConfig  {
     public Collection<String> getLanguages() {
         return this.languages;
     }
+    
+    public String getRepoUrl() {
+        return this.repoUrl;
+    }
+
+    public void setRepoUrl(String repoUrl) {
+        this.repoUrl = repoUrl;
+    }
 
     public static class OntologyResourceConfigBuilder {
         private  String id;
@@ -459,6 +470,7 @@ public class OntologyResourceConfig  {
         private boolean allowDownload = true;
         private Collection<Map<String, Collection<String>>> classifications = new ArrayList<>();
         private License license;
+        private String repoUrl;
 
         public OntologyResourceConfigBuilder(String id, String namespace, URI fileLocation) {
             this.id = id;
@@ -617,6 +629,10 @@ public class OntologyResourceConfig  {
         
         public void setLicense(License license) {
             this.license = license;
+        }
+        
+        public void setRepoUrl(String repoUrl) {
+            this.repoUrl= repoUrl;
         }
 
         public OntologyResourceConfig build() {

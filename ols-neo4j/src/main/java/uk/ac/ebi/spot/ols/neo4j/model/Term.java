@@ -20,6 +20,7 @@ import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.SYNO
 import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.TERM_REPLACED_BY;
 import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.IS_PREFERRED_ROOT;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -51,9 +52,14 @@ import static uk.ac.ebi.spot.ols.neo4j.model.Neo4JNodePropertyNameConstants.*;
 @NodeEntity
 @TypeAlias(value = "Class")
 @ApiModel
-public class Term {
+public class Term implements Serializable {
 
-    @GraphId
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -9110858640929864583L;
+
+	@GraphId
     @JsonIgnore
     Long id;
 

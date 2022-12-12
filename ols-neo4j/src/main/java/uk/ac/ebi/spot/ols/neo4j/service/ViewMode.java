@@ -45,4 +45,8 @@ public enum ViewMode {
     public static ViewMode getFromShortName(String shortName) {
         return ENUM_MAP.get(shortName);
     }
+    
+    public String toString() {
+        return shortName+"--"+neo4jLabel+"--"+displayString;
+     }
 }

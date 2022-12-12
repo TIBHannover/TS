@@ -25,7 +25,8 @@ public enum OntologyResourceConfigEnum {
     CLASSIFICATION("classification"),
     LICENSE("license"),
     LOCALIZED_TITLES("localized_titles"),
-    LOCALIZED_DESCRIPTIONS("localized_descriptions");
+    LOCALIZED_DESCRIPTIONS("localized_descriptions"),
+    REPO_URL("repo_url");
 
     private final String propertyName;
 

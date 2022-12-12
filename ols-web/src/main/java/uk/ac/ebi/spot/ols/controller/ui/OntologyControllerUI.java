@@ -18,11 +18,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Sort;
+
+import uk.ac.ebi.spot.ols.entities.RepoFilterEnum;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyIndividualService;
 
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
+import uk.ac.ebi.spot.ols.service.RepoMetadataService;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import uk.ac.ebi.spot.ols.util.OLSEnv;
 
@@ -53,6 +58,9 @@ public class OntologyControllerUI {
 
     @Autowired
     private HomeController homeController;
+    
+    @Autowired
+    RepoMetadataService repoMetadataService;
 
     @Autowired
     OntologyRepositoryService repositoryService;
@@ -102,6 +110,14 @@ public class OntologyControllerUI {
     	 
     	 return temp;
     }
+    
+    public static String removePrefix(String s, String prefix)
+    {
+        if (s != null && prefix != null && s.startsWith(prefix)) {
+            return s.substring(prefix.length());
+        }
+        return s;
+    }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
     String getAll(
@@ -129,6 +145,7 @@ public class OntologyControllerUI {
             @PathVariable("onto") String ontologyId,
             @RequestParam(value = "lang", required = false, defaultValue = "en") String lang,
             @PageableDefault(page = 0, size = 1000, sort="n.label") Pageable pageable,
+            @RequestParam(value = "filter", required = true, defaultValue = "MAPPING_ONTOLOGIES") RepoFilterEnum filter,
             Model model) throws ResourceNotFoundException {
 
         ontologyId = ontologyId.toLowerCase();
@@ -154,10 +171,22 @@ public class OntologyControllerUI {
  
             Page<Individual> individuals = ontologyIndividualService.findAllByOntology(ontologyId, pageable);
 
-            model.addAttribute("contact", contact);
             model.addAttribute("ontologyDocument", document);
             model.addAttribute("ontologyIndividuals", individuals);
             
+            List<String> filters = new ArrayList<String>();
+            for (RepoFilterEnum filterOption : RepoFilterEnum.values())
+                filters.add(filterOption.toString());
+            Collections.sort(filters);
+            model.addAttribute("filterValues", filters);
+
+            model.addAttribute("ontologyDocument", document); 
+            if(document.getConfig().getRepoUrl() != null)
+                if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),filter, ontologyId));	
+                } else if (document.getConfig().getRepoUrl().startsWith("http"))
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(), filter, ontologyId));
+                
 
             customisationProperties.setCustomisationModelAttributes(model);
             DisplayUtils.setPreferredRootTermsModelAttributes(ontologyId, document, ontologyTermGraphService, model);
