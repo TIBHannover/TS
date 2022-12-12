@@ -28,6 +28,8 @@
     </script>
 
 </head>
+
+
 <style>
 .collapsible {
   background-color: #777;
@@ -248,7 +250,7 @@
             <div id="right_info_box" class="small-4 columns">
                 <div id="ontology_info_box" class="panel">
                     <div class="panel-heading">
-                        <h4 th:inline="text">[[${shortTitle}]] [[${ontologyAlias}]] information</h4>
+                        <h4 th:inline="text">[[${ontologyAlias}]] information</h4>
                     </div>
                     <div class="panel-body">
                         <div>
@@ -282,43 +284,44 @@
                             <b>Last loaded: </b> <span property="dateModified"
                                                        th:text="${ontologyDocument.getLoaded()}">NCBI_9606</span>
                         </div>
-	                    <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('creator') or ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('contributor') or ontologyDocument.getConfig().getCreators().size() < 1}">
-	                           <b th:if="${ontologyDocument.getConfig().getCreators().size() > 1}">Creators:</b>
-	                           <div th:each="creator : ${ontologyDocument.getConfig().getCreators()}">
-	                               <b th:if="${ontologyDocument.getConfig().getCreators().size() == 1}">Creator: </b>
-	                               <span th:if="${ontologyDocument.getConfig().getCreators().size() == 1}" th:text="${creator}">NCBI:9606</span>
-	                               <p th:if="${ontologyDocument.getConfig().getCreators().size() > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${creator}">NCBI:9606</p>
-	                           </div>                                      
-	                     </div>
+                    <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('creator') or ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('contributor') or ontologyDocument.getConfig().getCreators().size() < 1}">
+	                    <b th:if="${ontologyDocument.getConfig().getCreators().size() > 1}">Creators:</b>
+	                    <div th:each="creator : ${ontologyDocument.getConfig().getCreators()}">
+	                        <b th:if="${ontologyDocument.getConfig().getCreators().size() == 1}">Creator: </b>
+	                        <span th:if="${ontologyDocument.getConfig().getCreators().size() == 1}" th:text="${creator}">NCBI:9606</span>
+	                        <p th:if="${ontologyDocument.getConfig().getCreators().size() > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${creator}">NCBI:9606</p>
+	                    </div>                                      
+                    </div>
+                    
+                    <b th:unless="${ontologyDocument.getConfig().getClassifications().isEmpty()}">Classifications: </b>
+                    <div th:each="classification: ${ontologyDocument.getConfig().getClassifications()}">
+                       <b style="margin-left:9px;" th:text="'Class ' + ${classification.keySet().toString()} + ' : '"></b>
+                       <div th:each="schema: ${classification.keySet().toArray()}">
+                           <b style="margin-left:18px;" th:text="${schema} + ': '"></b>
+                           <p style="margin-left:27px;margin-bottom: 0rem;" th:each="schemavalue : ${classification.get(schema)}" th:text="${schemavalue}">NCBI_9606</p>
+                       </div>
+                    </div>
+                    
+                    <div th:unless="${ontologyDocument.getConfig().getReasonerType() == T(uk.ac.ebi.spot.ols.util.ReasonerType).NONE}">
+                        <b>Reasoner: </b> <span th:text="${ontologyDocument.getConfig().getReasonerType()}">NCBI_9606</span>
+                    </div>
+                    
+                    <div th:unless="${ontologyDocument.getConfig().getLicense().getLabel() == null}">
+                        <b>License Label: </b> <span th:text="${ontologyDocument.getConfig().getLicense().getLabel()}">NCBI_9606</span>
+                    </div>
+                    
+                    <div th:unless="${ontologyDocument.getConfig().getLicense().getLogo() == null}">
+                        <b>License Logo: </b>
+                        <a th:href="${ontologyDocument.getConfig().getLicense().getLogo()}" th:text="${ontologyDocument.getConfig().getLicense().getLogo()}">License Logo</a>
+                    </div>
+                                                     
+                    <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('license') or ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('rights') or ontologyDocument.getConfig().getLicense().getUrl() == null}">
+                        <b>License URL: </b>
+                        <a th:href="${ontologyDocument.getConfig().getLicense().getUrl()}" th:text="${ontologyDocument.getConfig().getLicense().getUrl()}">License URL</a>
+                    </div> 
 
+                    <br/>
 
-	                    <b th:unless="${ontologyDocument.getConfig().getClassifications().isEmpty()}">Classifications: </b>
-	                    <div th:each="classification: ${ontologyDocument.getConfig().getClassifications()}">
-	                       <b style="margin-left:9px;" th:text="'Class ' + ${classification.keySet().toString()} + ' : '"></b>
-	                       <div th:each="schema: ${classification.keySet().toArray()}">
-	                           <b style="margin-left:18px;" th:text="${schema} + ': '"></b>
-	                           <p style="margin-left:27px;margin-bottom: 0rem;" th:each="schemavalue : ${classification.get(schema)}" th:text="${schemavalue}">NCBI_9606</p>
-	                       </div>
-	                    </div>	                    
-	                    <div th:unless="${ontologyDocument.getConfig().getReasonerType() == T(uk.ac.ebi.spot.ols.util.ReasonerType).NONE}">
-	                        <b>Reasoner: </b> <span th:text="${ontologyDocument.getConfig().getReasonerType()}">NCBI_9606</span>
-	                    </div>
-	                    
-	                    <div th:unless="${ontologyDocument.getConfig().getLicense().getLabel() == null}">
-	                        <b>License Label: </b> <span th:text="${ontologyDocument.getConfig().getLicense().getLabel()}">NCBI_9606</span>
-	                    </div>
-	                    
-	                    <div th:unless="${ontologyDocument.getConfig().getLicense().getLogo() == null}">
-	                        <b>License Logo: </b>
-	                        <a th:href="${ontologyDocument.getConfig().getLicense().getLogo()}" th:text="${ontologyDocument.getConfig().getLicense().getLogo()}">License Logo</a>
-	                    </div>
-	                                                     
-	                    <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('license') or ontologyDocument.getConfig().getLocalizedAnnotations(lang).containsKey('rights') or ontologyDocument.getConfig().getLicense().getUrl() == null}">
-	                        <b>License URL: </b>
-	                        <a th:href="${ontologyDocument.getConfig().getLicense().getUrl()}" th:text="${ontologyDocument.getConfig().getLicense().getUrl()}">License URL</a>
-	                    </div>
-	                </div>
-	            </div>                                               
                     <button th:if="${releaseUrls}" class="collapsible" th:inline="text" onclick="collapse()" th:style="'background-color: #00827c;'">Releases</button>
                     <div th:if="${releaseUrls}" class="content">
                     
@@ -344,63 +347,26 @@
                             <a th:href="${downloadUrl}" th:text="${downloadUrl.split('/')[downloadUrl.split('/').length - 1]}">Release URL</a>
                         </div>
                         </div>
-                    </div> 
-                    
-                </div>
-            
+                    </div>
 
-            
-	            <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations(lang).isEmpty()}" id="ontology_info_box2" class="panel">
-	                <div class="panel-heading">
-	                    <h4 th:inline="text">Original [[${ontologyAlias}]] Info in [[${lang}]]</h4>
-	                </div>
-	                <div class="panel-body">
-                        <div th:each="annotations: ${ontologyDocument.getConfig().getLocalizedAnnotations(lang)}">
-                            <b>
-                                <a href="#"
-                                   th:href="@{../search(q=${annotations.key},exact='true', type=property, ontology=${ontologyDocument.getOntologyId()})}"
-                                   th:text="${annotations.key.replaceAll('_', ' ')}">property name</a>
-                            </b>
-	                        <div th:each="annovalue : ${annotations.value}">
-	                            <div th:unless="${annovalue.split(' ').length > 1}">
-	                                   <div th:unless="${annovalue.startsWith('http://') or annovalue.startsWith('https://')}">
-	                                       <a th:if="${annovalue.startsWith('www.')}" style="margin-left:9px;margin-bottom: 0rem;" th:href="'https://' + ${annovalue}" th:text="${annovalue}">NCBI_9606</a>
-	                                       <p th:unless="${annovalue.startsWith('www.')}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>  
-	                                   </div>
-	                                   <a th:if="${annovalue.startsWith('http://') or annovalue.startsWith('https://')}" style="margin-left:9px;margin-bottom: 0rem;" th:href="${annovalue}" th:text="${annovalue}">NCBI_9606</a>         
+
+                    <div th:each="annotations: ${ontologyDocument.getConfig().getLocalizedAnnotations(lang)}">
+                        <b>
+                            <a href="#" th:href="@{../search(q=${annotations.key},exact='true', type=property, ontology=${ontologyDocument.getOntologyId()})}" th:text="${annotations.key.replaceAll('_', ' ')}">property name</a>
+                        </b>
+                        <div th:each="annovalue : ${annotations.value}">
+                            <div th:unless="${annovalue.split(' ').length > 1}">
+	                            <div th:unless="${annovalue.startsWith('http://') or annovalue.startsWith('https://')}">
+	                                <a th:if="${annovalue.startsWith('www.')}" style="margin-left:9px;margin-bottom: 0rem;" th:href="'https://' + ${annovalue}" th:text="${annovalue}">NCBI_9606</a>
+	                                <p th:unless="${annovalue.startsWith('www.')}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>  
 	                            </div>
-	                            <p th:if="${annovalue.split(' ').length > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>
-	                        </div>
+	                            <a th:if="${annovalue.startsWith('http://') or annovalue.startsWith('https://')}" style="margin-left:9px;margin-bottom: 0rem;" th:href="${annovalue}" th:text="${annovalue}">NCBI_9606</a>         
+                            </div>
+                            <p th:if="${annovalue.split(' ').length > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>
+                         </div>
                         </div>
                     </div>
                 </div>
-                
-                <div th:unless="${ontologyDocument.getConfig().getLocalizedAnnotations('').isEmpty()}" id="ontology_info_box3" class="panel">
-	                <div class="panel-heading">
-	                    <h4 th:inline="text">Original [[${ontologyAlias}]] information</h4>
-	                </div>
-	                <div class="panel-body">
-                        <div th:each="annotations: ${ontologyDocument.getConfig().getLocalizedAnnotations('')}">
-                            <b>
-                                <a href="#"
-                                   th:href="@{../search(q=${annotations.key},exact='true', type=property, ontology=${ontologyDocument.getOntologyId()})}"
-                                   th:text="${annotations.key.replaceAll('_', ' ')}">property name</a>
-                            </b>
-	                        <div th:each="annovalue : ${annotations.value}">
-	                            <div th:unless="${annovalue.split(' ').length > 1}">
-	                                   <div th:unless="${annovalue.startsWith('http://') or annovalue.startsWith('https://')}">
-	                                       <a th:if="${annovalue.startsWith('www.')}" style="margin-left:9px;margin-bottom: 0rem;" th:href="'https://' + ${annovalue}" th:text="${annovalue}">NCBI_9606</a>
-	                                       <p th:unless="${annovalue.startsWith('www.')}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>  
-	                                   </div>
-	                                   <a th:if="${annovalue.startsWith('http://') or annovalue.startsWith('https://')}" style="margin-left:9px;margin-bottom: 0rem;" th:href="${annovalue}" th:text="${annovalue}">NCBI_9606</a>         
-	                            </div>
-	                            <p th:if="${annovalue.split(' ').length > 1}" style="margin-left:9px;margin-bottom: 0rem;" th:text="${annovalue}" th:text="${annovalue}">NCBI_9606</p>
-	                        </div>
-                        </div>
-                    </div>
-                </div>
-                
-                
             </div>
         </div>
     </div>
@@ -461,6 +427,8 @@
                     $(this).attr("href", getUrlType('individual') + '?iri=' + encodeURIComponent(href));
                 }
             });
+
+
         });
     </script>
 
@@ -488,5 +456,6 @@
         });
     </script>
 
+</div>
 </body>
 </html>
