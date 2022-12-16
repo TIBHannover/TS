@@ -327,6 +327,25 @@ AbstractOWLOntologyLoader extends Initializable implements OntologyLoader {
         owlVocabulary.add(factory.getOWLTopObjectProperty().getIRI());
         owlVocabulary.add(factory.getOWLBottomObjectProperty().getIRI());
     }
+    
+    private void populateOntologyLanguages(Collection<OWLEntity> allEntities) {
+
+        for (OWLEntity owlEntity: allEntities) {
+		for (OWLOntology anOntology : getManager().ontologies().collect(Collectors.toSet())){
+			EntitySearcher.getAnnotationAssertionAxioms(owlEntity, anOntology).forEach(annotationAssertionAxiom -> {
+
+				OWLAnnotationValue value = annotationAssertionAxiom.getValue();
+
+				if(value.isLiteral()) {
+					if(((OWLLiteral) value).hasLang()) {
+							ontologyLanguages.add( ((OWLLiteral) value).getLang() );
+					}
+				}
+
+			});
+		}
+	}
+    }
 
     @Override
     public String getShortForm(IRI ontologyTermIRI) {
@@ -439,6 +458,8 @@ AbstractOWLOntologyLoader extends Initializable implements OntologyLoader {
             }
             ResourceUsage.logUsage(getLogger(), "#### Monitoring ", getOntologyName() +
                     ":After copying of entities", ":");
+            
+            populateOntologyLanguages(allEntities);
 
             indexTerms(allEntities);
             ResourceUsage.logUsage(getLogger(), "#### Monitoring ", getOntologyName() +
