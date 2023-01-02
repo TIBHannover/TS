@@ -120,4 +120,11 @@ public class LocalizedStrings {
 
     }
     
+    public void setStrings(String language, List<String> strings) {
+
+	localizations.put(language, new ArrayList<String>(strings));
+
+    }
+    
+    
 }

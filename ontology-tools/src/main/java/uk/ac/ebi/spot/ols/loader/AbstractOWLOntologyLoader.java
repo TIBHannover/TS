@@ -1416,6 +1416,39 @@ AbstractOWLOntologyLoader extends Initializable implements OntologyLoader {
                 }
             });
         }
+        
+
+    	// cross reference the set of all ontologies properties with the set of
+    	// languages in the ontology.  Any missing languages are added with the English strings.
+    	// Otherwise, if you switch language in the webapp to a language into which the ontology
+    	// is not localised, the annotations will not appear!
+    	//
+    	if (termAnnotations.containsKey(owlEntityIRI)) {
+
+    		Map<IRI, LocalizedStrings> annotations = termAnnotations.get(owlEntityIRI);
+
+    		for(IRI annotationPropertyIri : annotations.keySet()) {
+
+    			LocalizedStrings annos = annotations.get(annotationPropertyIri);
+
+    			for(String ontologyLang : ontologyLanguages) {
+
+    				if(!annos.getLanguages().contains(ontologyLang)) {
+    					annos.setStrings(ontologyLang, annos.getStrings("", "en", "en-US"));
+    				}
+    			}
+
+    		}
+    	}
+    	
+    	// The fragment belowresults in an error in the indexing of several ontologies. For this reason, it is commented out. 
+
+    	/*for (String ontologyLang : ontologyLanguages) {
+    		if (!classLabels.getLanguages().contains(ontologyLang)) {
+    			classLabels.setStrings(ontologyLang, classLabels.getStrings(""));
+    		}
+    	}*/
+
 
         setClassLabels(owlEntityIRI, classLabels);
 
