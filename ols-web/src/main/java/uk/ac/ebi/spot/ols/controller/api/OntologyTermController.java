@@ -335,7 +335,7 @@ public class OntologyTermController {
     @RequestMapping(path = "/{onto}/terms/{id}/hierarchicalAncestors", produces = 
       {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<PagedResources<LocalizedTerm>> getHierarchicalAncestors(@PathVariable("onto") String ontologyId,
-            @RequestParam(value = "lang", defaultValue = "en", required = false) String lang,
+        @RequestParam(value = "lang", defaultValue = "en", required = false) String lang,
         @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
       
         ontologyId = ontologyId.toLowerCase();
@@ -766,6 +766,7 @@ public class OntologyTermController {
     
     @RequestMapping(path = "/{onto}/displaytermtree", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     HttpEntity<String> displayTermHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+    @RequestParam(value = "langauge", defaultValue = "en", required = false) String lang, 
     @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes, 
     @ApiParam(value = "Page Size", required = true)
     @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
@@ -774,8 +775,8 @@ public class OntologyTermController {
 	    List<TreeNode<Term>> termTree = ontologyTermGraphService.populateTermTree(ontologyId, includeObsoletes, pageSize);
 	    	
 	   	 for (TreeNode<Term> root : termTree) {
-			 sb.append(root.getIndex() + " , "+ root.getData().getLabelByLang("en") + " , " + root.getData().getIri()).append("\n");
-		     sb.append(generateConceptHierarchyTextByOntology(root)); 
+			 sb.append(root.getIndex() + " , "+ root.getData().getLabelByLang(lang) + " , " + root.getData().getIri()).append("\n");
+		     sb.append(generateConceptHierarchyTextByOntology(root,lang)); 
 		 }
 	    	
 	     return new HttpEntity<String>(sb.toString());
@@ -811,6 +812,7 @@ public class OntologyTermController {
     HttpEntity<String> displaySubTermHierarchyByOntology(  
     @PathVariable("onto") String ontologyId, 
     @PathVariable("iri") String iri,
+    @RequestParam(value = "langauge", defaultValue = "en", required = false) String lang, 
     @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes,
     @ApiParam(value = "index value for the root term", required = true)
     @RequestParam(value = "index", required = true, defaultValue = "1") String index,
@@ -829,17 +831,17 @@ public class OntologyTermController {
 			e.printStackTrace();
 		}
     	
-		 sb.append(termTree.getIndex() + " , "+ termTree.getData().getLabelByLang("en") + " , " + termTree.getData().getIri()).append("\n");
-	     sb.append(generateConceptHierarchyTextByOntology(termTree));  
+		 sb.append(termTree.getIndex() + " , "+ termTree.getData().getLabelByLang(lang) + " , " + termTree.getData().getIri()).append("\n");
+	     sb.append(generateConceptHierarchyTextByOntology(termTree, lang));  
 
          return new HttpEntity<String>(sb.toString());
     }
     
-    public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Term> rootConcept) {
+    public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Term> rootConcept, String lang) {
     	StringBuilder sb = new StringBuilder();
         for (TreeNode<Term> childProperty : rootConcept.getChildren()) {
-       	     sb.append(childProperty.getIndex() + " , "+ childProperty.getData().getLabelByLang("en") + " , " + childProperty.getData().getIri()).append("\n");
-       	     sb.append(generateConceptHierarchyTextByOntology(childProperty));
+       	     sb.append(childProperty.getIndex() + " , "+ childProperty.getData().getLabelByLang(lang) + " , " + childProperty.getData().getIri()).append("\n");
+       	     sb.append(generateConceptHierarchyTextByOntology(childProperty, lang));
         }
 
         return sb;

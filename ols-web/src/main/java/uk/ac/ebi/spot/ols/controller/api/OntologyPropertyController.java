@@ -270,6 +270,7 @@ public class OntologyPropertyController {
     
     @RequestMapping(path = "/{onto}/displaypropertytree", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     HttpEntity<String> displayPropertyHierarchyByOntology(  @PathVariable("onto") String ontologyId,
+    @RequestParam(value = "langauge", defaultValue = "en", required = false) String lang, 
     @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes, 
     @ApiParam(value = "Page Size", required = true)
     @RequestParam(value = "page_size", required = true, defaultValue = "20") Integer pageSize,
@@ -279,8 +280,8 @@ public class OntologyPropertyController {
     	StringBuilder sb = new StringBuilder();
     	
     	 for (TreeNode<Property> root : propertyTree) {
-    		 sb.append(root.getIndex() + " , "+ root.getData().getLabelByLang("en") + " , " + root.getData().getIri()).append("\n");
-    	     sb.append(generateConceptHierarchyTextByOntology(root)); 
+    		 sb.append(root.getIndex() + " , "+ root.getData().getLabelByLang(lang) + " , " + root.getData().getIri()).append("\n");
+    	     sb.append(generateConceptHierarchyTextByOntology(root,lang)); 
     	 }
 
          return new HttpEntity<String>(sb.toString());
@@ -317,6 +318,7 @@ public class OntologyPropertyController {
     HttpEntity<String> displaySubPropertyHierarchyByOntology(  
     @PathVariable("onto") String ontologyId, 
     @PathVariable("iri") String iri,
+    @RequestParam(value = "langauge", defaultValue = "en", required = false) String lang, 
     @RequestParam(value = "includeObsoletes", defaultValue = "false", required = false) boolean includeObsoletes,
     @ApiParam(value = "index value for the root term", required = true)
     @RequestParam(value = "index", required = true, defaultValue = "1") String index,
@@ -335,17 +337,17 @@ public class OntologyPropertyController {
 			e.printStackTrace();
 		}
 		
-		 sb.append(propertyTree.getIndex() + " , "+ propertyTree.getData().getLabelByLang("en") + " , " + propertyTree.getData().getIri()).append("\n");
-	     sb.append(generateConceptHierarchyTextByOntology(propertyTree));   	    	
+		 sb.append(propertyTree.getIndex() + " , "+ propertyTree.getData().getLabelByLang(lang) + " , " + propertyTree.getData().getIri()).append("\n");
+	     sb.append(generateConceptHierarchyTextByOntology(propertyTree,lang));   	    	
 
         return new HttpEntity<String>(sb.toString());
     }
     
-    public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Property> rootConcept) {
+    public StringBuilder generateConceptHierarchyTextByOntology(TreeNode<Property> rootConcept, String lang) {
     	StringBuilder sb = new StringBuilder();
         for (TreeNode<Property> childProperty : rootConcept.getChildren()) {
-       	     sb.append(childProperty.getIndex() + " , "+ childProperty.getData().getLabelByLang("en") + " , " + childProperty.getData().getIri()).append("\n");
-       	     sb.append(generateConceptHierarchyTextByOntology(childProperty));
+       	     sb.append(childProperty.getIndex() + " , "+ childProperty.getData().getLabelByLang(lang) + " , " + childProperty.getData().getIri()).append("\n");
+       	     sb.append(generateConceptHierarchyTextByOntology(childProperty,lang));
         }
 
         return sb;
