@@ -133,6 +133,7 @@ public class DataPreparationController {
             @RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
+    		@RequestParam(value = "language", required = false) Collection<String> languages,
     		@ApiParam(value = "Set to true (default setting is false) for intersection (default behavior is union) of classifications.")
     		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive,
             @ApiParam(value = "Page Size", required = true)
@@ -160,14 +161,18 @@ public class DataPreparationController {
 	         Page<Property> properties = ontologyPropertyGraphService.findAllByOntology(document.getOntologyId(), pageable);
 	         
 	 		for (Property property : properties.getContent()) {
-	 			everything.add(new BasicTerm(property));
+	 			for (String lang : languages) {
+	 				everything.add(new BasicTerm(property,lang));
+	 			}	
 	 		}
 	     	
 	     	while(properties.hasNext()) {
 	     		properties = ontologyPropertyGraphService.findAllByOntology(document.getOntologyId(), pageable);
 	     		
 	     		for (Property property : properties.getContent()) {
-	     			everything.add(new BasicTerm(property));
+	     			for (String lang : languages) {
+	     				everything.add(new BasicTerm(property,lang));	
+	     			}
 	     		}
 	
 	     	}
@@ -175,26 +180,34 @@ public class DataPreparationController {
 	         Page<Term> terms = ontologyTermGraphService.findAllByOntology(document.getOntologyId(), pageable);
 	         
 	 		for (Term term : terms.getContent()) {
-	 			everything.add(new BasicTerm(term));
+	 			for (String lang : languages) {
+	 				everything.add(new BasicTerm(term,lang));
+	 			}
 	 		}
 	     	
 	     	while(terms.hasNext()) {
 	     		terms = ontologyTermGraphService.findAllByOntology(document.getOntologyId(), pageable);
 	     		for (Term term : terms.getContent()) {
-	     			everything.add(new BasicTerm(term));
+	     			for (String lang : languages) {
+	     				everything.add(new BasicTerm(term,lang));
+	     			}	
 	     		}
 	     	}
 	     	System.out.println("terms of "+document.getOntologyId()+" finished!");
 	         Page<Individual> individuals = ontologyIndividualService.findAllByOntology(document.getOntologyId(), pageable);  
 	         
 	 		for (Individual individual : individuals.getContent()) {
-	 			everything.add(new BasicTerm(individual));
+	 			for (String lang : languages) {
+	 				everything.add(new BasicTerm(individual,lang));
+	 			}
 	 		}
 	     	
 	     	while(individuals.hasNext()) {
 	     		individuals = ontologyIndividualService.findAllByOntology(document.getOntologyId(), pageable);
 	     		for (Individual individual : individuals.getContent()) {
-	     			everything.add(new BasicTerm(individual));
+	     			for (String lang : languages) {
+	     				everything.add(new BasicTerm(individual,lang));
+	     			}
 	     		}
 	     	}
 	     	System.out.println("individuals  of "+document.getOntologyId()+" finished!");
@@ -209,6 +222,7 @@ public class DataPreparationController {
     		@RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
     		@RequestParam(value = "schema", required = false) Collection<String> schemas,
     		@RequestParam(value = "classification", required = false) Collection<String> classifications,
+    		@RequestParam(value = "language", required = false) Collection<String> languages,
     		@ApiParam(value = "Set to true (default setting is false) for intersection (default behavior is union) of classifications.")
     		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive,
     		@ApiParam(value = "The specified annotations are added as extra sentences to the corpus.")
@@ -216,12 +230,12 @@ public class DataPreparationController {
             @ApiParam(value = "Page Size", required = true)
             @RequestParam(value = "page_size", required = false, defaultValue = "20") Integer pageSize) {
 
-    	String sentences = getRawSentences(ontologies, schemas, classifications, exclusive, annotations,pageSize);	
+    	String sentences = getRawSentences(ontologies, schemas, classifications, languages, exclusive, annotations,pageSize);	
     	
     	return new HttpEntity<String>(sentences);
     }
     
-    public String getRawSentences(Collection<String> ontologies,Collection<String> schemas,Collection<String> classifications, boolean exclusive, Collection<String> annotations,Integer pageSize) {
+    public String getRawSentences(Collection<String> ontologies,Collection<String> schemas,Collection<String> classifications, Collection<String> languages, boolean exclusive, Collection<String> annotations,Integer pageSize) {
     	StringBuilder sb = new StringBuilder();
     	Pageable pageable = new PageRequest(0, pageSize);
     	
@@ -248,77 +262,89 @@ public class DataPreparationController {
 	         Page<Property> properties = ontologyPropertyGraphService.findAllByOntology(document.getOntologyId(), pageable);
 	         
 	 		for (Property property : properties.getContent()) {
-	 			if(property.getDescriptionsByLang("en") != null)
-		 			for (String description : property.getDescriptionsByLang("en"))
-		 			    sb.append(description).append("\n");
-	 			if(property.getAnnotationByLang("en") != null)
-	 				for (String annotation : annotations)
-	 					if(property.getAnnotationByLang("en").containsKey(annotation))
-	 						sb.append(property.getAnnotationByLang("en").get(annotation)).append("\n");
+	 			for (String lang : languages) {
+		 			if(property.getDescriptionsByLang(lang) != null)
+			 			for (String description : property.getDescriptionsByLang(lang))
+			 			    sb.append(description).append("\n");
+		 			if(property.getAnnotationByLang(lang) != null)
+		 				for (String annotation : annotations)
+		 					if(property.getAnnotationByLang(lang).containsKey(annotation))
+		 						sb.append(property.getAnnotationByLang(lang).get(annotation)).append("\n");
+	 			}
 	 		}
 	     	
 	     	while(properties.hasNext()) {
 	     		properties = ontologyPropertyGraphService.findAllByOntology(document.getOntologyId(), pageable);
 	     		
 	     		for (Property property : properties.getContent()) {
-	     			if(property.getDescriptionsByLang("en") != null)
-			 			for (String description : property.getDescriptionsByLang("en"))
-			 			    sb.append(description).append("\n");
-	     			if(property.getAnnotationByLang("en") != null)
-		 				for (String annotation : annotations)
-		 					if(property.getAnnotationByLang("en").containsKey(annotation))
-		 						sb.append(property.getAnnotationByLang("en").get(annotation)).append("\n");
+	     			
+	     			for (String lang : languages) {
+		     			if(property.getDescriptionsByLang(lang) != null)
+				 			for (String description : property.getDescriptionsByLang(lang))
+				 			    sb.append(description).append("\n");
+		     			if(property.getAnnotationByLang(lang) != null)
+			 				for (String annotation : annotations)
+			 					if(property.getAnnotationByLang(lang).containsKey(annotation))
+			 						sb.append(property.getAnnotationByLang(lang).get(annotation)).append("\n");
+	     			}
 	     		}
-	
 	     	}
 	     	System.out.println("properties of "+document.getOntologyId()+" finished!");
 	         Page<Term> terms = ontologyTermGraphService.findAllByOntology(document.getOntologyId(), pageable);
 	         
 	 		for (Term term : terms.getContent()) {
-	 			if(term.getDescriptionsByLang("en") != null)
-		 			for (String description : term.getDescriptionsByLang("en"))
-		 			    sb.append(description).append("\n");
-	 			if(term.getAnnotationByLang("en") != null)
-	 				for (String annotation : annotations)
-	 					if(term.getAnnotationByLang("en").containsKey(annotation))
-	 						sb.append(term.getAnnotationByLang("en").get(annotation)).append("\n");
+	 			for (String lang : languages) {
+		 			if(term.getDescriptionsByLang(lang) != null)
+			 			for (String description : term.getDescriptionsByLang(lang))
+			 			    sb.append(description).append("\n");
+		 			if(term.getAnnotationByLang(lang) != null)
+		 				for (String annotation : annotations)
+		 					if(term.getAnnotationByLang(lang).containsKey(annotation))
+		 						sb.append(term.getAnnotationByLang(lang).get(annotation)).append("\n");
+	 			}
 	 		}
 	     	
 	     	while(terms.hasNext()) {
 	     		terms = ontologyTermGraphService.findAllByOntology(document.getOntologyId(), pageable);
-	     		for (Term term : terms.getContent()) {
-	     			if(term.getDescriptionsByLang("en") != null)
-			 			for (String description : term.getDescriptionsByLang("en"))
-			 			    sb.append(description).append("\n");
-	     			if(term.getAnnotationByLang("en") != null)
-		 				for (String annotation : annotations)
-		 					if(term.getAnnotationByLang("en").containsKey(annotation))
-		 						sb.append(term.getAnnotationByLang("en").get(annotation)).append("\n");
+	     		for (Term term : terms.getContent()) {     			
+	     			for (String lang : languages) {
+		     			if(term.getDescriptionsByLang(lang) != null)
+				 			for (String description : term.getDescriptionsByLang(lang))
+				 			    sb.append(description).append("\n");
+		     			if(term.getAnnotationByLang(lang) != null)
+			 				for (String annotation : annotations)
+			 					if(term.getAnnotationByLang(lang).containsKey(annotation))
+			 						sb.append(term.getAnnotationByLang(lang).get(annotation)).append("\n");	
+	     			}
 	     		}
 	     	}
 	     	System.out.println("terms of "+document.getOntologyId()+" finished!");
 	         Page<Individual> individuals = ontologyIndividualService.findAllByOntology(document.getOntologyId(), pageable);  
 	         
 	 		for (Individual individual : individuals.getContent()) {
-	 			if(individual.getDescriptionsByLang("en") != null)
-		 			for (String description : individual.getDescriptionsByLang("en"))
-		 			    sb.append(description).append("\n");
-	 			if(individual.getAnnotationByLang("en") != null)
-	 				for (String annotation : annotations)
-	 					if(individual.getAnnotationByLang("en").containsKey(annotation))
-	 						sb.append(individual.getAnnotationByLang("en").get(annotation)).append("\n");
+	 			for (String lang : languages) {
+		 			if(individual.getDescriptionsByLang(lang) != null)
+			 			for (String description : individual.getDescriptionsByLang(lang))
+			 			    sb.append(description).append("\n");
+		 			if(individual.getAnnotationByLang(lang) != null)
+		 				for (String annotation : annotations)
+		 					if(individual.getAnnotationByLang(lang).containsKey(annotation))
+		 						sb.append(individual.getAnnotationByLang(lang).get(annotation)).append("\n");
+	 			}
 	 		}
 	     	
 	     	while(individuals.hasNext()) {
 	     		individuals = ontologyIndividualService.findAllByOntology(document.getOntologyId(), pageable);
 	     		for (Individual individual : individuals.getContent()) {
-	     			if(individual.getDescriptionsByLang("en") != null)
-			 			for (String description : individual.getDescriptionsByLang("en"))
-			 			    sb.append(description).append("\n");
-	     			if(individual.getAnnotationByLang("en") != null)
-		 				for (String annotation : annotations)
-		 					if(individual.getAnnotationByLang("en").containsKey(annotation))
-		 						sb.append(individual.getAnnotationByLang("en").get(annotation)).append("\n");
+	     			for (String lang : languages) {
+		     			if(individual.getDescriptionsByLang(lang) != null)
+				 			for (String description : individual.getDescriptionsByLang(lang))
+				 			    sb.append(description).append("\n");
+		     			if(individual.getAnnotationByLang(lang) != null)
+			 				for (String annotation : annotations)
+			 					if(individual.getAnnotationByLang(lang).containsKey(annotation))
+			 						sb.append(individual.getAnnotationByLang(lang).get(annotation)).append("\n");
+	     			}
 	     		}
 	     	}
 	     	System.out.println("individuals  of "+document.getOntologyId()+" finished!");
@@ -338,28 +364,28 @@ public class DataPreparationController {
     	String type;
     	Map annotation;
     	
-    	BasicTerm(Property property) {
-    	this.setLabel(property.getLabelByLang("en"));
+    	BasicTerm(Property property, String lang) {
+    	this.setLabel(property.getLabelByLang(lang));
     	this.setIri(property.getIri());
-    	this.setDescription(property.getDescriptionsByLang("en"));
+    	this.setDescription(property.getDescriptionsByLang(lang));
     	this.setType("property");
-    	this.setAnnotation(property.getAnnotationByLang("en"));
+    	this.setAnnotation(property.getAnnotationByLang(lang));
     	}
     	
-    	BasicTerm(Term term) {
-    	this.setLabel(term.getLabelByLang("en"));
+    	BasicTerm(Term term, String lang) {
+    	this.setLabel(term.getLabelByLang(lang));
     	this.setIri(term.getIri());
-    	this.setDescription(term.getDescriptionsByLang("en"));
+    	this.setDescription(term.getDescriptionsByLang(lang));
     	this.setType("term");
-    	this.setAnnotation(term.getAnnotationByLang("en"));
+    	this.setAnnotation(term.getAnnotationByLang(lang));
     	}
     	
-    	BasicTerm(Individual individual) {
-    	this.setLabel(individual.getLabelByLang("en"));
+    	BasicTerm(Individual individual, String lang) {
+    	this.setLabel(individual.getLabelByLang(lang));
     	this.setIri(individual.getIri());
-    	this.setDescription(individual.getDescriptionsByLang("en"));
+    	this.setDescription(individual.getDescriptionsByLang(lang));
     	this.setType("individual");
-    	this.setAnnotation(individual.getAnnotationByLang("en"));
+    	this.setAnnotation(individual.getAnnotationByLang(lang));
     	}
     	
 		public String getIri() {
