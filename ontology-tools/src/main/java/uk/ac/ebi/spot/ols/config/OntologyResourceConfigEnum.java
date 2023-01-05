@@ -24,7 +24,10 @@ public enum OntologyResourceConfigEnum {
     ALLOW_DOWNLOAD("allow_download"),
     CLASSIFICATION("classification"),
     LICENSE("license"),
-    REPO_URL("repo_url");
+    LOCALIZED_TITLES("localized_titles"),
+    LOCALIZED_DESCRIPTIONS("localized_descriptions"),
+    REPO_URL("repo_url"),
+    SKOS("skos");
 
     private final String propertyName;
 

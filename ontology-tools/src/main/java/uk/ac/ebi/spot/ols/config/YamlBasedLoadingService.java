@@ -84,6 +84,7 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
             populateClassification(builder);
             populateLicense(builder);
             populateRepoUrl(builder);
+            populateIsSkos(builder);
 
             return builder.build();
         }
@@ -313,5 +314,15 @@ public class YamlBasedLoadingService extends AbstractLoadingService {
         } else {
             builder.setRepoUrl("");
         }
-    } 
+    }
+    
+    private void populateIsSkos(OntologyResourceConfig.OntologyResourceConfigBuilder builder) {
+        if (ontology.containsKey(SKOS.getPropertyName())) {
+            builder.setIsSkos((boolean) ontology.get(SKOS.getPropertyName()));
+        } else {
+            builder.setIsSkos(false);
+        }
+    }  
+    
+    
 }
