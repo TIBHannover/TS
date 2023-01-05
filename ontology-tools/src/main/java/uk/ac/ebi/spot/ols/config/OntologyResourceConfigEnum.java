@@ -26,7 +26,8 @@ public enum OntologyResourceConfigEnum {
     LICENSE("license"),
     LOCALIZED_TITLES("localized_titles"),
     LOCALIZED_DESCRIPTIONS("localized_descriptions"),
-    REPO_URL("repo_url");
+    REPO_URL("repo_url"),
+    SKOS("skos");
 
     private final String propertyName;
 
