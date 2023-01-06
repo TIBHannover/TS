@@ -22,10 +22,10 @@ public class OntologyLoaderFactory {
         }
         else if (config.getReasonerType().equals(ReasonerType.EL)) {
             return new ELKOWLOntologyLoader(config);
-        } /* SKOS option disabled since there is no skos specific ontology loading procedure yet.
+        }
         else if (config.isSkos()) {
             return new SKOSLoader(config);
-        } */
+        }
         else {
             return new StructuralOWLOntologyLoader(config);
         }
@@ -39,10 +39,10 @@ public class OntologyLoaderFactory {
         }
         else if (config.getReasonerType().equals(ReasonerType.EL)) {
             return new ELKOWLOntologyLoader(config, databaseService, ontologyLoadingConfiguration);
-        } /* SKOS option disabled since there is no skos specific ontology loading procedure yet.
+        } 
         else if (config.isSkos()) {
             return new SKOSLoader(config, databaseService, ontologyLoadingConfiguration);
-        } */
+        }
         else {
             return new StructuralOWLOntologyLoader(config, databaseService, ontologyLoadingConfiguration);
         }
