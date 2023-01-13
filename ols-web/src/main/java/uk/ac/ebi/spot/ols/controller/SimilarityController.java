@@ -51,7 +51,7 @@ public class SimilarityController {
 
     @ApiOperation(value = "Similarity measure between TS internal ontologies " +
         "by calculating shared Properties | Classes | Imports | Namespaces")
-    @GetMapping(value = "/{characteristics}/internal/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/{characteristics}/internal/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResources<SimilarityModel>> getSimilarityForInternalOntologyList(
         @ApiParam(value = "Characteristics to be compared by", example = "PROPERTY")
         @PathVariable("characteristics") CharacteristicsType characteristicsType,
@@ -70,7 +70,7 @@ public class SimilarityController {
 
     @ApiOperation(value = "Similarity measure between given TS internal ontology " +
         "and set of TS internal ontologies")
-    @GetMapping(value = "/{characteristics}/internal", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/{characteristics}/internal", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResources<SimilarityModel>> getSimilarityForInternalOntology(
         @ApiParam(value = "Characteristics to be compared by", example = "PROPERTY")
         @PathVariable("characteristics") CharacteristicsType characteristicsType,
@@ -89,7 +89,7 @@ public class SimilarityController {
 
     @ApiOperation(value = "Similarity measure for external ontology " +
         "by calculating shared Properties | Classes | Imports | Namespaces")
-    @GetMapping(value = "/{characteristics}/external", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/{characteristics}/external", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResources<SimilarityModel>> getSimilarityForExternalOntology(
         @ApiParam(value = "Characteristics to be compared by", example = "PROPERTY")
         @PathVariable("characteristics") CharacteristicsType characteristicsType,
@@ -109,7 +109,7 @@ public class SimilarityController {
     }
 
     @ApiOperation("Pairwise similarity between TS internal ontologies")
-    @GetMapping(value = "/pairwise/internal/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/pairwise/internal/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResources<PairwiseSimilarityModel>> getPairwiseSimilarityForInternalOntologyList(
         @ApiParam(value = "A set of Ontology IDs managed in the TS", example = "dicl,dicob")
         @RequestParam(required = false) Optional<List<String>> ids,
@@ -131,7 +131,7 @@ public class SimilarityController {
 
     @ApiOperation("Pairwise similarity between given TS internal ontology " +
         "and a set of TS internal ontologies")
-    @GetMapping(value = "/pairwise/internal", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/pairwise/internal", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResources<PairwiseSimilarityModel>> getPairwiseSimilarityForInternalOntology(
         @ApiParam(value = "A given Ontology ID managed in the TS", example = "swo")
         @RequestParam String id,
@@ -154,7 +154,7 @@ public class SimilarityController {
     }
 
     @ApiOperation("Pairwise similarity for external ontology")
-    @GetMapping(value = "/pairwise/external", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/pairwise/external", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResources<PairwiseSimilarityModel>> getPairwiseSimilarityForExternalOntology(
         @ApiParam(value = "External ontology URL")
         @RequestParam String url,
@@ -175,7 +175,7 @@ public class SimilarityController {
     }
 
     @ApiOperation("Pairwise similarity for external ontology")
-    @GetMapping(value = "/pairwise/external/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/pairwise/external/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResources<PairwiseSimilarityModel>> getPairwiseSimilarityForExternalOntologyList(
         @ApiParam(value = "External ontology URL")
         @RequestParam String url,

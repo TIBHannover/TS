@@ -38,7 +38,7 @@ public class MostCommonlyUsedController {
     }
 
     @ApiOperation(value = "Most commonly used Properties | Classes | Imports | Namespaces")
-    @GetMapping(value = "/{characteristics}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, value = "/{characteristics}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedResources<KeyValueModel>> getMostCommonlyUsed(
         @ApiParam(value = "Characteristics to be compared by", example = "PROPERTY")
         @PathVariable("characteristics") CharacteristicsType characteristicsType,
