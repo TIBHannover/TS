@@ -30,6 +30,30 @@
         </dependency>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+            <version>1.18.24</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-hateoas</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zavtech</groupId>
+            <artifactId>morpheus-core</artifactId>
+            <version>0.9.23</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zavtech</groupId>
+            <artifactId>morpheus-viz</artifactId>
+            <version>0.9.21</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
             <version>4.0.4</version>
