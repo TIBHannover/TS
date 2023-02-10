@@ -2,7 +2,6 @@ package uk.ac.ebi.spot.ols.controller.dto;
 
 import uk.ac.ebi.spot.ols.model.ontology.CharacteristicsInfo;
 import lombok.*;
-import org.springframework.data.util.Pair;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.server.core.Relation;
 

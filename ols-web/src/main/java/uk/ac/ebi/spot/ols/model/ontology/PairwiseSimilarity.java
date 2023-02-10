@@ -2,7 +2,7 @@ package uk.ac.ebi.spot.ols.model.ontology;
 
 import lombok.Builder;
 import lombok.Value;
-import org.springframework.data.util.Pair;
+import uk.ac.ebi.spot.ols.controller.dto.Pair;
 
 import java.util.Map;
 

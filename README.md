@@ -152,7 +152,10 @@ It is possible to customise several branding options in `ols-web/src/main/resour
 * `ols.customisation.ontologyAliasPlural` — As `ontologyAlias` but plural, e.g. "Data Dictionaries"
 * `ols.customisation.oxoUrl` — The URL of an OxO instance to link to with a trailing slash e.g. `https://www.ebi.ac.uk/spot/oxo/`
 
+## changes done postgres to mongo
 
+hateos.PagedModel is changed to hateos.PagedResources
+hateos.RepresentationModel is changed to hateos.ResourceSupport
 
 
 
