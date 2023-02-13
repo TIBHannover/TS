@@ -123,7 +123,7 @@ public class OntologyControllerUI {
     @RequestMapping(path = "/{onto}", method = RequestMethod.GET)
     String getTerm(
             @PathVariable("onto") String ontologyId, 
-            @RequestParam(value = "filter", required = true, defaultValue = "MAPPING_ONTOLOGIES") RepoFilterEnum filter,
+            @RequestParam(value = "filter", required = true, defaultValue = "ALL_FILES") RepoFilterEnum filter,
             Model model) throws ResourceNotFoundException {
 
         ontologyId = ontologyId.toLowerCase();
