@@ -29,8 +29,8 @@ public interface OntologyIndividualRepository  extends GraphRepository<Individua
     @Query (value = "MATCH (n:Individual) WHERE n.ontology_name = {0} AND n.iri = {1} RETURN n")
     Individual findByOntologyAndIri(String ontologyName, String iri);
 
-    @Query (countQuery = "MATCH (n:Individual {ontology_name : {0}}) RETURN count(n)",
-            value = "MATCH (n:Individual {ontology_name : {0}}) RETURN n")
+    @Query (countQuery = "MATCH (n:Individual {ontology_name : {0}}) RETURN count(distinct n)",
+            value = "MATCH (n:Individual {ontology_name : {0}}) RETURN distinct n")
     Page<Individual> findAllByOntology(String ontologyName, Pageable pageable);
 
     @Query (value = "MATCH (n:Individual) WHERE n.ontology_name = {0} AND n.short_form = {1} RETURN n")
