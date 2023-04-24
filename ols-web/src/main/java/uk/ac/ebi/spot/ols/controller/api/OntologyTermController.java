@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
+import uk.ac.ebi.spot.ols.neo4j.model.Individual;
 import uk.ac.ebi.spot.ols.neo4j.model.Term;
 import uk.ac.ebi.spot.ols.neo4j.service.ClassJsTreeBuilder;
 import uk.ac.ebi.spot.ols.neo4j.service.OntologyTermGraphService;
@@ -56,6 +57,9 @@ public class OntologyTermController {
 
     @Autowired 
     TermAssembler termAssembler;
+    
+    @Autowired
+    IndividualAssembler individualAssembler;
 
     @Autowired 
     PreferredRootTermAssembler preferredRootTermAssembler;
@@ -189,9 +193,32 @@ public class OntologyTermController {
         }
     }
     
+    @RequestMapping(path = "/{onto}/{term}/terminstances", produces = {MediaType.APPLICATION_JSON_VALUE, 
+            MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<PagedResources<Individual>> getTermInstances(@PathVariable("onto") String ontologyId, 
+            @PathVariable("term") String termId,
+            Pageable pageable,
+            PagedResourcesAssembler assembler) 
+                throws ResourceNotFoundException {
+          
+            ontologyId = ontologyId.toLowerCase();
+            
+            try {
+                String decoded = UriUtils.decode(termId, "UTF-8");
+                Term term = ontologyTermGraphService.findByOntologyAndIri(ontologyId, decoded);
+                if (term == null) throw  new ResourceNotFoundException("No term with id " + decoded + 
+                    " in " + ontologyId);
+                Page<Individual> individuals = ontologyTermGraphService.getInstances(ontologyId, term.getIri(), pageable);
+                return new ResponseEntity<>( assembler.toResource(individuals,individualAssembler), HttpStatus.OK);
+            } catch (UnsupportedEncodingException e) {
+                throw new ResourceNotFoundException();
+            }
+
+        }
+    
     @RequestMapping(path = "/{onto}/terms/{id}/equivalentclassdescription", produces = {MediaType.APPLICATION_JSON_VALUE, 
             MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
-        HttpEntity<PagedResources<String>> getEquivalentClassDescription(@PathVariable("onto") String ontologyId, 
+    HttpEntity<PagedResources<String>> getEquivalentClassDescription(@PathVariable("onto") String ontologyId, 
             @PathVariable("id") String termId, Pageable pageable, PagedResourcesAssembler assembler) {
           
             ontologyId = ontologyId.toLowerCase();
