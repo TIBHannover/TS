@@ -196,17 +196,20 @@ public class RepoMetadataService {
             
             for (int i = 0; i< items.length();i++) {
                 final JSONObject item = items.getJSONObject(i);
-                
+                Set<String> downloadUrls = new HashSet<String>();
                 StringBuilder sbShaUrl = new StringBuilder();
                 sbShaUrl.append("https://api.github.com/repos/"+institution+"/"+user+"/git/ref/tags/");
                 sbShaUrl.append(item.getString("html_url").split("/")[item.getString("html_url").split("/").length - 1]);
                 String responseBodySha = runCallGithub(sbShaUrl.toString(),token.toString());
-                if (responseBodySha.equals(""))
+                if (responseBodySha.equals("")) {
+                	releases.add(addRelease(item.getString("name"), item.getString("html_url"), item.getString("created_at"),downloadUrls, filter, keyword));
                 	continue;
+                }
+                	
                 JSONObject shaObject = new JSONObject(responseBodySha);
                 String sha  =shaObject.getJSONObject("object").getString("sha");
                 String responseBodyFileList = runCallGithub("https://api.github.com/repos/"+institution+"/"+user+"/git/trees/"+sha+"?recursive=1",token.toString());
-                Set<String> downloadUrls = new HashSet<String>();
+                
                 if (!responseBodyFileList.equals("")) {
                 	JSONObject fileListObject = new JSONObject(responseBodyFileList);
                     JSONArray tree = fileListObject.getJSONArray("tree");
