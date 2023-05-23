@@ -150,9 +150,9 @@ public class OntologyControllerUI {
             model.addAttribute("ontologyDocument", document); 
             if(document.getConfig().getRepoUrl() != null)
                 if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
-                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),filter, ontologyId));	
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),null,filter, ontologyId));	
                 } else if (document.getConfig().getRepoUrl().startsWith("http"))
-                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(), filter, ontologyId));
+                	model.addAttribute("releaseUrls", repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(), null, filter, ontologyId));
                 
 
             customisationProperties.setCustomisationModelAttributes(model);

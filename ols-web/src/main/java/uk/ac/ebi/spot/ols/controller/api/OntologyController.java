@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import uk.ac.ebi.spot.ols.entities.Issue;
 import uk.ac.ebi.spot.ols.entities.Release;
 import uk.ac.ebi.spot.ols.entities.RepoFilterEnum;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
@@ -187,6 +188,8 @@ public class OntologyController implements
     @RequestMapping(path = "/{onto}/releases", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<Release>> getOntologyReleases(
     		@ApiParam(value = "The ontology id in this service", required = true) @PathVariable("onto") String ontologyId,
+    		@ApiParam(value = "External personal access token for the API call", required = false)
+    		@RequestParam(value = "externalToken", required = false) String externalToken,
     		@ApiParam(value = "Filtering criteria for the files in the respective", required = true)
     	    @RequestParam(value = "filter", required = true, defaultValue = "ALL_FILES") RepoFilterEnum filter) throws ResourceNotFoundException {
         ontologyId = ontologyId.toLowerCase();
@@ -195,10 +198,29 @@ public class OntologyController implements
         
         if(document.getConfig().getRepoUrl() != null)
             if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
-            	return new ResponseEntity<>( repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),filter, ontologyId), HttpStatus.OK);	
+            	return new ResponseEntity<>( repoMetadataService.releasesGithubREST(document.getConfig().getRepoUrl(),externalToken,filter, ontologyId), HttpStatus.OK);	
             } else if (document.getConfig().getRepoUrl().startsWith("http"))
-            	return new ResponseEntity<>( repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(),filter, ontologyId), HttpStatus.OK);
+            	return new ResponseEntity<>( repoMetadataService.releasesGitlabREST(document.getConfig().getRepoUrl(),externalToken,filter, ontologyId), HttpStatus.OK);
         return new ResponseEntity<>( new ArrayList<Release>(), HttpStatus.OK);        
+    }
+    
+    
+    @ApiOperation(value = "Retrieve the releases from the repo metadata of a particular ontology", notes = "Mapping files or ontologies are identified based on a comparison with an existing ontologyID from the terminology service. The file name and ontologyID are refined to be lowercase and alphanumeric before the comparison.")
+    @RequestMapping(path = "/{onto}/issues", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<List<Issue>> getOntologyIssues(
+    		@ApiParam(value = "The ontology id in this service", required = true) @PathVariable("onto") String ontologyId,
+    		@ApiParam(value = "External personal access token for the API call", required = false)
+    		@RequestParam(value = "externalToken", required = false) String externalToken) throws ResourceNotFoundException {
+        ontologyId = ontologyId.toLowerCase();
+        OntologyDocument document = ontologyRepositoryService.get(ontologyId);
+        if (document == null) throw new ResourceNotFoundException();
+        
+        if(document.getConfig().getRepoUrl() != null)
+            if(document.getConfig().getRepoUrl().startsWith("http") && document.getConfig().getRepoUrl().contains("github")) {
+            	return new ResponseEntity<>( repoMetadataService.issuesGithubREST(document.getConfig().getRepoUrl(),externalToken), HttpStatus.OK);	
+            } else if (document.getConfig().getRepoUrl().startsWith("http"))
+            	return new ResponseEntity<>( repoMetadataService.issuesGitlabREST(document.getConfig().getRepoUrl(),externalToken), HttpStatus.OK);
+        return new ResponseEntity<>( new ArrayList<Issue>(), HttpStatus.OK);        
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
