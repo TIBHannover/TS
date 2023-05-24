@@ -206,13 +206,13 @@ public class OntologyController implements
     }
 
 
-    @ApiOperation(value = "Retrieve the issues from the repo metadata of a particular ontology", notes = "Mapping files or ontologies are identified based on a comparison with an existing ontologyID from the terminology service. The file name and ontologyID are refined to be lowercase and alphanumeric before the comparison.")
+    @ApiOperation(value = "Retrieve the issues from the repo metadata of a particular ontology", notes = "It is further possible to filter issues based on their state (open(ed), closed, all")
     @RequestMapping(path = "/{onto}/issues", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<List<Issue>> getOntologyIssues(
             @ApiParam(value = "The ontology id in this service", required = true) @PathVariable("onto") String ontologyId,
             @ApiParam(value = "External personal access token for the API call", required = false)
     		@RequestParam(value = "externalToken", required = false) String externalToken,
-            @ApiParam(value = "Filtering criteria for the files in the respective", required = true)
+            @ApiParam(value = "Filtering criteria based on the state of the issue", required = true)
             @RequestParam(value = "filter", required = true, defaultValue = "OPEN") IssueFilterEnum filter) throws ResourceNotFoundException {
         ontologyId = ontologyId.toLowerCase();
         OntologyDocument document = ontologyRepositoryService.get(ontologyId);
