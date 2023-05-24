@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
 import uk.ac.ebi.spot.ols.entities.Issue;
+import uk.ac.ebi.spot.ols.entities.IssueFilterEnum;
 import uk.ac.ebi.spot.ols.entities.Release;
 import uk.ac.ebi.spot.ols.entities.RepoFilterEnum;
 
@@ -319,8 +320,8 @@ public class RepoMetadataService {
         return releases;
 	}
 
-	@Cacheable(value = "issues", key="#repoUrl.concat('-').concat('github').concat('-').concat('rest').concat('-').concat('issues')")
-	public List<Issue> issuesGithubREST(String repoUrl, String externalToken){
+	@Cacheable(value = "issues", key="#repoUrl.concat('-').concat(#filter).concat('-').concat('github').concat('-').concat('rest').concat('-').concat('issues')")
+	public List<Issue> issuesGithubREST(String repoUrl, String externalToken, IssueFilterEnum filter){
 	    StringBuilder token = new StringBuilder();
 
 
@@ -363,6 +364,12 @@ public class RepoMetadataService {
         }
         sb.append("issues");
 
+		if (filter == IssueFilterEnum.OPEN)
+			sb.append("?state=open");
+		else if (filter == IssueFilterEnum.ALL)
+			sb.append("?state=all");
+		else if (filter == IssueFilterEnum.CLOSED)
+			sb.append("?state=closed");
 
             String responseBody = runCallGithub(sb.toString(),token.toString());
 
@@ -388,10 +395,9 @@ public class RepoMetadataService {
                 }
 
                 String creator = item.getJSONObject("user").getString("login");
-
 				String body = "";
 				if(item.get("body") != null)
-					body = item.getString("body");
+					body = item.optString("body");
 
                 issues.add(addIssue(item.getString("title"), body, open, creator, assignees, item.getString("html_url"), item.getString("created_at")));
             }
@@ -401,8 +407,8 @@ public class RepoMetadataService {
 	}
 
 
-	@Cacheable(value = "issues", key="#repoUrl.concat('-').concat('gitlab').concat('-').concat('rest').concat('-').concat('issues')")
-	public List<Issue> issuesGitlabREST(String repoUrl, String externalToken){
+	@Cacheable(value = "issues", key="#repoUrl.concat('-').concat(#filter).concat('-').concat('gitlab').concat('-').concat('rest').concat('-').concat('issues')")
+	public List<Issue> issuesGitlabREST(String repoUrl, String externalToken, IssueFilterEnum filter){
 
 		List<Issue> issues = new ArrayList<Issue>();
 
@@ -454,7 +460,15 @@ public class RepoMetadataService {
             JSONObject project = new JSONObject(responseBody);
             Long id = project.getLong("id");
             String issuesUrl = "https://"+gitlabInstance+"/api/v4/projects/"+id+"/issues";
-            String responseBodyIssues = runCallGitlab(issuesUrl,token.toString());
+            StringBuilder issueUrlBuilder = new StringBuilder(issuesUrl);
+			if (filter == IssueFilterEnum.OPEN)
+				issueUrlBuilder.append("?state=opened");
+			else if (filter == IssueFilterEnum.ALL)
+				issueUrlBuilder.append("?state=all");
+			else if (filter == IssueFilterEnum.CLOSED)
+				issueUrlBuilder.append("?state=closed");
+
+            String responseBodyIssues = runCallGitlab(issueUrlBuilder.toString(),token.toString());
             if(responseBodyIssues.equals(""))
             	return issues;
             JSONArray items = new JSONArray(responseBodyIssues);
@@ -478,7 +492,7 @@ public class RepoMetadataService {
                 String creator = item.getJSONObject("author").getString("name");
                 String description = "";
 				if(item.get("description") != null)
-                    description = item.getString("description");
+                    description = item.optString("description");
                 issues.add(addIssue(item.getString("title"), description, open, creator, assignees, item.getString("web_url"), item.getString("created_at")));
             }
 
@@ -487,8 +501,6 @@ public class RepoMetadataService {
 
 
     public String runCallGithub(String callUrl, String token) {
-      System.out.println("callUrl: "+callUrl);
-      System.out.println("token: "+token);
       CloseableHttpClient httpclient = HttpClients.createDefault();
       HttpGet httpget = new HttpGet(callUrl);
 //      httpget.addHeader("Authorization", "Basic "+token.toString());
@@ -505,8 +517,6 @@ public class RepoMetadataService {
     }
 
     public String runCallGitlab(String callUrl, String token) {
-    	System.out.println("callUrl: "+callUrl);
-    	System.out.println("token: "+token);
         StringBuilder responseBody = new StringBuilder();
         try {
 			URL url = new URL(callUrl);

@@ -32,8 +32,8 @@
     <cache name="issues"
            maxElementsInMemory="100"
            maxElementsOnDisk="2000"
-           timeToIdleSeconds="1209600"
-           timeToLiveSeconds="1209600"
+           timeToIdleSeconds="86400"
+           timeToLiveSeconds="86400"
            overflowToDisk="true"
            memoryStoreEvictionPolicy="LFU" />
 </ehcache>
