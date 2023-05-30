@@ -17,6 +17,8 @@ public class RestCall {
 
     private Set<RestCallParameter> parameters = new HashSet<>();
 
+    private Set<RestCallHeader> headers = new HashSet<>();
+
     private LocalDateTime createdAt;
 
     public RestCall() {
@@ -36,6 +38,10 @@ public class RestCall {
 
     public void addParameters(Set<RestCallParameter> set) {
         parameters.addAll(set);
+    }
+
+    public void addHeaders(Set<RestCallHeader> set) {
+        headers.addAll(set);
     }
 
     public String getId() {
@@ -70,12 +76,21 @@ public class RestCall {
         this.parameters = parameters;
     }
 
+    public Set<RestCallHeader> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Set<RestCallHeader> headers) {
+        this.headers = headers;
+    }
+
     @Override
     public String toString() {
         return "RestCall{" +
             "id=" + id +
             ", url='" + url + '\'' +
             ", parameters=" + parameters +
+            ", headers=" + headers +
             ", createdAt=" + createdAt +
             '}';
     }
@@ -85,11 +100,11 @@ public class RestCall {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RestCall restCall = (RestCall) o;
-        return id.equals(restCall.id) && url.equals(restCall.url);
+        return id.equals(restCall.id) && url.equals(restCall.url) && headers.equals(restCall.headers);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, url);
+        return Objects.hash(id, url, headers);
     }
 }

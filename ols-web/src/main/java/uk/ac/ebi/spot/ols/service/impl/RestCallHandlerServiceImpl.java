@@ -33,6 +33,7 @@ public class RestCallHandlerServiceImpl implements RestCallHandlerService {
         RestCall restCall = new RestCall(requestInfo.getUrl());
         restCall.addParameters(requestInfo.getPathVariables());
         restCall.addParameters(requestInfo.getQueryParameters());
+        restCall.addHeaders(requestInfo.getHeaders());
 
         RestCall saved = restCallService.save(restCall);
 

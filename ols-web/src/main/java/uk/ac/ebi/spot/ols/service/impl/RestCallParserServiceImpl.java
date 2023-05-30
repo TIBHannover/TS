@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.ac.ebi.spot.ols.entities.HttpServletRequestInfo;
+import uk.ac.ebi.spot.ols.entities.RestCallHeader;
 import uk.ac.ebi.spot.ols.entities.RestCallParameter;
 import uk.ac.ebi.spot.ols.entities.RestCallParameterType;
 import uk.ac.ebi.spot.ols.service.RestCallParserService;
@@ -52,7 +53,17 @@ public class RestCallParserServiceImpl implements RestCallParserService {
             logger.error("Could not get query parameters: {}", e.getLocalizedMessage());
         }
 
-        return new HttpServletRequestInfo(requestURI, pathVariables, queryParameters);
+        Set<RestCallHeader> headers = new HashSet<RestCallHeader>();
+        while (request.getHeaderNames().hasMoreElements()) {
+            String headerName = request.getHeaderNames().nextElement();
+            while(request.getHeaders(headerName).hasMoreElements()){
+                String headerValue = request.getHeaders(headerName).nextElement();
+                headers.add(new RestCallHeader(headerName,headerValue));
+            }
+
+        }
+
+        return new HttpServletRequestInfo(requestURI, pathVariables, queryParameters, headers);
     }
 
     private String doReplacement(String str, String parameterName, int startIndex, int endIndex) {
