@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerMapping;
 import uk.ac.ebi.spot.ols.entities.HttpServletRequestInfo;
-import uk.ac.ebi.spot.ols.entities.RestCallHeader;
 import uk.ac.ebi.spot.ols.entities.RestCallParameter;
 import uk.ac.ebi.spot.ols.entities.RestCallParameterType;
 import uk.ac.ebi.spot.ols.service.RestCallParserService;
@@ -15,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -53,12 +53,17 @@ public class RestCallParserServiceImpl implements RestCallParserService {
             logger.error("Could not get query parameters: {}", e.getLocalizedMessage());
         }
 
-        Set<RestCallHeader> headers = new HashSet<RestCallHeader>();
-        while (request.getHeaderNames().hasMoreElements()) {
-            String headerName = request.getHeaderNames().nextElement();
-            while(request.getHeaders(headerName).hasMoreElements()){
-                String headerValue = request.getHeaders(headerName).nextElement();
-                headers.add(new RestCallHeader(headerName,headerValue));
+        Set<RestCallParameter> headers = new HashSet<RestCallParameter>();
+        for (Enumeration<?> names = request.getHeaderNames(); names.hasMoreElements();) {
+            String headerName = (String) names.nextElement();
+/*          String headerValue = request.getHeader(headerName);
+            System.out.println(headerName + " - "+headerValue);
+            headers.add(new RestCallParameter(headerName,headerValue, RestCallParameterType.HEADER));*/
+
+            for(Enumeration<?> values = request.getHeaders(headerName); values.hasMoreElements();){
+                String headerValue = (String) values.nextElement();
+                System.out.println(headerName + " - "+headerValue);
+                headers.add(new RestCallParameter(headerName,headerValue, RestCallParameterType.HEADER));
             }
 
         }

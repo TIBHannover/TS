@@ -7,7 +7,7 @@ public class HttpServletRequestInfo {
     private String url;
     private Set<RestCallParameter> pathVariables;
     private Set<RestCallParameter> queryParameters;
-    private Set<RestCallHeader> headers;
+    private Set<RestCallParameter> headers;
 
     public HttpServletRequestInfo() {
     }
@@ -15,7 +15,7 @@ public class HttpServletRequestInfo {
     public HttpServletRequestInfo(String url,
                                   Set<RestCallParameter> pathVariables,
                                   Set<RestCallParameter> queryParameters,
-                                  Set<RestCallHeader> headers) {
+                                  Set<RestCallParameter> headers) {
         this.url = url;
         this.pathVariables = pathVariables;
         this.queryParameters = queryParameters;
@@ -46,11 +46,11 @@ public class HttpServletRequestInfo {
         this.queryParameters = queryParameters;
     }
 
-    public Set<RestCallHeader> getHeaders() {
+    public Set<RestCallParameter> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(Set<RestCallHeader> headers) {
+    public void setHeaders(Set<RestCallParameter> headers) {
         this.headers = headers;
     }
 
