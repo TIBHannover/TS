@@ -149,7 +149,7 @@ public class RestCallStatisticsController {
     @ApiOperation(value = "REST Calls statistics by date")
     @RequestMapping(value = "/byDate", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public HttpEntity<PagedResources<KeyValueResultDto>> getStatisticsByDate(
-        @ApiParam(value = "Parameter type", allowableValues = "PATH,QUERY")
+        @ApiParam(value = "Parameter type", allowableValues = "PATH,QUERY,HEADER")
         @RequestParam(name = "type", required = false) RestCallParameterType type,
         @RequestParam(name = "url", required = false) String url,
         @ApiParam(value = "Parameter name")
