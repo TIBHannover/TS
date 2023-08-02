@@ -39,18 +39,20 @@ public class RestCallParserServiceImpl implements RestCallParserService {
             .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
         Set<RestCallParameter> pathVariables = new HashSet<>();
-        for (Map.Entry<String, String> entry : pathVariablesMap.entrySet()) {
-            String parameterName = entry.getKey();
-            String parameterValue = decoder.decode(entry.getValue());
 
-            int startIndex = requestURI.indexOf(parameterValue) - 1;
-            int endIndex = startIndex + parameterValue.length() + 1;
+        if (pathVariablesMap != null)
+            for (Map.Entry<String, String> entry : pathVariablesMap.entrySet()) {
+                String parameterName = entry.getKey();
+                String parameterValue = decoder.decode(entry.getValue());
 
-            if (startIndex >= 0 && requestURI.charAt(startIndex) == '/') {
-                requestURI = doReplacement(requestURI, parameterName, startIndex, endIndex);
-                pathVariables.add(new RestCallParameter(parameterName, parameterValue, RestCallParameterType.PATH));
+                int startIndex = requestURI.indexOf(parameterValue) - 1;
+                int endIndex = startIndex + parameterValue.length() + 1;
+
+                if (startIndex >= 0 && requestURI.charAt(startIndex) == '/') {
+                    requestURI = doReplacement(requestURI, parameterName, startIndex, endIndex);
+                    pathVariables.add(new RestCallParameter(parameterName, parameterValue, RestCallParameterType.PATH));
+                }
             }
-        }
 
         Set<RestCallParameter> queryParameters = new HashSet<>();
         try {
