@@ -52,7 +52,7 @@ public class RestCallParameter {
     @Override
     public String toString() {
         return "RestCallParameter{" +
-            ", parameterType='" + parameterType + '\'' +
+            "parameterType='" + parameterType + '\'' +
             ", name='" + name + '\'' +
             ", value='" + value + '\'' +
             '}';
@@ -81,5 +81,11 @@ public class RestCallParameter {
     @JsonIgnore
     public boolean isQueryType() {
         return RestCallParameterType.QUERY.equals(this.parameterType);
+    }
+
+    @Transient
+    @JsonIgnore
+    public boolean isHeaderType() {
+        return RestCallParameterType.HEADER.equals(this.parameterType);
     }
 }

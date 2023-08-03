@@ -11,6 +11,7 @@ public class RestCallRequest {
     private String url;
     private Optional<RestCallParameterType> type;
     private Optional<String> parameterName;
+
     private LocalDateTime dateTimeFrom;
     private LocalDateTime dateTimeTo;
 

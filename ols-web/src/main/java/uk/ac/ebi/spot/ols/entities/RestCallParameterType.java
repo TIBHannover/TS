@@ -14,6 +14,12 @@ public enum RestCallParameterType {
         public Predicate<RestCallParameter> getRestCallParameterPredicate() {
             return RestCallParameter::isQueryType;
         }
+    },
+    HEADER {
+        @Override
+        public Predicate<RestCallParameter> getRestCallParameterPredicate() {
+            return RestCallParameter::isHeaderType;
+        }
     };
 
     public abstract Predicate<RestCallParameter> getRestCallParameterPredicate();
