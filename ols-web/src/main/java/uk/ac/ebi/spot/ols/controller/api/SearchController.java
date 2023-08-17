@@ -1,5 +1,6 @@
 package uk.ac.ebi.spot.ols.controller.api;
 
+import com.google.common.collect.Sets;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
@@ -32,10 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -90,40 +88,25 @@ public class SearchController {
     ) throws IOException {
 
     }
-    @ApiOperation(value = "The search API is independent of the REST API and supports free text search over the ontologies. The default search is across all textual fields in the ontology, but results are ranked towards hits in labels, then synonyms, then definitions, then annotations.", notes = "You can override the fields that are searched by supplying a queryFields argument. For example, to query on labels and synonyms use")
-    @RequestMapping(path = "/api/search", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+
     public void search(
-            @ApiParam(value = "The terms to search. By default the search is performed over term labels, synonyms, descriptions, identifiers and annotation properties.")
-            @RequestParam("q") String query,
-            @ApiParam(value = "Restrict a search to a set of ontologies e.g. ontology=aeon,duo")
-            @RequestParam(value = "ontology", required = false) Collection<String> ontologies,
-            @ApiParam(value = "Restrict a search to an entity type, one of {class,property,individual,ontology}")
-            @RequestParam(value = "type", required = false) Collection<String> types,
-            @ApiParam(value = "Restrict a search to an particular set of slims by name")
-            @RequestParam(value= "slim", required = false) Collection<String> slims,
-            @ApiParam(value = "Specify the fields to return, the defaults are {iri,label,short_form,obo_id,ontology_name,ontology_prefix,description,type}")
-            @RequestParam(value = "fieldList", required = false) Collection<String> fieldList,
-            @ApiParam(value = "Specify the fields to query, the defaults are {label, synonym, description, short_form, obo_id, annotations, logical_description, iri}")
-            @RequestParam(value = "queryFields", required = false) Collection<String> queryFields,
-            @ApiParam(value = "Set to true for exact matches")
-            @RequestParam(value = "exact", required = false) boolean exact,
-            @ApiParam(value = "Set to true to group results by unique id (IRI)")
-            @RequestParam(value = "groupField", required = false) String groupField,
-            @ApiParam(value = "Set to true to include obsoleted terms in the results")
-            @RequestParam(value = "obsoletes", defaultValue = "false") boolean queryObsoletes,
-            @ApiParam(value = "Set to true to only return terms that are in a defining ontology e.g. Only return matches to gene ontology terms in the gene ontology, and exclude ontologies where those terms are also referenced")
-            @RequestParam(value = "local", defaultValue = "false") boolean isLocal,
-            @ApiParam(value = "You can restrict a search to children of a given term. Supply a list of IRI for the terms that you want to search under")
-            @RequestParam(value = "childrenOf", required = false) Collection<String> childrenOf,
-            @ApiParam(value = "You can restrict a search to all children of a given term. Supply a list of IRI for the terms that you want to search under (subclassOf/is-a plus any hierarchical/transitive properties like 'part of' or 'develops from')")
-            @RequestParam(value = "allChildrenOf", required = false) Collection<String> allChildrenOf,
-            @RequestParam(value = "inclusive", required = false) boolean inclusive,
-            @RequestParam(value = "isLeaf", required = false) boolean isLeaf,
-            @ApiParam(value = "How many results per page")
-            @RequestParam(value = "rows", defaultValue = "10") Integer rows,
-            @ApiParam(value = "The results page number")
-            @RequestParam(value = "start", defaultValue = "0") Integer start,
-            @RequestParam(value = "format", defaultValue = "json") String format,
+            String query,
+            Collection<String> ontologies,
+            Collection<String> types,
+            Collection<String> slims,
+            Collection<String> fieldList,
+            Collection<String> queryFields,
+            boolean exact,
+            String groupField,
+            boolean queryObsoletes,
+            boolean isLocal,
+            Collection<String> childrenOf,
+            Collection<String> allChildrenOf,
+            boolean inclusive,
+            boolean isLeaf,
+            Integer rows,
+            Integer start,
+            String format,
             HttpServletResponse response
     ) throws IOException {
 
@@ -246,21 +229,24 @@ public class SearchController {
         dispatchSearch(solrSearchBuilder.toString(), response);
     }
 
-    @ApiOperation(value = "The filtered search API is independent of the REST API and supports free text search over the ontologies. The default search is across all textual fields in the ontology, but results are ranked towards hits in labels, then synonyms, then definitions, then annotations.", notes = "You can override the fields that are searched by supplying a queryFields argument. For example, to query on labels and synonyms use")
-    @RequestMapping(path = "/api/filteredsearch", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+    @ApiOperation(value = "The search API is independent of the REST API and supports free text search over the ontologies. The default search is across all textual fields in the ontology, but results are ranked towards hits in labels, then synonyms, then definitions, then annotations.", notes = "You can override the fields that are searched by supplying a queryFields argument. For example, to query on labels and synonyms use")
+    @RequestMapping(path = "/api/search", produces = {MediaType.APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     public void filteredSearch(
             @ApiParam(value = "The terms to search. By default the search is performed over term labels, synonyms, descriptions, identifiers and annotation properties.")
             @RequestParam("q") String query,
-            @RequestParam(value = "schema", required = true) Collection<String> schemas,
+            @ApiParam(value = "Filter search by a particular list of ontologies using schema keys (/api/ontologies/schemakeys) and classification values /api/ontologies/schemavalues")
+            @RequestParam(value = "schema", required = false) Collection<String> schemas,
+            @ApiParam(value = "Filter search by a particular list of ontologies using schema keys (/api/ontologies/schemakeys) and classification values /api/ontologies/schemavalues")
+            @RequestParam(value = "classification", required = false) Collection<String> classifications,
+            @ApiParam(value = "Intersection or union of ontology classifications")
             @RequestParam(value = "exclusiveFilter", required = false, defaultValue = "false") boolean exclusiveFilter,
-            @RequestParam(value = "classification", required = true) Collection<String> classifications,
             @ApiParam(value = "Restrict a search to a set of ontologies e.g. ontology=aeon,duo")
             @RequestParam(value = "ontology", required = false) Collection<String> ontologies,
             @ApiParam(value = "Restrict a search to an entity type, one of {class,property,individual,ontology}")
             @RequestParam(value = "type", required = false) Collection<String> types,
             @ApiParam(value = "Restrict a search to an particular set of slims by name")
             @RequestParam(value= "slim", required = false) Collection<String> slims,
-            @ApiParam(value = "Specifcy the fields to return, the defaults are {iri,label,short_form,obo_id,ontology_name,ontology_prefix,description,type}")
+            @ApiParam(value = "Specify the fields to return, the defaults are {iri,label,short_form,obo_id,ontology_name,ontology_prefix,description,type}")
             @RequestParam(value = "fieldList", required = false) Collection<String> fieldList,
             @ApiParam(value = "Specify the fields to query, the defaults are {label, synonym, description, short_form, obo_id, annotations, logical_description, iri}")
             @RequestParam(value = "queryFields", required = false) Collection<String> queryFields,
@@ -285,14 +271,7 @@ public class SearchController {
             @RequestParam(value = "format", defaultValue = "json") String format,
             HttpServletResponse response
     ) throws IOException {
-
-        List<OntologyDocument> documents = ontologyRepositoryService.getAllDocuments(schemas, classifications, exclusiveFilter);
-        List<String> filteredOntologyList = new ArrayList<String>();
-        for (OntologyDocument document : documents){
-            filteredOntologyList.add(document.getOntologyId());
-        }
-
-        search(query,filteredOntologyList,types,slims,fieldList,queryFields,exact,groupField,queryObsoletes,isLocal,childrenOf,allChildrenOf,inclusive,isLeaf,rows,start,format,response);
+        search(query,filterOntologies(schemas,classifications,ontologies,exclusiveFilter),types,slims,fieldList,queryFields,exact,groupField,queryObsoletes,isLocal,childrenOf,allChildrenOf,inclusive,isLeaf,rows,start,format,response);
     }
 
     Function<String,String> addQuotes = new Function<String,String>() {
@@ -345,31 +324,19 @@ public class SearchController {
         }
         return builder.toString();
     }
-    @ApiOperation(value = "We provide an additional search endopint that is designed specifically for selecting ontology terms. This has been tuned specifically to support applications such as autocomplete.")
-    @RequestMapping(path = "/api/select", produces = {APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+
     public void select(
-    		@ApiParam(value = "The terms to search. By default the search is performed over term labels, synonyms, descriptions, identifiers and annotation properties.")
-    		@RequestParam("q") String query,
-            @ApiParam(value = "Restrict a search to a set of ontologies e.g. ontology=aeon,duo")
-            @RequestParam(value = "ontology", required = false) Collection<String> ontologies,
-            @ApiParam(value = "Restrict a search to an entity type, one of {class,property,individual,ontology}")
-            @RequestParam(value = "type", required = false) Collection<String> types,
-            @ApiParam(value = "Restrict a search to an particular set of slims by name")
-            @RequestParam(value= "slim", required = false) Collection<String> slims,
-            @ApiParam(value = "Specifcy the fields to return, the defaults are {iri,label,short_form,obo_id,ontology_name,ontology_prefix,description,type}")
-            @RequestParam(value = "fieldList", required = false) Collection<String> fieldList,
-            @ApiParam(value = "Set to true to include obsoleted terms in the results")
-            @RequestParam(value = "obsoletes", defaultValue = "false") boolean queryObsoletes,
-            @ApiParam(value = "Set to true to only return terms that are in a defining ontology e.g. Only return matches to gene ontology terms in the gene ontology, and exclude ontologies where those terms are also referenced")
-            @RequestParam(value = "local", defaultValue = "false") boolean isLocal,
-            @ApiParam(value = "You can restrict a search to children of a given term. Supply a list of IRI for the terms that you want to search under")
-            @RequestParam(value = "childrenOf", required = false) Collection<String> childrenOf,
-            @ApiParam(value = "You can restrict a search to all children of a given term. Supply a list of IRI for the terms that you want to search under (subclassOf/is-a plus any hierarchical/transitive properties like 'part of' or 'develops from')")
-            @RequestParam(value = "allChildrenOf", required = false) Collection<String> allChildrenOf,
-            @ApiParam(value = "How many results per page")
-            @RequestParam(value = "rows", defaultValue = "10") Integer rows,
-            @ApiParam(value = "The results page number")
-            @RequestParam(value = "start", defaultValue = "0") Integer start,
+    		String query,
+            Collection<String> ontologies,
+            Collection<String> types,
+            Collection<String> slims,
+            Collection<String> fieldList,
+            boolean queryObsoletes,
+            boolean isLocal,
+            Collection<String> childrenOf,
+            Collection<String> allChildrenOf,
+            Integer rows,
+            Integer start,
             HttpServletResponse response
     ) throws IOException {
 
@@ -449,13 +416,16 @@ public class SearchController {
     }
 
     @ApiOperation(value = "We provide an additional search endopint that is designed specifically for selecting ontology terms. This has been tuned specifically to support applications such as autocomplete.")
-    @RequestMapping(path = "/api/filteredselect", produces = {APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+    @RequestMapping(path = "/api/select", produces = {APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     public void filteredSelect(
             @ApiParam(value = "The terms to search. By default the search is performed over term labels, synonyms, descriptions, identifiers and annotation properties.")
             @RequestParam("q") String query,
-            @RequestParam(value = "schema", required = true) Collection<String> schemas,
+            @ApiParam(value = "Filter search by a particular list of ontologies using schema keys (/api/ontologies/schemakeys) and classification values /api/ontologies/schemavalues")
+            @RequestParam(value = "schema", required = false) Collection<String> schemas,
+            @ApiParam(value = "Filter search by a particular list of ontologies using schema keys (/api/ontologies/schemakeys) and classification values /api/ontologies/schemavalues")
+            @RequestParam(value = "classification", required = false) Collection<String> classifications,
+            @ApiParam(value = "Intersection or union of ontology classifications")
             @RequestParam(value = "exclusiveFilter", required = false, defaultValue = "false") boolean exclusiveFilter,
-            @RequestParam(value = "classification", required = true) Collection<String> classifications,
             @ApiParam(value = "Restrict a search to a set of ontologies e.g. ontology=aeon,duo")
             @RequestParam(value = "ontology", required = false) Collection<String> ontologies,
             @ApiParam(value = "Restrict a search to an entity type, one of {class,property,individual,ontology}")
@@ -478,26 +448,14 @@ public class SearchController {
             @RequestParam(value = "start", defaultValue = "0") Integer start,
             HttpServletResponse response
     ) throws IOException {
-        List<OntologyDocument> documents = ontologyRepositoryService.getAllDocuments(schemas, classifications, exclusiveFilter);
-        List<String> filteredOntologyList = new ArrayList<String>();
-        for (OntologyDocument document : documents){
-            filteredOntologyList.add(document.getOntologyId());
-        }
-
-       select(query,filteredOntologyList,types,slims,fieldList,queryObsoletes,isLocal,childrenOf,allChildrenOf,rows,start,response);
+       select(query,filterOntologies(schemas,classifications,ontologies,exclusiveFilter),types,slims,fieldList,queryObsoletes,isLocal,childrenOf,allChildrenOf,rows,start,response);
     }
 
-    @ApiOperation(value = "We also provide a generic suggester endpoint. This endpoint aims to provide traditional autosuggest based on all the vocabulary in OLS (all class labels or synonyms). All results from this endpoint are unique and are not coupled to any particular ontology, however, searches can be restricted by ontology.")
-    @RequestMapping(path = "/api/suggest", produces = {APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     public void suggest(
-    		@ApiParam(value = "The terms to search. By default the search is performed over term labels, synonyms, descriptions, identifiers and annotation properties.")
-    		@RequestParam("q") String query,
-            @ApiParam(value = "Restrict a search to a set of ontologies e.g. ontology=aeon,duo")
-            @RequestParam(value = "ontology", required = false) Collection<String> ontologies,
-            @ApiParam(value = "How many results per page")
-            @RequestParam(value = "rows", defaultValue = "10") Integer rows,
-            @ApiParam(value = "The results page number")
-            @RequestParam(value = "start", defaultValue = "0") Integer start,
+    		String query,
+            Collection<String> ontologies,
+            Integer rows,
+            Integer start,
             HttpServletResponse response
     ) throws IOException {
 
@@ -534,13 +492,16 @@ public class SearchController {
     }
 
     @ApiOperation(value = "We also provide a generic suggester endpoint. This endpoint aims to provide traditional autosuggest based on all the vocabulary in OLS (all class labels or synonyms). All results from this endpoint are unique and are not coupled to any particular ontology, however, searches can be restricted by ontology.")
-    @RequestMapping(path = "/api/filteredsuggest", produces = {APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
+    @RequestMapping(path = "/api/suggest", produces = {APPLICATION_JSON_VALUE}, method = RequestMethod.GET)
     public void filteredSuggest(
             @ApiParam(value = "The terms to search. By default the search is performed over term labels, synonyms, descriptions, identifiers and annotation properties.")
             @RequestParam("q") String query,
-            @RequestParam(value = "schema", required = true) Collection<String> schemas,
+            @ApiParam(value = "Filter search by a particular list of ontologies using schema keys (/api/ontologies/schemakeys) and classification values /api/ontologies/schemavalues")
+            @RequestParam(value = "schema", required = false) Collection<String> schemas,
+            @ApiParam(value = "Filter search by a particular list of ontologies using schema keys (/api/ontologies/schemakeys) and classification values /api/ontologies/schemavalues")
+            @RequestParam(value = "classification", required = false) Collection<String> classifications,
+            @ApiParam(value = "Intersection or union of ontology classifications")
             @RequestParam(value = "exclusiveFilter", required = false, defaultValue = "false") boolean exclusiveFilter,
-            @RequestParam(value = "classification", required = true) Collection<String> classifications,
             @ApiParam(value = "Restrict a search to a set of ontologies e.g. ontology=aeon,duo")
             @RequestParam(value = "ontology", required = false) Collection<String> ontologies,
             @ApiParam(value = "How many results per page")
@@ -549,13 +510,46 @@ public class SearchController {
             @RequestParam(value = "start", defaultValue = "0") Integer start,
             HttpServletResponse response
     ) throws IOException {
-        List<OntologyDocument> documents = ontologyRepositoryService.getAllDocuments(schemas, classifications, exclusiveFilter);
-        List<String> filteredOntologyList = new ArrayList<String>();
-        for (OntologyDocument document : documents){
-            filteredOntologyList.add(document.getOntologyId());
-        }
-        suggest(query,filteredOntologyList,rows,start,response);
+        suggest(query,filterOntologies(schemas,classifications,ontologies,exclusiveFilter),rows,start,response);
 
+    }
+
+    private Collection<String> filterOntologies(Collection<String> schemas,Collection<String> classifications, Collection<String> ontologies, boolean exclusiveFilter){
+        if(schemas == null && classifications == null && ontologies == null)
+            return null;
+        Set<OntologyDocument> documents = ontologyRepositoryService.filter(schemas, classifications, exclusiveFilter);
+        Collection<String> ontologiesTemp = ontologies;
+        Set<String> filteredOntologySet = new HashSet<String>();
+        for (OntologyDocument document : documents){
+            filteredOntologySet.add(document.getOntologyId());
+        }
+        Set<String> postOperationOntologySet;
+
+        if (exclusiveFilter){
+            if(ontologies == null || ontologies.size() == 0)
+                postOperationOntologySet = filteredOntologySet;
+            else {
+                ontologies.remove("");
+                if(ontologies.size() == 0) {
+                    postOperationOntologySet = filteredOntologySet;
+                } else
+                    postOperationOntologySet = Sets.intersection(filteredOntologySet,new HashSet<String>(ontologies));
+            }
+
+        } else {
+            if(ontologies == null || ontologies.size() == 0)
+                postOperationOntologySet = filteredOntologySet;
+            else {
+                ontologies.remove("");
+                if(ontologies.size() == 0) {
+                    postOperationOntologySet = filteredOntologySet;
+                } else
+                    postOperationOntologySet = Sets.union(filteredOntologySet,new HashSet<String>(ontologies));
+            }
+        }
+        if(postOperationOntologySet.size() == 0)
+            postOperationOntologySet.add("nosuchontologyfound");
+        return postOperationOntologySet;
     }
 
     private void dispatchSearch(String searchString, HttpServletResponse httpresponse) throws IOException {
