@@ -515,41 +515,70 @@ public class SearchController {
     }
 
     private Collection<String> filterOntologies(Collection<String> schemas,Collection<String> classifications, Collection<String> ontologies, boolean exclusiveFilter){
-        if(schemas == null && classifications == null && ontologies == null)
+        if (schemas != null)
+            schemas.remove("");
+        if (classifications != null)
+            classifications.remove("");
+        if(ontologies != null)
+            ontologies.remove("");
+        if((schemas == null || schemas.size() == 0 ) && (classifications == null || classifications.size() == 0 ) && (ontologies == null || ontologies.size() == 0))
             return null;
+        if ((schemas == null || schemas.size() == 0 ) && (classifications == null || classifications.size() == 0 ))
+            return ontologies;
         Set<OntologyDocument> documents = ontologyRepositoryService.filter(schemas, classifications, exclusiveFilter);
-        Collection<String> ontologiesTemp = ontologies;
         Set<String> filteredOntologySet = new HashSet<String>();
         for (OntologyDocument document : documents){
             filteredOntologySet.add(document.getOntologyId());
         }
-        Set<String> postOperationOntologySet;
+        System.out.println("filteredOntologySet: "+filteredOntologySet);
+        if (( ontologies == null || ontologies.size() == 0) && filteredOntologySet.size() > 0)
+            return filteredOntologySet;
+        else if ((ontologies == null || ontologies.size() == 0) && (schemas.size() > 0 || classifications.size() > 0 ))
+            return new HashSet<String>(Arrays.asList("nosuchontologyfound"));
 
-        if (exclusiveFilter){
-            if(ontologies == null || ontologies.size() == 0)
-                postOperationOntologySet = filteredOntologySet;
-            else {
-                ontologies.remove("");
-                if(ontologies.size() == 0) {
-                    postOperationOntologySet = filteredOntologySet;
-                } else
-                    postOperationOntologySet = Sets.intersection(filteredOntologySet,new HashSet<String>(ontologies));
-            }
+        Set<String> postFilterOntologySet;
 
+        if(ontologies == null){
+            ontologies = new HashSet<String>();
+            System.out.println("ontologies == null");
         } else {
-            if(ontologies == null || ontologies.size() == 0)
-                postOperationOntologySet = filteredOntologySet;
-            else {
-                ontologies.remove("");
-                if(ontologies.size() == 0) {
-                    postOperationOntologySet = filteredOntologySet;
-                } else
-                    postOperationOntologySet = Sets.union(filteredOntologySet,new HashSet<String>(ontologies));
+            ontologies = new HashSet<String>(ontologies);
+            System.out.println("ontologies <> null");
+        }
+
+        System.out.println("ontologies: "+ontologies);
+        if (exclusiveFilter){
+            postFilterOntologySet = Sets.intersection(filteredOntologySet,new HashSet<String>(ontologies));
+            System.out.println("intersection");
+        } else {
+            postFilterOntologySet = Sets.union(filteredOntologySet,new HashSet<String>(ontologies));
+            System.out.println("union");
+        }
+        if(postFilterOntologySet.size() == 0)
+            postFilterOntologySet = new HashSet<String>(Arrays.asList("nosuchontologyfound"));
+        return postFilterOntologySet;
+    }
+
+    Set<String> union(Collection<String> a, Collection<String> b ) {
+        Set<String> union = new HashSet<String>();
+        for (String s : a){
+            union.add(s);
+        }
+        for (String s : b){
+            union.add(s);
+        }
+        return union;
+    }
+
+    Set<String> intersection(Collection<String> a, Collection<String> b ) {
+        Set<String> intersection = new HashSet<String>();
+        for (String s1 : a){
+            for (String s2 : b){
+                if (s1.equals(s2))
+                intersection.add(s1);
             }
         }
-        if(postOperationOntologySet.size() == 0)
-            postOperationOntologySet.add("nosuchontologyfound");
-        return postOperationOntologySet;
+        return intersection;
     }
 
     private void dispatchSearch(String searchString, HttpServletResponse httpresponse) throws IOException {
