@@ -79,38 +79,29 @@ public class MongoOntologyRepositoryService implements OntologyRepositoryService
                     }
                 }
             } else {
-
-	       	 for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
+                for (OntologyDocument ontologyDocument : repositoryService.findAll()) {
                     Set<String> tempClassifications = new HashSet<String>();
-	         		boolean toBeAdded = true;
-	         		if(ontologyDocument.getConfig().getClassifications() == null)
-	         			toBeAdded = false;
-	         		else if (ontologyDocument.getConfig().getClassifications().isEmpty())
-	         			toBeAdded = false;
-	         		else
-		        		 for(Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
-		          			for (String schema: schemas)
-		          			    if(classificationSchema.containsKey(schema)) {
-		          				    for (String classification: classifications) {
-		          				    	if (classificationSchema.get(schema) != null) {
-		          				    		if (!classificationSchema.get(schema).isEmpty()) {
-		          				    	        if (!classificationSchema.get(schema).contains(classification)) {
-		          				    	        	toBeAdded = false;
-		          				    	        } else tempClassifications.add(classification);
-		          				    		} else toBeAdded = false;
-		          				         } else toBeAdded = false;
-		          				    }
-		          			    } else toBeAdded = false;
-
-		          			}
-	       		 if(toBeAdded)
-	       			 tempSet.add(ontologyDocument);
-                 else if (tempClassifications.containsAll(classifications))
-                     tempSet.add(ontologyDocument);
-	     		}
-
+                    if(ontologyDocument.getConfig().getClassifications() != null)
+                        if (!ontologyDocument.getConfig().getClassifications().isEmpty()) {
+                            for (Map<String, Collection<String>> classificationSchema : ontologyDocument.getConfig().getClassifications()) {
+                                for (String schema : schemas)
+                                    if (classificationSchema.containsKey(schema)) {
+                                        for (String classification : classifications) {
+                                            if (classificationSchema.get(schema) != null) {
+                                                if (!classificationSchema.get(schema).isEmpty()) {
+                                                    if (classificationSchema.get(schema).contains(classification)) {
+                                                        tempClassifications.add(classification);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                            }
+                            if (tempClassifications.containsAll(classifications))
+                                tempSet.add(ontologyDocument);
+                        }
+                }
 	        }
-
     	return tempSet;
     }
 

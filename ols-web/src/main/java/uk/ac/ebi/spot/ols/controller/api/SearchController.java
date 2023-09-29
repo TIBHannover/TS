@@ -523,7 +523,7 @@ public class SearchController {
             ontologies.remove("");
         if((schemas == null || schemas.size() == 0 ) && (classifications == null || classifications.size() == 0 ) && (ontologies == null || ontologies.size() == 0))
             return null;
-        if ((schemas == null || schemas.size() == 0 ) && (classifications == null || classifications.size() == 0 ))
+        if ((schemas == null || schemas.size() == 0 ) || (classifications == null || classifications.size() == 0 ))
             return ontologies;
         Set<OntologyDocument> documents = ontologyRepositoryService.filter(schemas, classifications, exclusiveFilter);
         Set<String> filteredOntologySet = new HashSet<String>();
@@ -533,8 +533,9 @@ public class SearchController {
         System.out.println("filteredOntologySet: "+filteredOntologySet);
         if (( ontologies == null || ontologies.size() == 0) && filteredOntologySet.size() > 0)
             return filteredOntologySet;
-        else if ((ontologies == null || ontologies.size() == 0) && (schemas.size() > 0 || classifications.size() > 0 ))
-            return new HashSet<String>(Arrays.asList("nosuchontologyfound"));
+        else if (schemas != null)
+                 if ((ontologies == null || ontologies.size() == 0) && (schemas.size() > 0 || classifications.size() > 0 ))
+                     return new HashSet<String>(Arrays.asList("nosuchontologyfound"));
 
         Set<String> postFilterOntologySet;
 
