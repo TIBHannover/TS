@@ -203,6 +203,83 @@ public class DataPreparationController {
         return new ResponseEntity<>(everything, HttpStatus.OK);
     }
     
+    
+    @ApiOperation(value = "Retrieves the set of all annotation keys of terms, properties and individuals for the ontology and classification selection in JSON format.", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively. If no ontology, schema and classification is specified, everything is retrieved without any filter.")
+    @RequestMapping(path = "/getannotationkeys", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<Set<String>> getAnnotationKeySetByOntology(
+            @RequestParam(value = "ontology_id", required = false) Collection<String> ontologies,
+    		@RequestParam(value = "schema", required = false) Collection<String> schemas,
+    		@RequestParam(value = "classification", required = false) Collection<String> classifications,
+    		@ApiParam(value = "Set to true (default setting is false) for intersection (default behavior is union) of classifications.")
+    		@RequestParam(value = "exclusive", required = false, defaultValue = "false") boolean exclusive,
+            @ApiParam(value = "Page Size", required = true)
+            @RequestParam(value = "page_size", required = false, defaultValue = "20") Integer pageSize) {
+    	
+    	Pageable pageable = new PageRequest(0, pageSize);
+    	Set<String> annotationKeys = new HashSet<String>();
+    	Set<OntologyDocument> tempSet;
+    	if (ontologies == null && schemas == null && classifications == null) {
+    		tempSet = new HashSet<OntologyDocument>(ontologyRepositoryService.getAllDocuments());
+    	} else {
+        	tempSet = ontologyRepositoryService.filter(schemas, classifications, exclusive);
+
+        	if (ontologies != null)
+        	if(ontologies.size()>=1)
+        		for (String ontology : ontologies)
+        	{
+        		ontology = ontology.toLowerCase();
+        		tempSet.add(ontologyRepositoryService.get(ontology));
+        	}	
+    	}	
+    	
+	   	 for (OntologyDocument document : tempSet ) {
+	   		 System.out.println("starting ontology: "+document.getOntologyId());
+	         Page<Property> properties = ontologyPropertyGraphService.findAllByOntology(document.getOntologyId(), pageable);
+	         
+	 		for (Property property : properties.getContent()) {
+	 			annotationKeys.addAll(property.getAnnotation().keySet());
+	 		}
+	     	
+	     	while(properties.hasNext()) {
+	     		properties = ontologyPropertyGraphService.findAllByOntology(document.getOntologyId(), pageable);
+	     		
+	     		for (Property property : properties.getContent()) {
+	     			annotationKeys.addAll(property.getAnnotation().keySet());
+	     		}
+	
+	     	}
+	     	System.out.println("properties of "+document.getOntologyId()+" finished!");
+	         Page<Term> terms = ontologyTermGraphService.findAllByOntology(document.getOntologyId(), pageable);
+	         
+	 		for (Term term : terms.getContent()) {
+	 			annotationKeys.addAll(term.getAnnotation().keySet());
+	 		}
+	     	
+	     	while(terms.hasNext()) {
+	     		terms = ontologyTermGraphService.findAllByOntology(document.getOntologyId(), pageable);
+	     		for (Term term : terms.getContent()) {
+	     			annotationKeys.addAll(term.getAnnotation().keySet());
+	     		}
+	     	}
+	     	System.out.println("terms of "+document.getOntologyId()+" finished!");
+	         Page<Individual> individuals = ontologyIndividualService.findAllByOntology(document.getOntologyId(), pageable);  
+	         
+	 		for (Individual individual : individuals.getContent()) {
+	 			annotationKeys.addAll(individual.getAnnotation().keySet());
+	 		}
+	     	
+	     	while(individuals.hasNext()) {
+	     		individuals = ontologyIndividualService.findAllByOntology(document.getOntologyId(), pageable);
+	     		for (Individual individual : individuals.getContent()) {
+	     			annotationKeys.addAll(individual.getAnnotation().keySet());
+	     		}
+	     	}
+	     	System.out.println("individuals  of "+document.getOntologyId()+" finished!");
+	   	 }
+
+        return new ResponseEntity<>(annotationKeys, HttpStatus.OK);
+    }
+    
     @ApiOperation(value = "Retrieves definitions of all terms, properties and individuals as subsequent sentences of a corpus.", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively. If no ontology, schema and classification is specified, everything is retrieved without any filter.")
     @RequestMapping(path = "/displaysentences", produces = {MediaType.TEXT_PLAIN_VALUE}, method = RequestMethod.GET)
     public HttpEntity<String> getSentences(            
