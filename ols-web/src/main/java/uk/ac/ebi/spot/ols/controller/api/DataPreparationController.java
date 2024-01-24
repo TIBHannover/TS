@@ -253,8 +253,14 @@ public class DataPreparationController {
 		 			    sb.append(description).append("\n");
 	 			if(property.getAnnotation() != null)
 	 				for (String annotation : annotations)
-	 					if(property.getAnnotation().containsKey(annotation))
-	 						sb.append(property.getAnnotation().get(annotation)).append("\n");
+	 					if(property.getAnnotation().containsKey(annotation)) {
+	 						if (property.getAnnotation().get(annotation) instanceof String[]) {
+	 							for (String annotationItem : (String[])property.getAnnotation().get(annotation))
+	 								sb.append(annotationItem).append("\n");
+	 								
+	 						} else if (property.getAnnotation().get(annotation) instanceof String)
+	 							sb.append(property.getAnnotation().get(annotation)).append("\n");
+	 					}		
 	 		}
 	     	
 	     	while(properties.hasNext()) {
@@ -266,8 +272,14 @@ public class DataPreparationController {
 			 			    sb.append(description).append("\n");
 	     			if(property.getAnnotation() != null)
 		 				for (String annotation : annotations)
-		 					if(property.getAnnotation().containsKey(annotation))
-		 						sb.append(property.getAnnotation().get(annotation)).append("\n");
+		 					if(property.getAnnotation().containsKey(annotation)){
+		 						if (property.getAnnotation().get(annotation) instanceof String[]) {
+		 							for (String annotationItem : (String[])property.getAnnotation().get(annotation))
+		 								sb.append(annotationItem).append("\n");
+		 								
+		 						} else if (property.getAnnotation().get(annotation) instanceof String)
+		 							sb.append(property.getAnnotation().get(annotation)).append("\n");
+		 					}	
 	     		}
 	
 	     	}
@@ -280,8 +292,14 @@ public class DataPreparationController {
 		 			    sb.append(description).append("\n");
 	 			if(term.getAnnotation() != null)
 	 				for (String annotation : annotations)
-	 					if(term.getAnnotation().containsKey(annotation))
-	 						sb.append(term.getAnnotation().get(annotation)).append("\n");
+	 					if(term.getAnnotation().containsKey(annotation)){
+	 						if (term.getAnnotation().get(annotation) instanceof String[]) {
+	 							for (String annotationItem : (String[])term.getAnnotation().get(annotation))
+	 								sb.append(annotationItem).append("\n");
+	 								
+	 						} else if (term.getAnnotation().get(annotation) instanceof String)
+	 							sb.append(term.getAnnotation().get(annotation)).append("\n");
+	 					}	
 	 		}
 	     	
 	     	while(terms.hasNext()) {
@@ -292,8 +310,14 @@ public class DataPreparationController {
 			 			    sb.append(description).append("\n");
 	     			if(term.getAnnotation() != null)
 		 				for (String annotation : annotations)
-		 					if(term.getAnnotation().containsKey(annotation))
-		 						sb.append(term.getAnnotation().get(annotation)).append("\n");
+		 					if(term.getAnnotation().containsKey(annotation)){
+		 						if (term.getAnnotation().get(annotation) instanceof String[]) {
+		 							for (String annotationItem : (String[])term.getAnnotation().get(annotation))
+		 								sb.append(annotationItem).append("\n");
+		 								
+		 						} else if (term.getAnnotation().get(annotation) instanceof String)
+		 							sb.append(term.getAnnotation().get(annotation)).append("\n");
+		 					}	
 	     		}
 	     	}
 	     	System.out.println("terms of "+document.getOntologyId()+" finished!");
@@ -305,8 +329,14 @@ public class DataPreparationController {
 		 			    sb.append(description).append("\n");
 	 			if(individual.getAnnotation() != null)
 	 				for (String annotation : annotations)
-	 					if(individual.getAnnotation().containsKey(annotation))
-	 						sb.append(individual.getAnnotation().get(annotation)).append("\n");
+	 					if(individual.getAnnotation().containsKey(annotation)){
+	 						if (individual.getAnnotation().get(annotation) instanceof String[]) {
+	 							for (String annotationItem : (String[])individual.getAnnotation().get(annotation))
+	 								sb.append(annotationItem).append("\n");
+	 								
+	 						} else if (individual.getAnnotation().get(annotation) instanceof String)
+	 							sb.append(individual.getAnnotation().get(annotation)).append("\n");
+	 					}	
 	 		}
 	     	
 	     	while(individuals.hasNext()) {
@@ -317,8 +347,14 @@ public class DataPreparationController {
 			 			    sb.append(description).append("\n");
 	     			if(individual.getAnnotation() != null)
 		 				for (String annotation : annotations)
-		 					if(individual.getAnnotation().containsKey(annotation))
-		 						sb.append(individual.getAnnotation().get(annotation)).append("\n");
+		 					if(individual.getAnnotation().containsKey(annotation)){
+		 						if (individual.getAnnotation().get(annotation) instanceof String[]) {
+		 							for (String annotationItem : (String[])individual.getAnnotation().get(annotation))
+		 								sb.append(annotationItem).append("\n");
+		 								
+		 						} else if (individual.getAnnotation().get(annotation) instanceof String)
+		 							sb.append(individual.getAnnotation().get(annotation)).append("\n");
+		 					}	
 	     		}
 	     	}
 	     	System.out.println("individuals  of "+document.getOntologyId()+" finished!");
