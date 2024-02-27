@@ -15,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +24,7 @@ import uk.ac.ebi.spot.ols.controller.dto.KeyValueResultDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
 import uk.ac.ebi.spot.ols.entities.RestCallParameter;
+import uk.ac.ebi.spot.ols.entities.RestCallParameterList;
 import uk.ac.ebi.spot.ols.entities.RestCallParameterType;
 import uk.ac.ebi.spot.ols.service.RestCallService;
 import uk.ac.ebi.spot.ols.service.RestCallStatisticsService;
@@ -68,9 +70,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
-        @RequestParam(name = "parameter_name", required = false) String name,
-        @RequestParam(name = "parameter_value", required = false) String value,
-        @RequestParam(name = "parameter_type", required = false) RestCallParameterType parameterType
+        @ModelAttribute RestCallParameterList parameterList
     ) {
         RestCallRequest request = new RestCallRequest(
             url,
@@ -80,9 +80,8 @@ public class RestCallStatisticsController {
         
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
-        if(name != null && value != null && parameterType != null) {
-        	RestCallParameter p = new RestCallParameter(name,value,parameterType);
-        	parameters.add(p);
+        if(parameterList != null) {
+        	parameters.addAll(parameterList.getParameters());
         }    
 
         Page<RestCallDto> page = restCallService.getList(request, parameters, pageable);
@@ -98,9 +97,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
-        @RequestParam(name = "parameter_name", required = false) String name,
-        @RequestParam(name = "parameter_value", required = false) String value,
-        @RequestParam(name = "parameter_type", required = false) RestCallParameterType parameterType,
+        @ModelAttribute RestCallParameterList parameterList,
         Pageable pageable,
         PagedResourcesAssembler assembler
     ) {
@@ -112,10 +109,9 @@ public class RestCallStatisticsController {
         
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
-        if(name != null && value != null && parameterType != null) {
-        	RestCallParameter p = new RestCallParameter(name,value,parameterType);
-        	parameters.add(p);
-        }  
+        if(parameterList != null) {
+        	parameters.addAll(parameterList.getParameters());
+        }   
 
         Page<KeyValueResultDto> page = restCallStatisticsService.getRestCallsCountsByAddress(request, parameters, pageable);
 
@@ -130,9 +126,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
-        @RequestParam(name = "parameter_name", required = false) String name,
-        @RequestParam(name = "parameter_value", required = false) String value,
-        @RequestParam(name = "parameter_type", required = false) RestCallParameterType parameterType
+        @ModelAttribute RestCallParameterList parameterList
     ) {
         RestCallRequest request = new RestCallRequest(
             url,
@@ -143,9 +137,8 @@ public class RestCallStatisticsController {
         
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
-        if(name != null && value != null && parameterType != null) {
-        	RestCallParameter p = new RestCallParameter(name,value,parameterType);
-        	parameters.add(p);
+        if(parameterList != null) {
+        	parameters.addAll(parameterList.getParameters());
         }     
 
         KeyValueResultDto counts = restCallStatisticsService.getRestCallsTotalCount(request,parameters);
@@ -166,9 +159,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
-        @RequestParam(name = "parameter_name", required = false) String name,
-        @RequestParam(name = "parameter_value", required = false) String value,
-        @RequestParam(name = "parameter_type", required = false) RestCallParameterType parameterType,
+        @ModelAttribute RestCallParameterList parameterList,
         Pageable pageable,
         PagedResourcesAssembler assembler
     ) {
@@ -182,9 +173,8 @@ public class RestCallStatisticsController {
         
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
-        if(name != null && value != null && parameterType != null) {
-        	RestCallParameter p = new RestCallParameter(name,value,parameterType);
-        	parameters.add(p);
+        if(parameterList != null) {
+        	parameters.addAll(parameterList.getParameters());
         }  
 
         Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByParameter(request, parameters, pageable);
@@ -204,9 +194,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
-        @RequestParam(name = "parameter_name", required = false) String name,
-        @RequestParam(name = "parameter_value", required = false) String value,
-        @RequestParam(name = "parameter_type", required = false) RestCallParameterType parameterType,
+        @ModelAttribute RestCallParameterList parameterList,
         Pageable pageable,
         PagedResourcesAssembler assembler
     ) {
@@ -220,10 +208,9 @@ public class RestCallStatisticsController {
         
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
-        if(name != null && value != null && parameterType != null) {
-        	RestCallParameter p = new RestCallParameter(name,value,parameterType);
-        	parameters.add(p);
-        }  
+        if(parameterList != null) {
+        	parameters.addAll(parameterList.getParameters());
+        }   
 
         Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByDate(request, parameters, pageable);
 
