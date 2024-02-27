@@ -29,8 +29,8 @@ public class RestCallStatisticsServiceImpl implements RestCallStatisticsService 
     }
 
     @Override
-    public Page<KeyValueResultDto> getRestCallsCountsByAddress(RestCallRequest request, Pageable pageable) {
-        Page<RestCallDto> page = restCallService.getList(request, pageable);
+    public Page<KeyValueResultDto> getRestCallsCountsByAddress(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable) {
+        Page<RestCallDto> page = restCallService.getList(request, parameters, pageable);
 
         Map<String, Long> countsMap = getCountsMap(page);
 
@@ -40,18 +40,18 @@ public class RestCallStatisticsServiceImpl implements RestCallStatisticsService 
 
         return new PageImpl<>(list, pageable, list.size());
     }
-
+    
     @Override
-    public KeyValueResultDto getRestCallsTotalCount(RestCallRequest request) {
-        Long count = restCallService.count(request);
+    public KeyValueResultDto getRestCallsTotalCount(RestCallRequest request, List<RestCallParameter> parameters) {
+        Long count = restCallService.count(request, parameters);
         Long value = Optional.ofNullable(count).orElse(0L);
 
         return new KeyValueResultDto("total", value);
     }
 
     @Override
-    public Page<KeyValueResultDto> getStatisticsByParameter(RestCallRequest request, Pageable pageable) {
-        Page<RestCallDto> page = restCallService.getList(request, pageable);
+    public Page<KeyValueResultDto> getStatisticsByParameter(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable) {
+        Page<RestCallDto> page = restCallService.getList(request, parameters, pageable);
 
         Map<String, Long> parametersWithCountsMap = page.getContent().stream()
             .flatMap(restCallDto -> restCallDto.getParameters().stream())
@@ -82,8 +82,8 @@ public class RestCallStatisticsServiceImpl implements RestCallStatisticsService 
     }
 
     @Override
-    public Page<KeyValueResultDto> getStatisticsByDate(RestCallRequest request, Pageable pageable) {
-        Page<RestCallDto> page = restCallService.getList(request, pageable);
+    public Page<KeyValueResultDto> getStatisticsByDate(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable) {
+        Page<RestCallDto> page = restCallService.getList(request, parameters, pageable);
 
         LinkedHashMap<String, Long> map = page.getContent().stream()
             .collect(

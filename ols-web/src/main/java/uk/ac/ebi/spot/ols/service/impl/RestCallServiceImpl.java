@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallDto;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
 import uk.ac.ebi.spot.ols.entities.RestCall;
+import uk.ac.ebi.spot.ols.entities.RestCallParameter;
 import uk.ac.ebi.spot.ols.repositories.RestCallRepository;
 import uk.ac.ebi.spot.ols.service.RestCallService;
 
@@ -30,26 +31,25 @@ public class RestCallServiceImpl implements RestCallService {
     }
 
     @Override
-    public Page<RestCallDto> getList(RestCallRequest request, Pageable pageable) {
-        List<RestCall> list = restCallRepository.query(request, pageable);
+    public Page<RestCallDto> getList(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable) {
+        List<RestCall> list = restCallRepository.query(request, parameters, pageable);
 
         List<RestCallDto> dtos = list.stream()
             .map(RestCallDto::of)
             .collect(Collectors.toList());
 
-        Long count = restCallRepository.count(request);
+        Long count = restCallRepository.count(request, parameters);
 
         return new PageImpl<>(dtos, pageable, count);
     }
-
     @Override
     public List<RestCall> findAll() {
         return restCallRepository.findAll();
     }
-
+    
     @Override
-    public Long count(RestCallRequest request) {
+    public Long count(RestCallRequest request, List<RestCallParameter> parameters) {
 
-        return restCallRepository.count(request);
+        return restCallRepository.count(request,parameters);
     }
 }

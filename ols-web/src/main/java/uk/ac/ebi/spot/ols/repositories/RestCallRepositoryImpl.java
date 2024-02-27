@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.util.UriUtils;
 import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
 import uk.ac.ebi.spot.ols.entities.RestCall;
+import uk.ac.ebi.spot.ols.entities.RestCallParameter;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -28,14 +29,17 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
     public RestCallRepositoryImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
-
+    
     @Override
-    public List<RestCall> query(RestCallRequest request, Pageable pageable) {
+    public List<RestCall> query(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable) {
         Query query = new Query();
         List<Criteria> criteria = new ArrayList<>();
 
         addCriteriaByDates(request, criteria);
         addCriteriaByUrl(request, criteria);
+        if (parameters !=null)
+        	if (parameters.size()>0)
+		        addCriteriaByParameter(request, criteria, parameters);
 
 
         if (!criteria.isEmpty()) {
@@ -48,15 +52,18 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
 
         return mongoTemplate.find(query, RestCall.class);
     }
-
+    
     @Override
-    public Long count(RestCallRequest request) {
+    public Long count(RestCallRequest request, List<RestCallParameter> parameters) {
         Query query = new Query();
 
         List<Criteria> criteria = new ArrayList<>();
 
         addCriteriaByDates(request, criteria);
         addCriteriaByUrl(request, criteria);
+        if (parameters !=null)
+        	if (parameters.size()>0)
+		        addCriteriaByParameter(request, criteria, parameters);
 
         if (!criteria.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
@@ -80,6 +87,11 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
         if (request.getDateTimeTo() != null) {
             criteria.add(Criteria.where("createdAt").lte(request.getDateTimeTo()));
         }
+    }
+    
+    private void addCriteriaByParameter(RestCallRequest request, List<Criteria> criteria, List<RestCallParameter> parameters) {
+    	if (parameters != null)
+    		criteria.add(Criteria.where("parameters").in(parameters));
     }
 
     private String getDecodedUrl(RestCallRequest request) {
