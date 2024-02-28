@@ -69,6 +69,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
+        @RequestParam(name="intersection", required=true,defaultValue="false") boolean intersection,
         @ModelAttribute RestCallParameterList parameterList
     ) {
         RestCallRequest request = new RestCallRequest(
@@ -84,7 +85,7 @@ public class RestCallStatisticsController {
 	        	parameters.addAll(parameterList.getParameters());
         }     
 
-        Page<RestCallDto> page = restCallService.getList(request, parameters, pageable);
+        Page<RestCallDto> page = restCallService.getList(request, parameters, intersection, pageable);
 
         return new ResponseEntity<>(assembler.toResource(page, restCallAssembler), HttpStatus.OK);
     }
@@ -97,6 +98,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
+        @RequestParam(name="intersection", required=true,defaultValue="false") boolean intersection,
         @ModelAttribute RestCallParameterList parameterList,
         Pageable pageable,
         PagedResourcesAssembler assembler
@@ -114,7 +116,7 @@ public class RestCallStatisticsController {
 	        	parameters.addAll(parameterList.getParameters());
         }      
 
-        Page<KeyValueResultDto> page = restCallStatisticsService.getRestCallsCountsByAddress(request, parameters, pageable);
+        Page<KeyValueResultDto> page = restCallStatisticsService.getRestCallsCountsByAddress(request, parameters, intersection, pageable);
 
         return new ResponseEntity<>(assembler.toResource(page, keyValueResultAssembler), HttpStatus.OK);
     }
@@ -127,6 +129,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
+        @RequestParam(name="intersection", required=true,defaultValue="false") boolean intersection,
         @ModelAttribute RestCallParameterList parameterList
     ) {
         RestCallRequest request = new RestCallRequest(
@@ -143,7 +146,7 @@ public class RestCallStatisticsController {
 	        	parameters.addAll(parameterList.getParameters());
         }     
 
-        KeyValueResultDto counts = restCallStatisticsService.getRestCallsTotalCount(request,parameters);
+        KeyValueResultDto counts = restCallStatisticsService.getRestCallsTotalCount(request,parameters,intersection);
 
         return new ResponseEntity<>(counts, HttpStatus.OK);
     }
@@ -161,6 +164,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
+        @RequestParam(name="intersection", required=true,defaultValue="false") boolean intersection,
         @ModelAttribute RestCallParameterList parameterList,
         Pageable pageable,
         PagedResourcesAssembler assembler
@@ -180,7 +184,7 @@ public class RestCallStatisticsController {
 	        	parameters.addAll(parameterList.getParameters());
         }     
 
-        Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByParameter(request, parameters, pageable);
+        Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByParameter(request, parameters, intersection,pageable);
 
         return new ResponseEntity<>(assembler.toResource(page, keyValueResultAssembler), HttpStatus.OK);
     }
@@ -197,6 +201,7 @@ public class RestCallStatisticsController {
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeFrom,
         @RequestParam(name = "dateTimeTo", required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTimeTo,
+        @RequestParam(name="intersection", required=true,defaultValue="false") boolean intersection,
         @ModelAttribute RestCallParameterList parameterList,
         Pageable pageable,
         PagedResourcesAssembler assembler
@@ -216,7 +221,7 @@ public class RestCallStatisticsController {
 	        	parameters.addAll(parameterList.getParameters());
         }     
 
-        Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByDate(request, parameters, pageable);
+        Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByDate(request, parameters, intersection, pageable);
 
         return new ResponseEntity<>(assembler.toResource(page, keyValueResultAssembler), HttpStatus.OK);
     }

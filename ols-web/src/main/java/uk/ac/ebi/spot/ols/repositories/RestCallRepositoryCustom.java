@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface RestCallRepositoryCustom {
     
-    List<RestCall> query(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable);
+    List<RestCall> query(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection, Pageable pageable);
     
-    Long count(RestCallRequest request, List<RestCallParameter> parameters);
+    Long count(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection);
 }

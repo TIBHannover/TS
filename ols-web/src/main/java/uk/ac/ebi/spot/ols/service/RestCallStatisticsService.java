@@ -9,11 +9,11 @@ import uk.ac.ebi.spot.ols.controller.dto.RestCallRequest;
 import uk.ac.ebi.spot.ols.entities.RestCallParameter;
 
 public interface RestCallStatisticsService {
-    Page<KeyValueResultDto> getRestCallsCountsByAddress(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable);
+    Page<KeyValueResultDto> getRestCallsCountsByAddress(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection, Pageable pageable);
     
-    KeyValueResultDto getRestCallsTotalCount(RestCallRequest request, List<RestCallParameter> parameters);
+    KeyValueResultDto getRestCallsTotalCount(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection);
 
-    Page<KeyValueResultDto> getStatisticsByParameter(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable);
+    Page<KeyValueResultDto> getStatisticsByParameter(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection, Pageable pageable);
 
-    Page<KeyValueResultDto> getStatisticsByDate(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable);
+    Page<KeyValueResultDto> getStatisticsByDate(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection, Pageable pageable);
 }

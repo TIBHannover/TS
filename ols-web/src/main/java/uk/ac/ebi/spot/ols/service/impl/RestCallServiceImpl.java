@@ -31,14 +31,14 @@ public class RestCallServiceImpl implements RestCallService {
     }
 
     @Override
-    public Page<RestCallDto> getList(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable) {
-        List<RestCall> list = restCallRepository.query(request, parameters, pageable);
+    public Page<RestCallDto> getList(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection, Pageable pageable) {
+        List<RestCall> list = restCallRepository.query(request, parameters, intersection, pageable);
 
         List<RestCallDto> dtos = list.stream()
             .map(RestCallDto::of)
             .collect(Collectors.toList());
 
-        Long count = restCallRepository.count(request, parameters);
+        Long count = restCallRepository.count(request, parameters, intersection);
 
         return new PageImpl<>(dtos, pageable, count);
     }
@@ -48,8 +48,8 @@ public class RestCallServiceImpl implements RestCallService {
     }
     
     @Override
-    public Long count(RestCallRequest request, List<RestCallParameter> parameters) {
+    public Long count(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection) {
 
-        return restCallRepository.count(request,parameters);
+        return restCallRepository.count(request,parameters,intersection);
     }
 }

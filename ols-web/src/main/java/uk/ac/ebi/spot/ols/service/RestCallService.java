@@ -13,9 +13,9 @@ public interface RestCallService {
 
     RestCall save(RestCall entity);
     
-    Page<RestCallDto> getList(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable);
+    Page<RestCallDto> getList(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection, Pageable pageable);
 
     List<RestCall> findAll();
     
-    Long count(RestCallRequest request, List<RestCallParameter> parameters);
+    Long count(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection);
 }

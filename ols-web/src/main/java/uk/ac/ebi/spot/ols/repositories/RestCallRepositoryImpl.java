@@ -31,7 +31,7 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
     }
     
     @Override
-    public List<RestCall> query(RestCallRequest request, List<RestCallParameter> parameters, Pageable pageable) {
+    public List<RestCall> query(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection, Pageable pageable) {
         Query query = new Query();
         List<Criteria> criteria = new ArrayList<>();
 
@@ -39,7 +39,7 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
         addCriteriaByUrl(request, criteria);
         if (parameters !=null)
         	if (parameters.size()>0)
-		        addCriteriaByParameter(request, criteria, parameters);
+		        addCriteriaByParameter(request, criteria, parameters, intersection);
 
 
         if (!criteria.isEmpty()) {
@@ -54,7 +54,7 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
     }
     
     @Override
-    public Long count(RestCallRequest request, List<RestCallParameter> parameters) {
+    public Long count(RestCallRequest request, List<RestCallParameter> parameters, boolean intersection) {
         Query query = new Query();
 
         List<Criteria> criteria = new ArrayList<>();
@@ -63,7 +63,7 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
         addCriteriaByUrl(request, criteria);
         if (parameters !=null)
         	if (parameters.size()>0)
-		        addCriteriaByParameter(request, criteria, parameters);
+		        addCriteriaByParameter(request, criteria, parameters, intersection);
 
         if (!criteria.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
@@ -89,9 +89,14 @@ public class RestCallRepositoryImpl implements RestCallRepositoryCustom {
         }
     }
     
-    private void addCriteriaByParameter(RestCallRequest request, List<Criteria> criteria, List<RestCallParameter> parameters) {
-    	if (parameters != null)
-    		criteria.add(Criteria.where("parameters").in(parameters));
+    private void addCriteriaByParameter(RestCallRequest request, List<Criteria> criteria, List<RestCallParameter> parameters, boolean intersection) {
+    	if (parameters != null) {
+    		if (intersection)
+    			criteria.add(Criteria.where("parameters").all(parameters));
+    		else
+    			criteria.add(Criteria.where("parameters").in(parameters));
+    	}
+    		
     }
 
     private String getDecodedUrl(RestCallRequest request) {
