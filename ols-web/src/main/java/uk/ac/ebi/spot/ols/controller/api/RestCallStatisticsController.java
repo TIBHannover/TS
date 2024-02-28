@@ -31,7 +31,6 @@ import uk.ac.ebi.spot.ols.service.RestCallStatisticsService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,8 +80,9 @@ public class RestCallStatisticsController {
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
         if(parameterList != null) {
-        	parameters.addAll(parameterList.getParameters());
-        }    
+        	if(parameterList.getParameters() != null)
+	        	parameters.addAll(parameterList.getParameters());
+        }     
 
         Page<RestCallDto> page = restCallService.getList(request, parameters, pageable);
 
@@ -110,8 +110,9 @@ public class RestCallStatisticsController {
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
         if(parameterList != null) {
-        	parameters.addAll(parameterList.getParameters());
-        }   
+        	if(parameterList.getParameters() != null)
+	        	parameters.addAll(parameterList.getParameters());
+        }      
 
         Page<KeyValueResultDto> page = restCallStatisticsService.getRestCallsCountsByAddress(request, parameters, pageable);
 
@@ -138,7 +139,8 @@ public class RestCallStatisticsController {
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
         if(parameterList != null) {
-        	parameters.addAll(parameterList.getParameters());
+        	if(parameterList.getParameters() != null)
+	        	parameters.addAll(parameterList.getParameters());
         }     
 
         KeyValueResultDto counts = restCallStatisticsService.getRestCallsTotalCount(request,parameters);
@@ -174,8 +176,9 @@ public class RestCallStatisticsController {
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
         if(parameterList != null) {
-        	parameters.addAll(parameterList.getParameters());
-        }  
+        	if(parameterList.getParameters() != null)
+	        	parameters.addAll(parameterList.getParameters());
+        }     
 
         Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByParameter(request, parameters, pageable);
 
@@ -209,8 +212,9 @@ public class RestCallStatisticsController {
         List<RestCallParameter> parameters = new ArrayList<RestCallParameter>();
         
         if(parameterList != null) {
-        	parameters.addAll(parameterList.getParameters());
-        }   
+        	if(parameterList.getParameters() != null)
+	        	parameters.addAll(parameterList.getParameters());
+        }     
 
         Page<KeyValueResultDto> page = restCallStatisticsService.getStatisticsByDate(request, parameters, pageable);
 
