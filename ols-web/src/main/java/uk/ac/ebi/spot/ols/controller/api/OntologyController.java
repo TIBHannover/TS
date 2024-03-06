@@ -195,8 +195,6 @@ public class OntologyController implements
     		keys.addAll(schemas);
     	}
     	
-    	schemas = keys;
-    	
     	for (String key : keys) {
     		Set<String> values = new HashSet<String>();
 
