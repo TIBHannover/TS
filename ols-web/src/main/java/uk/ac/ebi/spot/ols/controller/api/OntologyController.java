@@ -181,16 +181,36 @@ public class OntologyController implements
     HttpEntity<MultiKeyMap> getStatisticsBySchema(
     		@RequestParam(value = "schema", required = false) Collection<String> schemas
     ) throws ResourceNotFoundException {
-
     	MultiKeyMap summaries = new MultiKeyMap();
+    	Collection<String> keys = new HashSet<String>();
+    	if(schemas == null) {
+    		
+            try {
+            	for (OntologyDocument document : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+    				document.getConfig().getClassifications().forEach(x -> keys.addAll(x.keySet()));
+    			}
+            } catch (Exception e) {
+            }
+    	} else {
+    		keys.addAll(schemas);
+    	}
+    	
+    	schemas = keys;
+    	
+    	for (String key : keys) {
+    		Set<String> values = new HashSet<String>();
 
-        try {
-        	for (OntologyDocument document : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (schemas == null || (schemas.contains(k) && v != null &&!v.isEmpty()))
-					v.forEach(y -> summaries.put(k,y, ontologyRepositoryService.getClassificationMetadata(Collections.singleton(k),Collections.singleton(y), false)));} ));
-			}
-        } catch (Exception e) {
-        }
+            try {
+            	for (OntologyDocument document : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+    				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (key.equals(k)) if (v != null) if (!v.isEmpty()) values.addAll(v);} ));
+    			}
+            } catch (Exception e) {
+            }
+            
+            for (String value : values) {
+            	summaries.put(key,value, ontologyRepositoryService.getClassificationMetadata(Collections.singleton(key),Collections.singleton(value), false));
+            }    
+    	}
 
        return new ResponseEntity<>( summaries, HttpStatus.OK);
     }
