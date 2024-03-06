@@ -1,5 +1,6 @@
 package uk.ac.ebi.spot.ols.controller.api;
 
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,13 @@ import uk.ac.ebi.spot.ols.model.SummaryInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -169,6 +174,27 @@ public class OntologyController implements
     ) throws ResourceNotFoundException {
        return new ResponseEntity<>( ontologyRepositoryService.getClassificationMetadata(schemas,classifications, exclusive), HttpStatus.OK);
     }
+    
+    
+    @ApiOperation(value = "Get Schema based Statistics", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively.")
+    @RequestMapping(path = "/getstatisticsbyschema", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
+    HttpEntity<MultiKeyMap> getStatisticsBySchema(
+    		@RequestParam(value = "schema", required = false) Collection<String> schemas
+    ) throws ResourceNotFoundException {
+    	
+    	MultiKeyMap summaries = new MultiKeyMap();
+
+        try {
+        	for (OntologyDocument document : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
+				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (schemas == null || (schemas.contains(k) && v != null &&!v.isEmpty())) 
+					v.forEach(y -> summaries.put(k,y, ontologyRepositoryService.getClassificationMetadata(Collections.singleton(k),Collections.singleton(y), false)));} ));
+			}
+        } catch (Exception e) {
+        }
+  	
+       return new ResponseEntity<>( summaries, HttpStatus.OK);
+    }
+    
 
     @ApiOperation(value = "Get Whole System Statistics", notes = "Components in all ontologies are taken into consideration")
     @RequestMapping(path = "/getstatistics", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
