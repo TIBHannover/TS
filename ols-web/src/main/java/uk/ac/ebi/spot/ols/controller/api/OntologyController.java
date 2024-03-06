@@ -174,27 +174,27 @@ public class OntologyController implements
     ) throws ResourceNotFoundException {
        return new ResponseEntity<>( ontologyRepositoryService.getClassificationMetadata(schemas,classifications, exclusive), HttpStatus.OK);
     }
-    
-    
-    @ApiOperation(value = "Get Schema based Statistics", notes = "Possible schema keys and possible classification values of particular keys can be inquired with /api/ontologies/schemakeys and /api/ontologies/schemavalues methods respectively.")
+
+
+    @ApiOperation(value = "Get Schema based Statistics", notes = "All schemas with their respective classifications can be computed if a schema is not specified")
     @RequestMapping(path = "/getstatisticsbyschema", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
     HttpEntity<MultiKeyMap> getStatisticsBySchema(
     		@RequestParam(value = "schema", required = false) Collection<String> schemas
     ) throws ResourceNotFoundException {
-    	
+
     	MultiKeyMap summaries = new MultiKeyMap();
 
         try {
         	for (OntologyDocument document : ontologyRepositoryService.getAllDocuments(new Sort(new Sort.Order(Sort.Direction.ASC, "ontologyId")))) {
-				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (schemas == null || (schemas.contains(k) && v != null &&!v.isEmpty())) 
+				document.getConfig().getClassifications().forEach(x -> x.forEach((k, v) -> {if (schemas == null || (schemas.contains(k) && v != null &&!v.isEmpty()))
 					v.forEach(y -> summaries.put(k,y, ontologyRepositoryService.getClassificationMetadata(Collections.singleton(k),Collections.singleton(y), false)));} ));
 			}
         } catch (Exception e) {
         }
-  	
+
        return new ResponseEntity<>( summaries, HttpStatus.OK);
     }
-    
+
 
     @ApiOperation(value = "Get Whole System Statistics", notes = "Components in all ontologies are taken into consideration")
     @RequestMapping(path = "/getstatistics", produces = {MediaType.APPLICATION_JSON_VALUE, MediaTypes.HAL_JSON_VALUE}, method = RequestMethod.GET)
