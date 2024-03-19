@@ -4,7 +4,9 @@ import org.apache.commons.collections.map.MultiKeyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.propertyeditors.CustomCollectionEditor;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,17 +35,19 @@ import uk.ac.ebi.spot.ols.entities.RepoFilterEnum;
 import uk.ac.ebi.spot.ols.model.OntologyDocument;
 import uk.ac.ebi.spot.ols.service.OntologyRepositoryService;
 import uk.ac.ebi.spot.ols.service.RepoMetadataService;
+import uk.ac.ebi.spot.ols.util.OLSEnv;
 import uk.ac.ebi.spot.ols.model.SummaryInfo;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -73,6 +77,10 @@ public class OntologyController implements
     @Autowired DocumentAssembler documentAssembler;
 
     @Autowired TermAssembler termAssembler;
+    
+    // Reading these from application.properties
+    @Value("${ols.downloads.folder:}")
+    private String downloadsFolder;
 
     @InitBinder()
     public void initBinder(WebDataBinder binder) throws Exception
@@ -273,7 +281,44 @@ public class OntologyController implements
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
     @ExceptionHandler(ResourceNotFoundException.class)
     public void handleError(HttpServletRequest req, Exception exception) {
+    }    @RequestMapping(path = "/{onto}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE, method = RequestMethod.GET)
+    public @ResponseBody  FileSystemResource getDownloadOntology(@PathVariable("onto") String ontologyId, HttpServletResponse response) throws ResourceNotFoundException {
+
+        ontologyId = ontologyId.toLowerCase();
+
+        OntologyDocument document = ontologyRepositoryService.get(ontologyId);
+
+        if (document == null) {
+            throw new ResourceNotFoundException("Ontology called " + ontologyId + " not found");
+        }
+
+        if(document.getConfig().getAllowDownload() == false) {
+            throw new ResourceNotFoundException("This ontology is not available for download");
+        }
+
+        try {
+            response.setHeader( "Content-Disposition", "filename=" + ontologyId + ".owl" );
+            return new FileSystemResource(getDownloadFile(ontologyId));
+        } catch (FileNotFoundException e) {
+            throw new ResourceNotFoundException("This ontology is not available for download");
+        }
     }
 
+
+    private File getDownloadFile (String ontologyId) throws FileNotFoundException {
+        File file = new File (getDownloadsFolder(), ontologyId.toLowerCase());
+        if (!file.exists()) {
+            throw new FileNotFoundException();
+        }
+        return file;
+    }
+
+
+    private String getDownloadsFolder ( ) {
+        if (downloadsFolder.equals("")) {
+            return OLSEnv.getOLSHome() + File.separator + "downloads";
+        }
+        return downloadsFolder;
+    }
 
 }
