@@ -22,12 +22,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.kohsuke.github.GHContent;
-import org.kohsuke.github.GHRelease;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHTag;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -65,91 +59,6 @@ public class RepoMetadataService {
         }
         return s;
     }
-
-	 public static GHContent traverse (GHContent ghc, String keyword, GHTag tag, GHRepository repo, GHRelease ghr, Set<String> downloadUrls) {
-
-		 if (ghc.isFile()) {
-					try {
-						downloadUrls.add(repo.getFileContent(ghc.getPath(), tag.getCommit().getSHA1()).getDownloadUrl());  ;
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-		 } else if (ghc.isDirectory()) {
-			 try {
-				for (GHContent ghc2 : repo.getDirectoryContent(ghc.getPath(),ghr.getTagName())) {
-					 traverse(ghc2,keyword, tag, repo, ghr, downloadUrls);
-				 }
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		 }
-
-		 return null;
-	 }
-
-	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('kohsuke').concat('-').concat(#filter).concat('-').concat(#keyword)")
-	public List<Release> releasesKohsuke(String repoUrl, String externalToken, RepoFilterEnum filter, String keyword) {
-	    String userName = "";
-	    String personalAccessToken = "";
-
-	    if(externalToken != null)
-			if (externalToken.length() >= 1)
-				personalAccessToken = externalToken;
-		if(externalToken == null || externalToken.length() < 1) {
-	        try {
-	        	// reads from src/main/resource
-				InputStream is = new ClassPathResource("/github.com.token.txt").getInputStream();
-				try {
-				    String contents = new String(FileCopyUtils.copyToByteArray(is), StandardCharsets.UTF_8);
-				    System.out.println(contents);
-				    personalAccessToken = contents.split("\n")[0];
-				    userName = contents.split("\n")[1];
-				} catch (IOException e) {
-				    e.printStackTrace();
-				} finally {
-				    if (is != null) {
-				        is.close();
-				    }
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		List<Release> releasesWithRawUrls = new ArrayList<Release>();
-		try {
-			GitHub github = new GitHubBuilder().withOAuthToken(personalAccessToken, userName).build();
-			GHRepository repo = null;
-			if(repoUrl.startsWith("https://github.com/"))
-				repo = github.getRepository(removePrefix(repoUrl,"https://github.com/"));
-			else if (repoUrl.startsWith("http://github.com/"))
-				repo = github.getRepository(removePrefix(repoUrl,"http://github.com/"));
-			if(repo != null) {
-				List<GHTag> tags = repo.listTags().asList();
-				List<GHRelease> releases = repo.getReleases();
-				for(GHRelease ghr : releases) {
-					Set<String> downloadUrls = new HashSet<String>();
-
-					for (GHTag tag : tags) {
-						if(tag.getName().equals(ghr.getTagName())) {
-							for (GHContent ghc : repo.getDirectoryContent("",ghr.getTagName())) {
-								traverse(ghc,keyword, tag, repo, ghr, downloadUrls);
-							}
-						}
-					}
-					releasesWithRawUrls.add(addRelease(ghr.getName(), ghr.getHtmlUrl().toString(), ghr.getCreatedAt().toString(),downloadUrls,  filter, keyword));
-				}
-			}
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return releasesWithRawUrls;
-	}
 
 	@Cacheable(value = "releases", key="#repoUrl.concat('-').concat('github').concat('-').concat('rest').concat('-').concat(#filter).concat('-').concat(#keyword)")
 	public List<Release> releasesGithubREST(String repoUrl, String externalToken, RepoFilterEnum filter, String keyword){
